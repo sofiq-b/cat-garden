@@ -3,9 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34408.163
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CatGarden", "CatGarden.csproj", "{4CB45CB6-F8B1-4906-932B-E078DDD51243}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CatGarden.Web", "CatGarden.Web.csproj", "{4CB45CB6-F8B1-4906-932B-E078DDD51243}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CatGarden.Common", "..\CatGarden.Common\CatGarden.Common.csproj", "{CC56E18A-3F96-4370-A7AD-1C808E874BFD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CatGarden.Common", "..\CatGarden.Common\CatGarden.Common.csproj", "{CC56E18A-3F96-4370-A7AD-1C808E874BFD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{9D2CB643-326A-46E9-9B00-EF57EAEA520C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{56275CD9-7F84-465D-892B-F0489A05812E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CatGarden.Data", "..\CatGarden.Data\CatGarden.Data.csproj", "{862BDD60-80C0-4B62-BCB5-087C0429295E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CatGarden.Data.Models", "..\CatGarden.Data.Models\CatGarden.Data.Models.csproj", "{51BC68A8-45E1-483E-92DF-1303F0837470}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,9 +29,22 @@ Global
 		{CC56E18A-3F96-4370-A7AD-1C808E874BFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CC56E18A-3F96-4370-A7AD-1C808E874BFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CC56E18A-3F96-4370-A7AD-1C808E874BFD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{862BDD60-80C0-4B62-BCB5-087C0429295E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{862BDD60-80C0-4B62-BCB5-087C0429295E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{862BDD60-80C0-4B62-BCB5-087C0429295E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{862BDD60-80C0-4B62-BCB5-087C0429295E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51BC68A8-45E1-483E-92DF-1303F0837470}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51BC68A8-45E1-483E-92DF-1303F0837470}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51BC68A8-45E1-483E-92DF-1303F0837470}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51BC68A8-45E1-483E-92DF-1303F0837470}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4CB45CB6-F8B1-4906-932B-E078DDD51243} = {9D2CB643-326A-46E9-9B00-EF57EAEA520C}
+		{862BDD60-80C0-4B62-BCB5-087C0429295E} = {56275CD9-7F84-465D-892B-F0489A05812E}
+		{51BC68A8-45E1-483E-92DF-1303F0837470} = {56275CD9-7F84-465D-892B-F0489A05812E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9B607497-0D6A-47CA-B539-15F4EDC6A659}
