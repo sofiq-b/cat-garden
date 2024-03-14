@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CatGarden.Common\CatGarden.Common.csproj" />
     <ProjectReference Include="..\CatGarden.Data\CatGarden.Data.csproj" />
+    <ProjectReference Include="..\CatGarden.Web.ViewModels\CatGarden.Web.ViewModels.csproj" />
   </ItemGroup>
 
 </Project>

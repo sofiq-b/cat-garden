@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CatGarden.Data", "..\CatGar
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CatGarden.Data.Models", "..\CatGarden.Data.Models\CatGarden.Data.Models.csproj", "{51BC68A8-45E1-483E-92DF-1303F0837470}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CatGarden.Web.ViewModels", "..\CatGarden.Web.ViewModels\CatGarden.Web.ViewModels.csproj", "{31EDABC2-1B0A-45FF-9984-C0380E2BDB4A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{51BC68A8-45E1-483E-92DF-1303F0837470}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{51BC68A8-45E1-483E-92DF-1303F0837470}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{51BC68A8-45E1-483E-92DF-1303F0837470}.Release|Any CPU.Build.0 = Release|Any CPU
+		{31EDABC2-1B0A-45FF-9984-C0380E2BDB4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31EDABC2-1B0A-45FF-9984-C0380E2BDB4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31EDABC2-1B0A-45FF-9984-C0380E2BDB4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31EDABC2-1B0A-45FF-9984-C0380E2BDB4A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -45,6 +51,7 @@ Global
 		{4CB45CB6-F8B1-4906-932B-E078DDD51243} = {9D2CB643-326A-46E9-9B00-EF57EAEA520C}
 		{862BDD60-80C0-4B62-BCB5-087C0429295E} = {56275CD9-7F84-465D-892B-F0489A05812E}
 		{51BC68A8-45E1-483E-92DF-1303F0837470} = {56275CD9-7F84-465D-892B-F0489A05812E}
+		{31EDABC2-1B0A-45FF-9984-C0380E2BDB4A} = {9D2CB643-326A-46E9-9B00-EF57EAEA520C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9B607497-0D6A-47CA-B539-15F4EDC6A659}

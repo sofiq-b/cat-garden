@@ -1,8 +1,8 @@
-﻿using CatGarden.Models;
+﻿
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
-namespace CatGarden.Controllers
+namespace CatGarden.Web.Controllers
 {
     public class HomeController : Controller
     {
