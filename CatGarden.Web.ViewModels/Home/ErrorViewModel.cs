@@ -1,4 +1,4 @@
-namespace CatGarden.Web.ViewModels
+namespace CatGarden.Web.ViewModels.Home
 {
     public class ErrorViewModel
     {

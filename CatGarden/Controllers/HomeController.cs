@@ -1,4 +1,4 @@
-﻿using CatGarden.Web.ViewModels;
+﻿using CatGarden.Web.ViewModels.Home;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 

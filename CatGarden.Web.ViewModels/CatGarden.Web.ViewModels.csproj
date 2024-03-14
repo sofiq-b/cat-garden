@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CatGarden.Common\CatGarden.Common.csproj" />
+  </ItemGroup>
+
 </Project>
