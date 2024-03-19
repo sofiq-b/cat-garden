@@ -1,0 +1,33 @@
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace CatGarden.Data.Models
+{
+    public class Cattery
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        public string OwnerId { get; set; } = string.Empty;
+
+        [Required]
+        [ForeignKey(nameof(OwnerId))]
+        public IdentityUser Owner { get; set; } = null!;
+
+        [Required]
+        public string Name { get; set; } = string.Empty;
+
+        [Required]
+        public string Location { get; set; } = string.Empty;
+
+        [Required]
+        public DateTime EstablishmentDate { get; set; }
+
+        [Required]
+        public ContactInfo ContactInformation { get; set; } = null!;
+        public IList<Cat> Cats { get; set; } = new List<Cat>();
+
+        public IList<Review> Reviews { get; set; } = new List<Review>();
+    }
+}
