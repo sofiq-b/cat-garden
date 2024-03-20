@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using static CatGarden.Common.EntityValidationConstants.Cattery;
 
 namespace CatGarden.Data.Models
 {
@@ -16,10 +17,12 @@ namespace CatGarden.Data.Models
         public IdentityUser Owner { get; set; } = null!;
 
         [Required]
+        [MaxLength(NameMaxLength)]
         public string Name { get; set; } = string.Empty;
 
         [Required]
-        public string Location { get; set; } = string.Empty;
+        [MaxLength(AddressMaxLength)]
+        public string Address { get; set; } = string.Empty;
 
         [Required]
         public DateTime EstablishmentDate { get; set; }
@@ -29,5 +32,7 @@ namespace CatGarden.Data.Models
         public IList<Cat> Cats { get; set; } = new List<Cat>();
 
         public IList<Review> Reviews { get; set; } = new List<Review>();
+
+        public IList<AdoptionApplication> AdoptionApplications { get; set; } = new List<AdoptionApplication>();
     }
 }

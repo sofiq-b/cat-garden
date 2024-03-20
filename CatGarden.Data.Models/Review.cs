@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using static CatGarden.Common.EntityValidationConstants.Review;
 
 namespace CatGarden.Data.Models
 {
@@ -16,7 +17,7 @@ namespace CatGarden.Data.Models
         public Cattery Cattery { get; set; } = null!;
 
         [Required]
-        public string UserId { get; set; }
+        public string UserId { get; set; } = string.Empty;
 
         [Required]
         [ForeignKey(nameof(UserId))]
@@ -24,9 +25,9 @@ namespace CatGarden.Data.Models
 
         [Required]
         [Range(0.0, 5.0)] 
-        public double Rating { get; set; } 
+        public double Rating { get; set; }
 
-
+        [MaxLength(CommentMaxLength)]
         public string? Comment { get; set; }
 
         [Required]

@@ -82,6 +82,12 @@ namespace CatGarden.Common
             Unspecified
         }
 
+        public enum Gender
+        {
+            Male,
+            Female,
+            Unknown 
+        }
         public enum AvailabilityStatus
         {
             Available,
