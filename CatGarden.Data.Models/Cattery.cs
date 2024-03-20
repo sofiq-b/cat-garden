@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using static CatGarden.Common.EntityValidationConstants.Cattery;
 
@@ -29,6 +30,7 @@ namespace CatGarden.Data.Models
 
         [Required]
         public ContactInfo ContactInformation { get; set; } = null!;
+
         public IList<Cat> Cats { get; set; } = new List<Cat>();
 
         public IList<Review> Reviews { get; set; } = new List<Review>();

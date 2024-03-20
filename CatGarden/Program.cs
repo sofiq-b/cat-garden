@@ -7,14 +7,14 @@ var builder = WebApplication.CreateBuilder(args);
 string connectionString = 
     builder.Configuration.GetConnectionString("DefaultConnection");
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+builder.Services.AddDbContext<CatGardenDbContext>(options =>
     options.UseSqlServer(connectionString));
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 {
     options.SignIn.RequireConfirmedAccount = true;
 })
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+    .AddEntityFrameworkStores<CatGardenDbContext>();
 
 builder.Services.AddControllersWithViews();
 

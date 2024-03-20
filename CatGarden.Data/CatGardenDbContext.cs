@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CatGarden.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class CatGardenDbContext : IdentityDbContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        public CatGardenDbContext(DbContextOptions<CatGardenDbContext> options)
             : base(options)
         {
         }

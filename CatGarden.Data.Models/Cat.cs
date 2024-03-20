@@ -19,7 +19,7 @@ namespace CatGarden.Data.Models
         public int Age { get; set; }
 
         [Required]
-        public Gender Gender { get; set; }
+        public Gender Gender { get; set; } 
 
         [Required]
         public Breed Breed { get; set; }

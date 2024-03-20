@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using static CatGarden.Common.Enums;
 
@@ -10,11 +11,11 @@ namespace CatGarden.Data.Models
         public Guid Id { get; set; }
 
         [Required]
-        public string UserId { get; set; } = string.Empty;
+        public string ApplicationUserId { get; set; } = string.Empty;
 
         [Required]
-        [ForeignKey(nameof(UserId))]
-        public IdentityUser User { get; set; } = null!;
+        [ForeignKey(nameof(ApplicationUserId))]
+        public IdentityUser ApplicationUser { get; set; } = null!;
 
         [Required]
         public int CatId { get; set; }
