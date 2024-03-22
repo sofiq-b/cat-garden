@@ -17,11 +17,11 @@ namespace CatGarden.Data.Models
         public Cattery Cattery { get; set; } = null!;
 
         [Required]
-        public string UserId { get; set; } = string.Empty;
+        public Guid UserId { get; set; } 
 
         [Required]
         [ForeignKey(nameof(UserId))]
-        public IdentityUser User { get; set; } = null!;
+        public ApplicationUser User { get; set; } = null!;
 
         [Required]
         [Range(0.0, 5.0)] 

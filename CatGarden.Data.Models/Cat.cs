@@ -25,6 +25,14 @@ namespace CatGarden.Data.Models
         public Breed Breed { get; set; }
 
         [Required]
+        [MaxLength(CoatColorMaxLength)]
+        public string CoatColor { get; set; } = string.Empty;
+
+        [Required]
+        [MaxLength(DescriptionMaxLength)]
+        public string Description { get; set; } = string.Empty;
+
+        [Required]
         public DateTime DateAdded { get; set; }
 
         [Required]
@@ -34,14 +42,15 @@ namespace CatGarden.Data.Models
         [ForeignKey(nameof(CatteryId))]
         public Cattery Cattery { get; set; } = null!;
 
-        public string Address => Cattery.Address;
-
-        [Required]
-        [MaxLength(DescriptionMaxLength)]
-        public string Description { get; set; } = string.Empty;
-
         [Required]
         public AvailabilityStatus AvailabilityStatus { get; set; }
+
+        public Guid? UserId { get; set; }
+
+        [ForeignKey(nameof(UserId))]
+        public ApplicationUser? User { get; set; }
+
+        public IList<UserFavCat> UserFavCats { get; set; } = new List<UserFavCat>();
 
     }
 }

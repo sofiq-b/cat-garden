@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CatGarden.Data.Models
 {
-    public class UserCat
+    public class UserFavCat
     {
         [Required]
         public int CatId { get; set; }
@@ -13,10 +13,10 @@ namespace CatGarden.Data.Models
         public Cat Cat { get; set; } = null!;
 
         [Required]
-        public string ApplicationUserId { get; set; } = string.Empty;
+        public Guid UserId { get; set; } 
 
         [Required]
-        [ForeignKey(nameof(ApplicationUserId))]
-        public IdentityUser ApplicationUser { get; set; } = null!;
+        [ForeignKey(nameof(UserId))]
+        public ApplicationUser User { get; set; } = null!;
     }
 }

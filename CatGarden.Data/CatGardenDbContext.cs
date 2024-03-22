@@ -1,13 +1,43 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using CatGarden.Data.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography.X509Certificates;
 
 namespace CatGarden.Data
 {
-    public class CatGardenDbContext : IdentityDbContext
+    public class CatGardenDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
     {
         public CatGardenDbContext(DbContextOptions<CatGardenDbContext> options)
             : base(options)
         {
+
+        }
+
+        public DbSet<Cat> Cats { get; set; } = null!;
+        public DbSet<Cattery> Catteries { get; set; } = null!;
+        public DbSet<AdoptionApplication> AdoptionApplications { get; set; } = null!;
+        public DbSet<Article> Articles { get; set; } = null!;
+        public DbSet<CatteryOwner> CatteryOwners { get; set; } = null!;
+        public DbSet<Review> Reviews { get; set; } = null!;
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            builder.Entity<SeminarParticipant>()
+                .HasKey(sp => new
+                {
+                    sp.SeminarId,
+                    sp.ParticipantId
+                });
+
+            builder.Entity<SeminarParticipant>()
+                .HasOne(e => e.Seminar)
+                .WithMany(e => e.SeminarsParticipants)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            =
         }
     }
 }

@@ -25,6 +25,9 @@ namespace CatGarden.Common
             public const int AgeMinLength = 0;
             public const int AgeMaxLength = 30;
 
+            public const int CoatColorMinLength = 2;
+            public const int CoatColorMaxLength = 50;
+
             public const int DescriptionMinLength = 50;
             public const int DescriptionMaxLength = 300;
         }
@@ -37,7 +40,7 @@ namespace CatGarden.Common
             public const int AddressMinLength = 20;
             public const int AddressMaxLength = 500;
         }
-        public static class ContactInfo
+        public static class CatteryOwner
         {
             public const int EmailMinLength = 5;
             public const int EmailMaxLength = 320;

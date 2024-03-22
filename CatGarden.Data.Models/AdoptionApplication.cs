@@ -11,11 +11,11 @@ namespace CatGarden.Data.Models
         public Guid Id { get; set; }
 
         [Required]
-        public string ApplicationUserId { get; set; } = string.Empty;
+        public Guid UserId { get; set; }
 
         [Required]
-        [ForeignKey(nameof(ApplicationUserId))]
-        public IdentityUser ApplicationUser { get; set; } = null!;
+        [ForeignKey(nameof(UserId))]
+        public ApplicationUser User { get; set; } = null!;
 
         [Required]
         public int CatId { get; set; }
@@ -23,6 +23,13 @@ namespace CatGarden.Data.Models
         [Required]
         [ForeignKey(nameof(CatId))]
         public Cat Cat { get; set; } = null!;
+
+        [Required]
+        public int CatteryId { get; set; }
+
+        [Required]
+        [ForeignKey(nameof(CatteryId))]
+        public Cattery Cattery { get; set; } = null!;
 
         [Required]
         public DateTime ApplicationDate { get; set; }

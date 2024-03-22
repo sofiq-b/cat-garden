@@ -11,11 +11,11 @@ namespace CatGarden.Data.Models
         public int Id { get; set; }
 
         [Required]
-        public string OwnerId { get; set; } = string.Empty;
+        public Guid OwnerId { get; set; } 
 
         [Required]
         [ForeignKey(nameof(OwnerId))]
-        public IdentityUser Owner { get; set; } = null!;
+        public CatteryOwner Owner { get; set; } = null!;
 
         [Required]
         [MaxLength(NameMaxLength)]
@@ -27,9 +27,6 @@ namespace CatGarden.Data.Models
 
         [Required]
         public DateTime EstablishmentDate { get; set; }
-
-        [Required]
-        public ContactInfo ContactInformation { get; set; } = null!;
 
         public IList<Cat> Cats { get; set; } = new List<Cat>();
 
