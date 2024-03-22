@@ -25,13 +25,6 @@ namespace CatGarden.Data.Models
         public Cat Cat { get; set; } = null!;
 
         [Required]
-        public int CatteryId { get; set; }
-
-        [Required]
-        [ForeignKey(nameof(CatteryId))]
-        public Cattery Cattery { get; set; } = null!;
-
-        [Required]
         public DateTime ApplicationDate { get; set; }
 
         [Required]

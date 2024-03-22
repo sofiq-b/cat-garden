@@ -13,6 +13,13 @@ namespace CatGarden.Data.Configurations
                 .HasOne(e => e.Cat)
                 .WithMany(e => e.UserFavCats)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder
+               .HasKey(sp => new
+               {
+                   sp.UserId,
+                   sp.CatId
+               });
         }
     }
 }

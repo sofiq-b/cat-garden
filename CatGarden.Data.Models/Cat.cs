@@ -52,5 +52,6 @@ namespace CatGarden.Data.Models
 
         public IList<UserFavCat> UserFavCats { get; set; } = new List<UserFavCat>();
 
+        public IList<AdoptionApplication> AdoptionApplications { get; set; } = new List<AdoptionApplication>();
     }
 }

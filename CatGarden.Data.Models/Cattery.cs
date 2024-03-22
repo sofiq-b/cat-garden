@@ -32,6 +32,5 @@ namespace CatGarden.Data.Models
 
         public IList<Review> Reviews { get; set; } = new List<Review>();
 
-        public IList<AdoptionApplication> AdoptionApplications { get; set; } = new List<AdoptionApplication>();
     }
 }
