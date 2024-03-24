@@ -11,6 +11,11 @@ namespace CatGarden.Data.Models
 {
     public class CatteryOwner
     {
+        public CatteryOwner()
+        {
+            this.Id = Guid.NewGuid();
+        }
+
         [Key]
         public Guid Id { get; set; }
 
@@ -20,10 +25,6 @@ namespace CatGarden.Data.Models
         [Required]
         [ForeignKey(nameof(UserId))]
         public ApplicationUser User { get; set; } = null!;
-
-        [Required]
-        [MaxLength(EmailMaxLength)]
-        public string Email { get; set; } = string.Empty;
 
         [Required]
         [MaxLength(PhoneNumberMaxLength)]

@@ -7,6 +7,11 @@ namespace CatGarden.Data.Models
 {
     public class AdoptionApplication
     {
+        public AdoptionApplication()
+        {
+            this.Id = Guid.NewGuid();
+        }
+
         [Key]
         public Guid Id { get; set; }
 

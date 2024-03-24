@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using static CatGarden.Common.EntityValidationConstants.Cattery;
+using static CatGarden.Common.Enums;
 
 namespace CatGarden.Data.Models
 {
@@ -20,6 +21,9 @@ namespace CatGarden.Data.Models
         [Required]
         [MaxLength(NameMaxLength)]
         public string Name { get; set; } = string.Empty;
+
+        [Required]
+        public City City { get; set; }
 
         [Required]
         [MaxLength(AddressMaxLength)]

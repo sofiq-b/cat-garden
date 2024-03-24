@@ -4,6 +4,7 @@ using CatGarden.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CatGarden.Data.Migrations
 {
     [DbContext(typeof(CatGardenDbContext))]
-    partial class CatGardenDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240324131924_RemovedRedundantEmailFromCatteryOwner")]
+    partial class RemovedRedundantEmailFromCatteryOwner
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
