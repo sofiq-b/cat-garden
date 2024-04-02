@@ -26,6 +26,7 @@ namespace CatGarden.Data.Configurations
             Cattery cattery;
             cattery = new Cattery()
             {
+                Id = 1,
                 OwnerId = Guid.Parse("b1bfe4d3-a412-4ffe-b066-fc04238e432b"),
                 Name = "Whisker Haven",
                 City = City.Sofia,
@@ -36,6 +37,7 @@ namespace CatGarden.Data.Configurations
 
             cattery = new Cattery()
             {
+                Id = 2,
                 OwnerId = Guid.Parse("b1bfe4d3-a412-4ffe-b066-fc04238e432b"),
                 Name = "Purrfect Paws",
                 City = City.Varna,

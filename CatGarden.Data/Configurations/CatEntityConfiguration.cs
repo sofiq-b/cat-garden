@@ -20,15 +20,17 @@ namespace CatGarden.Data.Configurations
             Cat cat;
             cat = new Cat()
             {
+                Id = 1,
                 Name = "Jimmy",
                 Age = 2,
                 Gender = Gender.Male,
                 Breed = Breed.Scottish_Fold,
-                CoatColor = "white",
+                Color = Color.White,
+                CoatLength = CoatLength.Medium,
                 Description = "White furball, a picture of serenity, absolutely loves lounging around.",
                 DateAdded = DateTime.ParseExact("16/03/2024", "dd/MM/yyyy", CultureInfo.InvariantCulture),
                 CatteryId = 1,
-                AvailabilityStatus = 0
+                AvailabilityStatus = AvailabilityStatus.Available
             };
             cats.Add(cat);
 

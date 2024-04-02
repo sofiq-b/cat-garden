@@ -25,8 +25,10 @@ namespace CatGarden.Data.Models
         public Breed Breed { get; set; }
 
         [Required]
-        [MaxLength(CoatColorMaxLength)]
-        public string CoatColor { get; set; } = string.Empty;
+        public Color Color { get; set; }
+
+        [Required]
+        public CoatLength CoatLength { get; set; }
 
         [Required]
         [MaxLength(DescriptionMaxLength)]

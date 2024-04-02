@@ -25,9 +25,6 @@ namespace CatGarden.Common
             public const int AgeMinLength = 0;
             public const int AgeMaxLength = 30;
 
-            public const int CoatColorMinLength = 2;
-            public const int CoatColorMaxLength = 50;
-
             public const int DescriptionMinLength = 50;
             public const int DescriptionMaxLength = 300;
         }
