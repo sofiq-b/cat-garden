@@ -4,6 +4,7 @@ using CatGarden.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CatGarden.Data.Migrations
 {
     [DbContext(typeof(CatGardenDbContext))]
-    partial class CatGardenDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240402220448_AllowCatDelete")]
+    partial class AllowCatDelete
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -198,38 +200,6 @@ namespace CatGarden.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Cats");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Age = 2,
-                            AvailabilityStatus = 0,
-                            Breed = 41,
-                            CatteryId = 1,
-                            CoatLength = 2,
-                            Color = 3,
-                            DateAdded = new DateTime(2024, 3, 16, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "White furball, a picture of serenity, absolutely loves lounging around.",
-                            Gender = 0,
-                            ImageUrl = "https://64.media.tumblr.com/0bb8d8042dcacb6c53387a367ad24d3f/3e6ef086694c0856-a9/s540x810/86572e34b50123496219e1eb70b2baab4cb4378e.jpg",
-                            Name = "Jimmy"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Age = 2,
-                            AvailabilityStatus = 0,
-                            Breed = 10,
-                            CatteryId = 1,
-                            CoatLength = 1,
-                            Color = 6,
-                            DateAdded = new DateTime(2024, 2, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "White furball, a picture of serenity, absolutely loves lounging around.",
-                            Gender = 0,
-                            ImageUrl = "https://64.media.tumblr.com/293f19a06c23f855e1b5148bb523ff4e/99ddb4905642cf14-8c/s2048x3072/5cb1e037fb8a57fd82178d4ffe9d3f51f3c1fe6b.jpg",
-                            Name = "Nagi"
-                        });
                 });
 
             modelBuilder.Entity("CatGarden.Data.Models.Cattery", b =>

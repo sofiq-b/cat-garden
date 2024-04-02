@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace CatGarden.Web.Controllers
 {
     [Authorize]
-    public class AdoptionApplicationController : Controller
+    public class CatteryOwnerController : Controller
     {
-        public IActionResult Index()
+        public async Task<IActionResult> Become()
         {
             return View();
         }

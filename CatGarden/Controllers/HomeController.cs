@@ -1,4 +1,5 @@
-﻿using CatGarden.Web.ViewModels.Home;
+﻿using CatGarden.Services.Data.Interfaces;
+using CatGarden.Web.ViewModels.Home;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -6,14 +7,17 @@ namespace CatGarden.Web.Controllers
 {
     public class HomeController : Controller
     {
-        public HomeController()
-        {
+        private readonly ICatService catService;
 
+        public HomeController(ICatService catService)
+        {
+            this.catService = catService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            IEnumerable<IndexViewModel> viewModel = await this.catService.LastThreeCatsAsync();
+            return View(viewModel);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

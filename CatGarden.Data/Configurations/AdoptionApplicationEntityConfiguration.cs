@@ -13,11 +13,7 @@ namespace CatGarden.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<AdoptionApplication> builder)
         {
-            builder
-                .HasOne(a => a.Cat)
-                .WithMany(a => a.AdoptionApplications)
-                .HasForeignKey(a => a.CatId)
-                .OnDelete(DeleteBehavior.Restrict);
+            
         }
     }
 }

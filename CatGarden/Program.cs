@@ -1,5 +1,8 @@
 using CatGarden.Data;
 using CatGarden.Data.Models;
+using CatGarden.Services.Data;
+using CatGarden.Services.Data.Interfaces;
+using CatGarden.Web.Infrastructure.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,6 +28,8 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
     options.Password.RequiredLength = builder.Configuration.GetValue<int>("Identity:Password:RequiredLength");
 })
     .AddEntityFrameworkStores<CatGardenDbContext>();
+
+builder.Services.AddApplicationServices(typeof(ICatService)); 
 
 builder.Services.AddControllersWithViews();
 

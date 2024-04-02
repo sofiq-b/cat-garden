@@ -38,6 +38,9 @@ namespace CatGarden.Data.Models
         public DateTime DateAdded { get; set; }
 
         [Required]
+        public string ImageUrl { get; set; } = string.Empty;
+
+        [Required]
         public int CatteryId { get; set; }
 
         [Required]
