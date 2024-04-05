@@ -2,7 +2,7 @@
 using CatGarden.Web.Infrastructure.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Runtime.CompilerServices;
+using static CatGarden.Common.NotificationMessagesConstants;
 
 namespace CatGarden.Web.Controllers
 {
@@ -24,7 +24,10 @@ namespace CatGarden.Web.Controllers
 
             if (isCatteryOwner)
             {
-                return this.BadRequest();
+                TempData[ErrorMessage] = "You are already a cattery owner!";
+
+                return this.RedirectToAction("Index", "Home");
+
             }
 
             return View();
