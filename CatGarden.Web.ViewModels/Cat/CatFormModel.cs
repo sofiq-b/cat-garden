@@ -11,8 +11,7 @@ namespace CatGarden.Web.ViewModels.Cat
     {
         [Required(ErrorMessage = CatAttributeRequired)]
         [StringLength(NameMaxLength,
-            MinimumLength = NameMinLength,
-            ErrorMessage = StringLengthErrorMessage)]
+            MinimumLength = NameMinLength)]
         public string Name { get; set; } = string.Empty;
 
         [Required(ErrorMessage = CatAttributeRequired)]
@@ -29,12 +28,12 @@ namespace CatGarden.Web.ViewModels.Cat
         public Color Color { get; set; }
 
         [Required(ErrorMessage = CatAttributeRequired)]
+        [Display(Name = "Coat Length")]
         public CoatLength CoatLength { get; set; }
 
         [Required(ErrorMessage = CatAttributeRequired)]
         [StringLength(DescriptionMaxLength,
-            MinimumLength = DescriptionMinLength,
-            ErrorMessage = StringLengthErrorMessage)]
+            MinimumLength = DescriptionMinLength)]
         public string Description { get; set; } = string.Empty;
 
         public DateTime DateAdded { get; set; } = DateTime.Now;
@@ -45,9 +44,10 @@ namespace CatGarden.Web.ViewModels.Cat
         public string ImageUrl { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Please select a cattery.")]
+        [Display(Name = "Cattery")]
         public int SelectedCatteryId { get; set; }
 
-        public List<CatteryViewForCatFormModel> Catteries { get; set; } = new List<CatteryViewForCatFormModel>();
+        public IEnumerable<CatteryViewForCatFormModel> Catteries { get; set; } = new List<CatteryViewForCatFormModel>();
 
         public AvailabilityStatus AvailabilityStatus { get; set; } = AvailabilityStatus.Available;
     }

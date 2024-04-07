@@ -46,7 +46,7 @@ namespace CatGarden.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AdoptionApplications");
+                    b.ToTable("AdoptionApplications", (string)null);
                 });
 
             modelBuilder.Entity("CatGarden.Data.Models.ApplicationUser", b =>
@@ -138,7 +138,7 @@ namespace CatGarden.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Articles");
+                    b.ToTable("Articles", (string)null);
                 });
 
             modelBuilder.Entity("CatGarden.Data.Models.Cat", b =>
@@ -197,7 +197,7 @@ namespace CatGarden.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Cats");
+                    b.ToTable("Cats", (string)null);
 
                     b.HasData(
                         new
@@ -263,7 +263,7 @@ namespace CatGarden.Data.Migrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("Catteries");
+                    b.ToTable("Catteries", (string)null);
 
                     b.HasData(
                         new
@@ -304,7 +304,7 @@ namespace CatGarden.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("CatteryOwners");
+                    b.ToTable("CatteryOwners", (string)null);
                 });
 
             modelBuilder.Entity("CatGarden.Data.Models.Review", b =>
@@ -337,7 +337,7 @@ namespace CatGarden.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Reviews");
+                    b.ToTable("Reviews", (string)null);
                 });
 
             modelBuilder.Entity("CatGarden.Data.Models.UserFavCat", b =>
@@ -352,7 +352,7 @@ namespace CatGarden.Data.Migrations
 
                     b.HasIndex("CatId");
 
-                    b.ToTable("UsersFavCats");
+                    b.ToTable("UsersFavCats", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>

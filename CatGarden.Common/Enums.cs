@@ -1,13 +1,4 @@
-﻿using static CatGarden.Common.Enums;
-using System.ComponentModel;
-using System.Drawing;
-using System.Net;
-using System.Reflection.PortableExecutable;
-using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
-using System.Text;
-using System.Xml;
-using System;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace CatGarden.Common
 {
@@ -16,47 +7,65 @@ namespace CatGarden.Common
         public enum Breed
         {
             Abyssinian,
+            [Display(Name = "American Bobtail")]
             American_Bobtail,
+            [Display(Name = "American Curl")]
             American_Curl,
+            [Display(Name = "American Shorthair")]
             American_Shorthair,
+            [Display(Name = "American Wirehair")]
             American_Wirehair,
+            [Display(Name = "American Mist")]
             Australian_Mist,
             Balinese,
             Bengal,
             Birman,
             Bombay,
+            [Display(Name = "British Shorthair")]
             British_Shorthair,
             Burmese,
             Burmilla,
             Chartreux,
             Chausie,
+            [Display(Name = "Cornish Rex")]
             Cornish_Rex,
             Cymric,
+            [Display(Name = "Devon Rex")]
             Devon_Rex,
             Donskoy,
+            [Display(Name = "Egyptian Mau")]
             Egyptian_Mau,
+            [Display(Name = "Exotic Shorthair")]
             Exotic_Shorthair,
             Havana,
             Himalayan,
+            [Display(Name = "Japanese Bobtail")]
             Japanese_Bobtail,
             Khaomanee,
             Korat,
+            [Display(Name = "Kurilian Bobtail")]
             Kurilian_Bobtail,
             LaPerm,
             Lykoi,
+            [Display(Name = "Maine Coon")]
             Maine_Coon,
             Manx,
+            [Display(Name = "Mekong Bobtail")]
             Mekong_Bobtail,
             Nebelung,
+            [Display(Name = "Norwegian Forest Cat")]
             Norwegian_Forest_Cat,
             Ocicat,
             Oriental,
             Persian,
             Peterbald,
             Ragdoll,
+            [Display(Name = "Russian Blue")]
             Russian_Blue,
             Savannah,
+            [Display(Name = "Scottish Fold")]
             Scottish_Fold,
+            [Display(Name = "Scottish Straight")]
             Scottish_Straight,
             Siamese,
             Siberian,
@@ -68,7 +77,9 @@ namespace CatGarden.Common
             Thai,
             Tonkinese,
             Toyger,
+            [Display(Name = "Turkish Angora")]
             Turkish_Angora,
+            [Display(Name = "Turkish Van")]
             Turkish_Van,
             Unspecified
         }
@@ -137,10 +148,13 @@ namespace CatGarden.Common
             Sliven,
             Smolyan,
             Sofia,
+            [Display(Name = "Sofia-grad")]
             Sofia_grad,
+            [Display(Name = "Stara Zagora")]
             Stara_Zagora,
             Targovishte,
             Varna,
+            [Display(Name = "Veliko Tarnovo")]
             Veliko_Tarnovo,
             Vidin,
             Vratsa,
