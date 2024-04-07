@@ -2,103 +2,106 @@
 @using static CatGarden.Common.Enums
 @using CatGarden.Web.Infrastructure.Extensions
 
-
 @{
     ViewData["Title"] = "Add Cat";
 }
 
-<h2>@ViewData["Title"]</h2>
+<div style="display: flex; justify-content: center; align-items: center;">
+    <div style="max-width: 600px; width: 100%;">
+        <h2 class="text-center">@ViewData["Title"]</h2>
 
-<form asp-action="Add" method="post">
-    <div class="form-group">
-        <label asp-for="Name"></label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
+        <form asp-action="Add" method="post">
+            <div class="form-group">
+                <label asp-for="Name"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Age"></label>
+                <input asp-for="Age" class="form-control" />
+                <span asp-validation-for="Age" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Gender"></label>
+                <select asp-for="Gender" class="form-control">
+                    <option value="">Select Gender</option>
+                    @foreach (var gender in Enum.GetValues(typeof(Gender)))
+                    {
+                        <option value="@gender">@gender</option>
+                    }
+                </select>
+                <span asp-validation-for="Gender" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Breed"></label>
+                <select asp-for="Breed" class="form-control">
+                    <option value="">Select Breed</option>
+                    @foreach (Breed breed in Enum.GetValues(typeof(Breed)))
+                    {
+                        <option value="@breed.ToString()">@EnumExtensions.GetDisplayName(breed)</option>
+                    }
+                </select>
+                <span asp-validation-for="Breed" class="text-danger"></span>
+            </div>
+
+
+
+            <div class="form-group">
+                <label asp-for="Color"></label>
+                <select asp-for="Color" class="form-control">
+                    <option value="">Select Color</option>
+                    @foreach (var color in Enum.GetValues(typeof(Color)))
+                    {
+                        <option value="@color">@color</option>
+                    }
+                </select>
+                <span asp-validation-for="Color" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="CoatLength"></label>
+                <select asp-for="CoatLength" class="form-control">
+                    <option value="">Select Coat Length</option>
+                    @foreach (var coatLength in Enum.GetValues(typeof(CoatLength)))
+                    {
+                        <option value="@coatLength">@coatLength</option>
+                    }
+                </select>
+                <span asp-validation-for="CoatLength" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Description"></label>
+                <textarea asp-for="Description" class="form-control"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ImageUrl"></label>
+                <input asp-for="ImageUrl" class="form-control" />
+                <span asp-validation-for="ImageUrl" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="SelectedCatteryId"></label>
+                <select asp-for="SelectedCatteryId" class="form-control">
+                    <option value="">Select Cattery</option>
+                    @foreach (var cattery in Model.Catteries)
+                    {
+                        <option value="@cattery.Id">@cattery.Name</option>
+                    }
+                </select>
+                <span asp-validation-for="SelectedCatteryId" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Add Cat</button>
+        </form>
     </div>
+</div>
 
-    <div class="form-group">
-        <label asp-for="Age"></label>
-        <input asp-for="Age" class="form-control" />
-        <span asp-validation-for="Age" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Gender"></label>
-        <select asp-for="Gender" class="form-control">
-            <option value="">Select Gender</option>
-            @foreach (var gender in Enum.GetValues(typeof(Gender)))
-            {
-                <option value="@gender">@gender</option>
-            }
-        </select>
-        <span asp-validation-for="Gender" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Breed"></label>
-        <select asp-for="Breed" class="form-control">
-            <option value="">Select Breed</option>
-            @foreach (Breed breed in Enum.GetValues(typeof(Breed)))
-            {
-                <option value="@breed.ToString()">@EnumExtensions.GetDisplayName(breed)</option>
-            }
-        </select>
-        <span asp-validation-for="Breed" class="text-danger"></span>
-    </div>
-
-
-
-    <div class="form-group">
-        <label asp-for="Color"></label>
-        <select asp-for="Color" class="form-control">
-            <option value="">Select Color</option>
-            @foreach (var color in Enum.GetValues(typeof(Color)))
-            {
-                <option value="@color">@color</option>
-            }
-        </select>
-        <span asp-validation-for="Color" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="CoatLength"></label>
-        <select asp-for="CoatLength" class="form-control">
-            <option value="">Select Coat Length</option>
-            @foreach (var coatLength in Enum.GetValues(typeof(CoatLength)))
-            {
-                <option value="@coatLength">@coatLength</option>
-            }
-        </select>
-        <span asp-validation-for="CoatLength" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Description"></label>
-        <textarea asp-for="Description" class="form-control"></textarea>
-        <span asp-validation-for="Description" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="ImageUrl"></label>
-        <input asp-for="ImageUrl" class="form-control" />
-        <span asp-validation-for="ImageUrl" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="SelectedCatteryId"></label>
-        <select asp-for="SelectedCatteryId" class="form-control">
-            <option value="">Select Cattery</option>
-            @foreach (var cattery in Model.Catteries)
-            {
-                <option value="@cattery.Id">@cattery.Name</option>
-            }
-        </select>
-        <span asp-validation-for="SelectedCatteryId" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Add Cat</button>
-</form>
-
-        @section Scripts {
+@section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
