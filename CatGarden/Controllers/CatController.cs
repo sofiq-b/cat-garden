@@ -49,7 +49,7 @@ namespace CatGarden.Web.Controllers
             // If the cattery owner doesn't have any catteries, display an error message or redirect them
             if (!ownedCatteries.Any())
             {
-                TempData[ErrorMessage] = "You must create a cattery before adding cats!";
+                TempData[ErrorMessage] = "You must register a cattery before adding cats!";
                 return RedirectToAction("Add", "Cattery"); 
             }
 
