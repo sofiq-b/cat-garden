@@ -10,6 +10,6 @@ namespace CatGarden.Web.ViewModels.CatteryOwner
             MinimumLength = PhoneNumberMinLength)]
         [Phone]
         [Display(Name = "Phone")]
-        public string PhoneNumber { get; set; }
+        public string PhoneNumber { get; set; } = string.Empty;
     }
 }
