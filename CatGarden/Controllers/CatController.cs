@@ -1,4 +1,5 @@
 ﻿using CatGarden.Services.Data.Interfaces;
+using CatGarden.ViewModels.Cat;
 using CatGarden.Web.Infrastructure.Extensions;
 using CatGarden.Web.ViewModels.Cat;
 using CatGarden.Web.ViewModels.Cattery;
@@ -123,6 +124,33 @@ namespace CatGarden.Web.Controllers
                 return View(formModel);
             }
         }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> Details(int id)
+        {
+            bool catExists = await catService
+                .ExistsByIdAsync(id);
+            if (!catExists)
+            {
+                TempData[ErrorMessage] = "Cat with the provided id does not exist!";
+
+                return RedirectToAction("All", "Cat");
+            }
+
+            try
+            {
+                CatDetailsViewModel viewModel = await catService
+                    .GetDetailsByIdAsync(id);
+                return View(viewModel);
+            }
+            catch (Exception)
+            {
+                return GeneralError();
+            }
+        }
+
+
 
 
         private IActionResult GeneralError()

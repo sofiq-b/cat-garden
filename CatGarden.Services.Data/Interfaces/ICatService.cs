@@ -1,4 +1,6 @@
-﻿using CatGarden.Web.ViewModels.Cat;
+﻿
+using CatGarden.ViewModels.Cat;
+using CatGarden.Web.ViewModels.Cat;
 using CatGarden.Web.ViewModels.Home;
 
 namespace CatGarden.Services.Data.Interfaces
@@ -8,6 +10,10 @@ namespace CatGarden.Services.Data.Interfaces
         Task<IEnumerable<IndexViewModel>> LastThreeCatsAsync();
 
         Task<int> CreateAndReturnIdAsync(CatFormModel formModel);
+
+        Task<bool> ExistsByIdAsync(int catId);
+
+        Task<CatDetailsViewModel> GetDetailsByIdAsync(int catId);
 
     }
 }

@@ -1,6 +1,7 @@
 ﻿using CatGarden.Data;
 using CatGarden.Data.Models;
 using CatGarden.Services.Data.Interfaces;
+using CatGarden.ViewModels.Cat;
 using CatGarden.Web.ViewModels.Cat;
 using CatGarden.Web.ViewModels.Home;
 using Microsoft.EntityFrameworkCore;
@@ -61,6 +62,41 @@ namespace CatGarden.Services.Data
 
             return newCat.Id;
 
+        }
+
+        public async Task<bool> ExistsByIdAsync(int catId)
+        {
+            bool result = await dbContext
+                .Cats
+                .AnyAsync(c => c.Id == catId);
+
+            return result;
+        }
+
+        public async Task<CatDetailsViewModel> GetDetailsByIdAsync(int catId)
+        {
+            Cat cat = await dbContext.Cats
+                .Include(c => c.Cattery)
+                .Include(c => c.Images)
+                .FirstAsync(c => c.Id == catId);
+
+            var viewModel = new CatDetailsViewModel
+            {
+                Id = cat.Id,
+                Name = cat.Name,
+                Age = cat.Age,
+                Gender = cat.Gender.ToString(),
+                Breed = cat.Breed.ToString(),  
+                CoatLength = cat.CoatLength.ToString(),
+                Color = cat.Color.ToString(), 
+                CatteryName = cat.Cattery.Name,
+                Description = cat.Description,
+                DateAdded = cat.DateAdded,
+                CoverImageUrl = cat.CoverImageUrl,
+                ImageUrls = cat.Images.Select(image => image.URL).ToList()
+            };
+
+            return viewModel;
         }
     }
 }
