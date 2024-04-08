@@ -7,7 +7,7 @@ public class ImageEntityConfiguration : IEntityTypeConfiguration<Image>
     public void Configure(EntityTypeBuilder<Image> builder)
     {
         
-        //builder.HasData(this.GenerateImages());
+        builder.HasData(this.GenerateImages());
     }
 
     private Image[] GenerateImages()
