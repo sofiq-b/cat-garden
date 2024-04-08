@@ -7,10 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CatGarden.Common\CatGarden.Common.csproj" />
     <ProjectReference Include="..\CatGarden.Data.Models\CatGarden.Data.Models.csproj" />
     <ProjectReference Include="..\CatGarden.Data\CatGarden.Data.csproj" />
     <ProjectReference Include="..\CatGarden.Web.ViewModels\CatGarden.Web.ViewModels.csproj" />
   </ItemGroup>
-
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
 </Project>

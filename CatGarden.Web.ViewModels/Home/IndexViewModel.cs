@@ -12,6 +12,6 @@ namespace CatGarden.Web.ViewModels.Home
 
         public string Name { get; set; } = null!;
 
-        public string ImageUrl { get; set; } = null!;
+        public string CoverImageUrl { get; set; } = null!;
     }
 }

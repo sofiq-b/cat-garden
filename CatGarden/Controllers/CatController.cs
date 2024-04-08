@@ -2,6 +2,7 @@
 using CatGarden.Web.Infrastructure.Extensions;
 using CatGarden.Web.ViewModels.Cat;
 using CatGarden.Web.ViewModels.Cattery;
+using CatGarden.Web.ViewModels.ImageGallery;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static CatGarden.Common.NotificationMessagesConstants;
@@ -11,13 +12,20 @@ namespace CatGarden.Web.Controllers
     [Authorize]
     public class CatController : Controller
     {
+        private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ICatteryService catteryService;
         private readonly ICatteryOwnerService catteryOwnerService;
+        private readonly ICatService catService;
+        private readonly IImageService imageService;
 
-        public CatController(ICatteryService catteryService, ICatteryOwnerService catteryOwnerService)
+
+        public CatController(ICatteryService catteryService, ICatteryOwnerService catteryOwnerService, ICatService catService, IImageService imageService, IWebHostEnvironment webHostEnvironment)
         {
             this.catteryService = catteryService;
             this.catteryOwnerService = catteryOwnerService;
+            this.catService = catService;
+            this.imageService = imageService;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         [AllowAnonymous]
@@ -67,6 +75,56 @@ namespace CatGarden.Web.Controllers
                 return GeneralError();
             }
         }
+
+        [HttpPost]
+        public async Task<IActionResult> Add(CatFormModel formModel)
+        {
+
+            if (!ModelState.IsValid)
+            {
+                formModel.Catteries = await catteryService.AllCatteriesAsync(User.GetId()!);
+
+                return View(formModel);
+            }
+           
+            if (formModel.CoverPhoto != null)
+            {
+                string folder = "cats/cover/";
+                formModel.CoverImageUrl = await imageService.UploadImage(folder, formModel.CoverPhoto);
+            }
+
+            if (formModel.ImageFiles != null)
+            {
+                string folder = "cats/gallery/";
+
+                foreach (var file in formModel.ImageFiles)
+                {
+                    var gallery = new ImageModel()
+                    {
+                        Name = file.FileName,
+                        URL = await imageService.UploadImage(folder, file)
+                    };
+                    formModel.Images.Add(gallery);
+                }
+            }
+
+            try
+            {
+                int catId = await catService.CreateAndReturnIdAsync(formModel);
+
+                TempData[SuccessMessage] = "Cat was added successfully!";
+                return RedirectToAction("Details", "Cat", new { id = catId });
+            }
+            catch (Exception)
+            {
+                ModelState.AddModelError(string.Empty, "Unexpected error occurred while trying to add your new house!Pleasetryagainlater or contact administrator!");
+                formModel.Catteries = await catteryService.AllCatteriesAsync(User.GetId()!);
+
+                return View(formModel);
+            }
+        }
+
+
         private IActionResult GeneralError()
         {
             TempData[ErrorMessage] =

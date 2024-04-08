@@ -21,6 +21,7 @@ namespace CatGarden.Data
         public DbSet<CatteryOwner> CatteryOwners { get; set; } = null!;
         public DbSet<UserFavCat> UsersFavCats { get; set; } = null!;
         public DbSet<Review> Reviews { get; set; } = null!;
+        public DbSet<Image> Images { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

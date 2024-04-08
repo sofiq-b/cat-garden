@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CatGarden.Data.Migrations
 {
     [DbContext(typeof(CatGardenDbContext))]
-    [Migration("20240402221313_ReseedCats")]
-    partial class ReseedCats
+    [Migration("20240408013406_SeedCatsForReal")]
+    partial class SeedCatsForReal
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -170,6 +170,10 @@ namespace CatGarden.Data.Migrations
                     b.Property<int>("Color")
                         .HasColumnType("int");
 
+                    b.Property<string>("CoverImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("DateAdded")
                         .HasColumnType("datetime2");
 
@@ -180,10 +184,6 @@ namespace CatGarden.Data.Migrations
 
                     b.Property<int>("Gender")
                         .HasColumnType("int");
-
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -211,10 +211,10 @@ namespace CatGarden.Data.Migrations
                             CatteryId = 1,
                             CoatLength = 2,
                             Color = 3,
+                            CoverImageUrl = "/cats/cover/jimmy_cover.jpg",
                             DateAdded = new DateTime(2024, 3, 16, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "White furball, a picture of serenity, absolutely loves lounging around.",
                             Gender = 0,
-                            ImageUrl = "https://64.media.tumblr.com/0bb8d8042dcacb6c53387a367ad24d3f/3e6ef086694c0856-a9/s540x810/86572e34b50123496219e1eb70b2baab4cb4378e.jpg",
                             Name = "Jimmy"
                         },
                         new
@@ -226,10 +226,10 @@ namespace CatGarden.Data.Migrations
                             CatteryId = 1,
                             CoatLength = 1,
                             Color = 6,
+                            CoverImageUrl = "/cats/cover/nagi_cover.jpg",
                             DateAdded = new DateTime(2024, 2, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "White furball, a picture of serenity, absolutely loves lounging around.",
+                            Description = "Playful and very energetic, knows how to do a handshake!",
                             Gender = 0,
-                            ImageUrl = "https://64.media.tumblr.com/293f19a06c23f855e1b5148bb523ff4e/99ddb4905642cf14-8c/s2048x3072/5cb1e037fb8a57fd82178d4ffe9d3f51f3c1fe6b.jpg",
                             Name = "Nagi"
                         });
                 });
@@ -307,6 +307,32 @@ namespace CatGarden.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("CatteryOwners");
+                });
+
+            modelBuilder.Entity("CatGarden.Data.Models.Image", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("CatId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("URL")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CatId");
+
+                    b.ToTable("Images");
                 });
 
             modelBuilder.Entity("CatGarden.Data.Models.Review", b =>
@@ -550,6 +576,17 @@ namespace CatGarden.Data.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("CatGarden.Data.Models.Image", b =>
+                {
+                    b.HasOne("CatGarden.Data.Models.Cat", "Cat")
+                        .WithMany("Images")
+                        .HasForeignKey("CatId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Cat");
+                });
+
             modelBuilder.Entity("CatGarden.Data.Models.Review", b =>
                 {
                     b.HasOne("CatGarden.Data.Models.Cattery", "Cattery")
@@ -647,6 +684,8 @@ namespace CatGarden.Data.Migrations
             modelBuilder.Entity("CatGarden.Data.Models.Cat", b =>
                 {
                     b.Navigation("AdoptionApplications");
+
+                    b.Navigation("Images");
 
                     b.Navigation("UserFavCats");
                 });

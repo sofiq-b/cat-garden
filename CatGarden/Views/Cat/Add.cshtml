@@ -10,7 +10,7 @@
     <div style="max-width: 600px; width: 100%;">
         <h2 class="text-center">@ViewData["Title"]</h2>
 
-        <form asp-action="Add" method="post">
+        <form asp-action="Add" method="post" enctype="multipart/form-data">
             <div class="form-group">
                 <label asp-for="Name"></label>
                 <input asp-for="Name" class="form-control" />
@@ -80,9 +80,21 @@
             </div>
 
             <div class="form-group">
-                <label asp-for="ImageUrl"></label>
-                <input asp-for="ImageUrl" class="form-control" />
-                <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                <label asp-for="CoverPhoto" class="control-label"></label>
+                <div class="custom-file">
+                    <input asp-for="CoverPhoto" class="custom-file-input" id="customFile">
+                    <label class="custom-file-label" for="customFile">Choose file</label>
+                </div>
+                <span asp-validation-for="CoverPhoto" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ImageFiles" class="control-label"></label>
+                <div class="custom-file">
+                    <input asp-for="ImageFiles" class="custom-file-input" id="customFile">
+                    <label class="custom-file-label" for="customFile">Choose file</label>
+                </div>
+                <span asp-validation-for="ImageFiles" class="text-danger"></span>
             </div>
 
             <div class="form-group">

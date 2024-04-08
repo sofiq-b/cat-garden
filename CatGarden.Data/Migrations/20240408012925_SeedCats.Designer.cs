@@ -4,6 +4,7 @@ using CatGarden.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CatGarden.Data.Migrations
 {
     [DbContext(typeof(CatGardenDbContext))]
-    partial class CatGardenDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240408012925_SeedCats")]
+    partial class SeedCats
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -198,38 +200,6 @@ namespace CatGarden.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Cats");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Age = 2,
-                            AvailabilityStatus = 0,
-                            Breed = 41,
-                            CatteryId = 1,
-                            CoatLength = 2,
-                            Color = 3,
-                            CoverImageUrl = "/cats/cover/jimmy_cover.jpg",
-                            DateAdded = new DateTime(2024, 3, 16, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "White furball, a picture of serenity, absolutely loves lounging around.",
-                            Gender = 0,
-                            Name = "Jimmy"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Age = 2,
-                            AvailabilityStatus = 0,
-                            Breed = 10,
-                            CatteryId = 1,
-                            CoatLength = 1,
-                            Color = 6,
-                            CoverImageUrl = "/cats/cover/nagi_cover.jpg",
-                            DateAdded = new DateTime(2024, 2, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Playful and very energetic, knows how to do a handshake!",
-                            Gender = 0,
-                            Name = "Nagi"
-                        });
                 });
 
             modelBuilder.Entity("CatGarden.Data.Models.Cattery", b =>

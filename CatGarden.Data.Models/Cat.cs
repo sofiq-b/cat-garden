@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using static CatGarden.Common.Enums;
 using static CatGarden.Common.EntityValidationConstants.Cat;
+using Microsoft.AspNetCore.Http;
 
 namespace CatGarden.Data.Models
 {
@@ -38,7 +39,10 @@ namespace CatGarden.Data.Models
         public DateTime DateAdded { get; set; }
 
         [Required]
-        public string ImageUrl { get; set; } = string.Empty;
+        public string CoverImageUrl { get; set; } = string.Empty;
+
+        [Required]
+        public ICollection<Image> Images { get; set; } = new List<Image>();
 
         [Required]
         public int CatteryId { get; set; }

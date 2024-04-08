@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.25" />
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.25" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.25" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.25" />
@@ -22,6 +23,10 @@
     <ProjectReference Include="..\CatGarden.Services.Data\CatGarden.Services.Data.csproj" />
     <ProjectReference Include="..\CatGarden.Web.Infrastructure\CatGarden.Web.Infrastructure.csproj" />
     <ProjectReference Include="..\CatGarden.Web.ViewModels\CatGarden.Web.ViewModels.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
 </Project>
