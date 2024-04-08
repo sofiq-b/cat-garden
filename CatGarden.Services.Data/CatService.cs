@@ -98,5 +98,10 @@ namespace CatGarden.Services.Data
 
             return viewModel;
         }
+
+        public Task<bool> IsFavoritedByUserWithIdAsync(int catId, string userId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

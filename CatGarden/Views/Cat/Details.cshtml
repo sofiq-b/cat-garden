@@ -3,6 +3,70 @@
 @using CatGarden.Web.Infrastructure.Extensions
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<style>
+    .col-md-7 img {
+        width: 400px;
+        height: 540px;
+        object-fit: cover; /* Crop the image to fit the container */
+    }
+
+    .pro-img-list {
+        text-align: right;
+    }
+
+    .pro-img-list img {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        margin-left: 10px;
+    }
+
+    .col-md-5 {
+        padding-left: 20px;
+        padding-top: 20px;
+    }
+
+    .col-md-7  {
+        width: auto;
+    }
+
+    .right-column {
+        float: right;
+        width: calc(50% - 100px); /* Adjust based on your design */
+        display: flex;
+        justify-content: flex-end;
+        flex-direction: column; /* Stack items on top of each other */
+    }
+
+    .project-info-box {
+        margin-bottom: 20px; /* Add margin between the info boxes */
+    }
+
+    .right-column .col-md-7 {
+        margin-left: auto; /* Move the col-md-7 to the right */
+    }
+
+    /* Remove flex wrap and flex shrink from div-row */
+    .row {
+        flex-wrap: nowrap !important;
+    }
+
+    .favorite-btn {
+        background-color: transparent;
+        border: none;
+        color: red;
+        font-size: 24px;
+        cursor: pointer;
+    }
+
+    .position-relative {
+        position: relative;
+    }
+
+</style>
+
+
+
 <div class="container">
     <div class="row">
         <div class="col-md-5">
@@ -14,27 +78,39 @@
             <div class="project-info-box">
                 <p><b>Age:</b> @Model.Age</p>
                 <p><b>Gender:</b> @Model.Gender</p>
-                <p><b>Breed:</b> @Model.Breed</p>
+                <p><b>Breed:</b> @EnumExtensions.GetDisplayName(Enum.Parse<Breed>(Model.Breed))</p>
                 <p><b>Color:</b> @Model.Color</p>
                 <p><b>Coat Length:</b> @Model.CoatLength</p>
             </div><!-- / project-info-box -->
         </div>
 
-        <div class="col-md-7">
-            <img src="@Model.CoverImageUrl" alt="project-image" class="rounded">
-            <div class="project-info-box">
-                <p><b>Date Added:</b> @Model.DateAdded.ToShortDateString()</p>
-                <p><b>Cattery:</b> @Model.CatteryName</p>
-            </div><!-- / project-info-box -->
-        </div>
-    </div>
+        <div class="right-column">
+            <div class="col-md-7 position-relative">
+                <!-- Container for image and heart icon -->
+                <div class="position-relative">
+                    <!-- Image -->
+                    <img src="@Model.CoverImageUrl" alt="project-image" class="rounded">
+                    <!-- Heart icon -->
+                    <button class="favorite-btn position-absolute top-0 end-0 m-2">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                </div>
+                <!-- Project info box -->
+                <div class="project-info-box">
+                    <p><b>Date Added:</b> @Model.DateAdded.ToShortDateString()</p>
+                    <p><b>Cattery:</b> @Model.CatteryName</p>
+                </div><!-- / project-info-box -->
+            </div>
 
-    <div class="pro-img-list">
-        @foreach (var imageUrl in Model.ImageUrls)
-        {
-            <a href="#">
-                <img src="@imageUrl" alt="">
-            </a>
-        }
+
+            <div class="pro-img-list">
+                @foreach (var imageUrl in Model.ImageUrls)
+                {
+                    <a href="#">
+                        <img src="@imageUrl" alt="">
+                    </a>
+                }
+            </div>
+        </div>
     </div>
 </div>

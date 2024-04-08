@@ -39,7 +39,7 @@ public class ImageEntityConfiguration : IEntityTypeConfiguration<Image>
             Id = 3,
             CatId = 2,
             Name = "nagi_image2.jpg.jpg",
-            URL = "/cats/gallery/nagi_image2.jpg.jpg"
+            URL = "/cats/gallery/nagi_image2.jpg"
         };
         images.Add(image);
 
@@ -48,7 +48,7 @@ public class ImageEntityConfiguration : IEntityTypeConfiguration<Image>
             Id = 4,
             CatId = 2,
             Name = "nagi_image3.jpg",
-            URL = "/cats/gallery/nagi_image3.jpg.jpg"
+            URL = "/cats/gallery/nagi_image3.jpg"
         };
         images.Add(image);
 

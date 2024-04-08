@@ -15,5 +15,7 @@ namespace CatGarden.Services.Data.Interfaces
 
         Task<CatDetailsViewModel> GetDetailsByIdAsync(int catId);
 
+        Task<bool> IsFavoritedByUserWithIdAsync(int catId, string userId);
+
     }
 }

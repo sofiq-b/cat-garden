@@ -54,6 +54,9 @@ namespace CatGarden.Data.Models
         [Required]
         public AvailabilityStatus AvailabilityStatus { get; set; }
 
+        [Required]
+        public int LikesCount { get; set; }
+
         public Guid? UserId { get; set; }
 
         [ForeignKey(nameof(UserId))]
