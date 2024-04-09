@@ -7,7 +7,7 @@
     .col-md-7 img {
         width: 400px;
         height: 540px;
-        object-fit: cover; /* Crop the image to fit the container */
+        object-fit: cover; 
     }
 
     .pro-img-list {
@@ -32,33 +32,38 @@
 
     .right-column {
         float: right;
-        width: calc(50% - 100px); /* Adjust based on your design */
+        width: calc(50% - 100px); 
         display: flex;
         justify-content: flex-end;
-        flex-direction: column; /* Stack items on top of each other */
+        flex-direction: column; 
     }
 
     .project-info-box {
-        margin-bottom: 20px; /* Add margin between the info boxes */
+        margin-bottom: 20px; 
     }
 
     .right-column .col-md-7 {
-        margin-left: auto; /* Move the col-md-7 to the right */
+        margin-left: auto; 
     }
 
-    /* Remove flex wrap and flex shrink from div-row */
     .row {
         flex-wrap: nowrap !important;
     }
-
-    .favorite-btn {
-        background-color: transparent;
-        border: none;
-        color: red;
-        font-size: 24px;
-        cursor: pointer;
+    .heart-icon {
+        color: lightgreen; 
+        font-size: 40px;
     }
 
+    .heart-button {
+        background-color: rgba(0, 0, 0, 0.3); 
+        border: none;
+        border-radius: 50%; 
+        width: 60px; 
+        height: 60px; 
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
     .position-relative {
         position: relative;
     }
@@ -87,13 +92,28 @@
         <div class="right-column">
             <div class="col-md-7 position-relative">
                 <!-- Container for image and heart icon -->
-                <div class="position-relative">
+                <div class=" position-relative">
                     <!-- Image -->
                     <img src="@Model.CoverImageUrl" alt="project-image" class="rounded">
                     <!-- Heart icon -->
-                    <button class="favorite-btn position-absolute top-0 end-0 m-2">
-                        <i class="fas fa-heart"></i>
-                    </button>
+                    
+                    @if (Model.isFavorite)
+                    {
+                        <form method="post" asp-controller="Cat" asp-action="RemoveFavorite" asp-route-catId="@Model.Id">
+                            <button type="submit" class="btn btn-warning heart-button position-absolute top-0 end-0 m-2">
+                                <i class="fas fa-heart heart-icon"></i>
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <form method="post" asp-controller="Cat" asp-action="AddFavorite" asp-route-catId="@Model.Id">
+                            <button type="submit" class="btn btn-warning heart-button position-absolute top-0 end-0 m-2">
+                                <i class="far fa-heart heart-icon"></i>
+                            </button>
+                        </form>
+                    }
+
                 </div>
                 <!-- Project info box -->
                 <div class="project-info-box">

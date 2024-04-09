@@ -1,4 +1,5 @@
-﻿using CatGarden.Services.Data.Interfaces;
+﻿using CatGarden.Data.Models;
+using CatGarden.Services.Data.Interfaces;
 using CatGarden.ViewModels.Cat;
 using CatGarden.Web.Infrastructure.Extensions;
 using CatGarden.Web.ViewModels.Cat;
@@ -6,6 +7,7 @@ using CatGarden.Web.ViewModels.Cattery;
 using CatGarden.Web.ViewModels.ImageGallery;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using static CatGarden.Common.NotificationMessagesConstants;
 
 namespace CatGarden.Web.Controllers
@@ -141,7 +143,7 @@ namespace CatGarden.Web.Controllers
             try
             {
                 CatDetailsViewModel viewModel = await catService
-                    .GetDetailsByIdAsync(id);
+                    .GetDetailsByIdAsync(id, User.GetId()!);
                 return View(viewModel);
             }
             catch (Exception)
@@ -150,7 +152,75 @@ namespace CatGarden.Web.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> AddFavorite(int catId)
+        {
+            bool catExists = await catService
+                .ExistsByIdAsync(catId);
+            if (!catExists)
+            {
+                TempData[ErrorMessage] = "Cat with the provided id does not exist!";
 
+                return RedirectToAction("All", "Cat");
+            }
+
+            // Get the current user's Id
+            string userId = User.GetId()!;
+
+            // Check if the cat is already in the user's favorites
+            var isFavorite = await catService.IsFavoritedByUserWithIdAsync(catId, userId);
+
+            if (!isFavorite)
+            {
+                // Add the cat to the user's favorites
+                await catService.AddCatToFavoritesAsync(catId, userId);
+
+                return RedirectToAction("Favorites", "Cat");
+
+            }
+
+            return RedirectToAction("RemoveFavorite", "Cat");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RemoveFavorite(int catId)
+        {
+            bool catExists = await catService.ExistsByIdAsync(catId);
+            if (!catExists)
+            {
+                TempData[ErrorMessage] = "Cat with the provided id does not exist!";
+                return RedirectToAction("All", "Cat");
+            }
+            string userId = User.GetId()!;
+
+            // Check if the cat is favorited by the user
+            var isFavorite = await catService.IsFavoritedByUserWithIdAsync(catId, userId);
+            if (!isFavorite)
+            {
+                TempData[ErrorMessage] = "Unauthorized to remove cat from favorites!";
+
+                return RedirectToAction("All", "Cat");
+            }
+            await catService.RemoveFavoriteAsync(catId, userId);
+            return RedirectToAction("Favorites", "Cat");
+        }
+
+
+        public async Task<IActionResult> Favorites()
+        {
+            // Get the current user's ID
+            string userId = User.GetId()!;
+
+            // Retrieve the favorite cats of the user
+            var favoriteCats = await catService.GetFavoriteCatsAsync(userId);
+
+            if (!favoriteCats.Any())
+            {
+                return View("NoCatsInFavorites");
+                
+            }
+            return View(favoriteCats);
+        }
 
 
         private IActionResult GeneralError()

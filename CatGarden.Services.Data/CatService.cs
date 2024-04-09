@@ -73,12 +73,13 @@ namespace CatGarden.Services.Data
             return result;
         }
 
-        public async Task<CatDetailsViewModel> GetDetailsByIdAsync(int catId)
+        public async Task<CatDetailsViewModel> GetDetailsByIdAsync(int catId, string userId)
         {
             Cat cat = await dbContext.Cats
                 .Include(c => c.Cattery)
                 .Include(c => c.Images)
                 .FirstAsync(c => c.Id == catId);
+
 
             var viewModel = new CatDetailsViewModel
             {
@@ -86,22 +87,96 @@ namespace CatGarden.Services.Data
                 Name = cat.Name,
                 Age = cat.Age,
                 Gender = cat.Gender.ToString(),
-                Breed = cat.Breed.ToString(),  
+                Breed = cat.Breed.ToString(),
                 CoatLength = cat.CoatLength.ToString(),
-                Color = cat.Color.ToString(), 
+                Color = cat.Color.ToString(),
                 CatteryName = cat.Cattery.Name,
                 Description = cat.Description,
                 DateAdded = cat.DateAdded,
                 CoverImageUrl = cat.CoverImageUrl,
-                ImageUrls = cat.Images.Select(image => image.URL).ToList()
+                ImageUrls = cat.Images.Select(image => image.URL).ToList(),
+                isFavorite = await IsFavoritedByUserWithIdAsync(catId, userId)
             };
 
             return viewModel;
         }
 
-        public Task<bool> IsFavoritedByUserWithIdAsync(int catId, string userId)
+        public async Task AddCatToFavoritesAsync(int catId, string userId)
         {
-            throw new NotImplementedException();
+            // Create a new entry in the UserFavCat table linking the user and the cat
+            dbContext.UsersFavCats.Add(new UserFavCat
+            {
+                CatId = catId,
+                UserId = Guid.Parse(userId)
+            });
+
+            await dbContext.SaveChangesAsync();
         }
+
+        public async Task RemoveFavoriteAsync(int catId, string userId)
+        {
+            // Find the existing favorite entry
+            var favorite = await dbContext.UsersFavCats
+                .FirstOrDefaultAsync(f => f.CatId == catId && f.UserId.ToString() == userId);
+
+            // Remove the favorite entry
+            dbContext.UsersFavCats.Remove(favorite!);
+            await dbContext.SaveChangesAsync();
+            
+        }
+
+        public async Task<CatDisplayViewModel> GetCatDisplayViewModelAsync(int catId)
+        {
+            Cat cat = await dbContext.Cats
+                .Include(c => c.Cattery)
+                .FirstAsync(c => c.Id == catId);
+
+            return new CatDisplayViewModel
+            {
+                Id = catId,
+                CoverImageUrl = cat.CoverImageUrl,
+                Name = cat.Name,
+                Breed = cat.Breed.ToString(),
+                Gender = cat.Gender.ToString(),
+                Age = cat.Age,
+                Location = cat.Cattery.City.ToString()
+            };
+        }
+
+        public async Task<IEnumerable<CatDisplayViewModel>> GetFavoriteCatsAsync(string userId)
+        {
+            // Get the IDs of cats favorited by the user
+            var favoriteCatIds = await dbContext.UsersFavCats
+                .Where(ufc => ufc.UserId.ToString() == userId)
+                .Select(ufc => ufc.CatId)
+                .ToListAsync();
+
+            // Retrieve the details of cats in the user's favorites
+            var favoriteCats = await dbContext.Cats
+                .Include(c => c.Cattery)
+                .Where(c => favoriteCatIds.Contains(c.Id)) // Filter by favorite cat IDs
+                .Select(cat => new CatDisplayViewModel
+                {
+                    Id = cat.Id,
+                    CoverImageUrl = cat.CoverImageUrl,
+                    Name = cat.Name,
+                    Breed = cat.Breed.ToString(),
+                    Gender = cat.Gender.ToString(),
+                    Age = cat.Age,
+                    IsFavorite = true,
+                    Location = cat.Cattery.City.ToString()
+                })
+                .ToListAsync();
+
+            return favoriteCats;
+        }
+
+
+        public async Task<bool> IsFavoritedByUserWithIdAsync(int catId, string userId)
+        {
+            return await dbContext.UsersFavCats
+            .AnyAsync(ufc => ufc.CatId == catId && ufc.UserId.ToString() == userId);
+        }
+    
     }
 }

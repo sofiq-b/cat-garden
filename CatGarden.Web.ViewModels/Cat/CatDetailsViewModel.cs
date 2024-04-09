@@ -14,7 +14,7 @@ namespace CatGarden.ViewModels.Cat
         public string Description { get; set; } = string.Empty;
         public DateTime DateAdded { get; set; } 
         public string CoverImageUrl { get; set; } = string.Empty;
-
+        public bool isFavorite { get; set; }
         public ICollection<string> ImageUrls { get; set; } = new List<string>();
 
     }

@@ -1,0 +1,73 @@
+﻿@model IEnumerable<CatGarden.Web.ViewModels.Cat.CatDisplayViewModel>
+@using CatGarden.Web.Infrastructure.Extensions
+@using static CatGarden.Common.Enums
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<style>
+	.heart-icon {
+		color: lightgreen;
+		font-size: 30px;
+	}
+
+	.heart-button {
+		background-color: rgba(0, 0, 0, 0.3);
+		border: none;
+		border-radius: 50%;
+		width: 50px;
+		height: 50px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+</style>
+
+
+
+@{
+    ViewBag.Title = "Favorite Cats";
+}
+
+<h2 class="text-center">@ViewBag.Title</h2>
+<hr />
+
+<div class="text-center row">
+    @foreach (var cat in Model)
+    {
+        <div class="card col-4" style="width: 20rem; position: relative; padding-top: 12px;">
+            <!-- Heart button -->
+            @if (cat.IsFavorite)
+            {
+                <form method="post" asp-controller="Cat" asp-action="RemoveFavorite" asp-route-catId="@cat.Id" class="position-absolute top-0 end-0 m-2">
+                    <button type="submit" class="btn btn-warning heart-button">
+                        <i class="fas fa-heart heart-icon"></i>
+                    </button>
+                </form>
+            }
+            else
+            {
+                <form method="post" asp-controller="Cat" asp-action="AddFavorite" asp-route-catId="@cat.Id" class="position-absolute top-0 end-0 m-2">
+                    <button type="submit" class="btn btn-warning heart-button">
+                        <i class="far fa-heart heart-icon"></i>
+                    </button>
+                </form>
+            }
+
+            <!-- Card content -->
+            <img src="@cat.CoverImageUrl" class="card-img-top" alt="Cat Image">
+            <div class="card-body">
+                <h5 class="card-title mt-1">@cat.Name</h5>
+                <h6 class="card-title mt-1">@EnumExtensions.GetDisplayName(Enum.Parse<Breed>(cat.Breed))</h6>
+                <p class="mb-0"><span class="fw-bold">Gender: </span>@cat.Gender</p>
+                <p class="mb-0"><span class="fw-bold">Age: </span>@cat.Age</p>
+                <p class="mb-0"><span class="fw-bold">City: </span>@cat.Location</p>
+            </div>
+
+            <!-- Details button -->
+            <a asp-controller="Cat" asp-action="Details" asp-route-id="@cat.Id" class="fs-6 btn btn-warning mb-3 w-100 p-3 fw-bold" style="background-color:lightgreen">Details</a>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

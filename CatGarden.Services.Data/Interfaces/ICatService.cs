@@ -13,7 +13,13 @@ namespace CatGarden.Services.Data.Interfaces
 
         Task<bool> ExistsByIdAsync(int catId);
 
-        Task<CatDetailsViewModel> GetDetailsByIdAsync(int catId);
+        Task<CatDetailsViewModel> GetDetailsByIdAsync(int catId, string userId);
+
+        Task AddCatToFavoritesAsync(int catId, string userId);
+        Task RemoveFavoriteAsync(int catId, string userId);
+        Task<CatDisplayViewModel> GetCatDisplayViewModelAsync(int catId);
+
+        Task<IEnumerable<CatDisplayViewModel>> GetFavoriteCatsAsync(string userId);
 
         Task<bool> IsFavoritedByUserWithIdAsync(int catId, string userId);
 
