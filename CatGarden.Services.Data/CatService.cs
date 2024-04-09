@@ -171,6 +171,16 @@ namespace CatGarden.Services.Data
             return favoriteCats;
         }
 
+        public async Task RemoveAllCatsFromFavoritesAsync(string userId)
+        {
+            var userFavorites = dbContext.UsersFavCats
+                .Where(ufc => ufc.UserId.ToString() == userId)
+                .ToList();
+
+            dbContext.UsersFavCats.RemoveRange(userFavorites);
+
+            await dbContext.SaveChangesAsync();
+        }
 
         public async Task<bool> IsFavoritedByUserWithIdAsync(int catId, string userId)
         {

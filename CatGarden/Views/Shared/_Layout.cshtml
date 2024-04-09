@@ -1,4 +1,10 @@
-﻿@using static CatGarden.Common.GeneralApplicationConstants;
+﻿@using CatGarden.Services.Data.Interfaces
+@using CatGarden.Web.Infrastructure.Extensions
+@using static CatGarden.Common.GeneralApplicationConstants;
+@inject ICatteryOwnerService CatteryOwnerService
+@{
+    bool isCatteryOwner = await CatteryOwnerService.CatteryOwnerExistsByUserIdAsync(User.GetId()!);
+}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -30,18 +36,35 @@
                         </li>
                         @if (this.User.Identity?.IsAuthenticated ?? false)
                         {
+                            @if (isCatteryOwner)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Cat" asp-action="Add">Add Cat</a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="AdoptionApplication" asp-action="MyApplications">Adoption Applications</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Cat" asp-action="Favorites">Favorites</a>
+                                </li>
+                            }
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Cat" asp-action="Mine">My Cats</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Cattery" asp-action="All">Catteries</a>
                             </li>
-
+                            @if (isCatteryOwner)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Cattery" asp-action="Add">Add Cattery</a>
+                                </li>
+                            }
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Cat" asp-action="Add">Add Cat</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Article" asp-action="FAQ">F.A.Q.</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Cat" asp-action="Favorites">Favorites</a>
-                            </li>
+                            
                         }
-
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>

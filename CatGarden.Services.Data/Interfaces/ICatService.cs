@@ -21,6 +21,8 @@ namespace CatGarden.Services.Data.Interfaces
 
         Task<IEnumerable<CatDisplayViewModel>> GetFavoriteCatsAsync(string userId);
 
+        Task RemoveAllCatsFromFavoritesAsync(string userId);
+
         Task<bool> IsFavoritedByUserWithIdAsync(int catId, string userId);
 
     }

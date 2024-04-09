@@ -205,6 +205,17 @@ namespace CatGarden.Web.Controllers
             return RedirectToAction("Favorites", "Cat");
         }
 
+        [HttpPost]
+        public async Task<IActionResult> ClearFavorites()
+        {
+            string userId = User.GetId()!;
+
+            // Call service method to remove all cats from favorites
+            await catService.RemoveAllCatsFromFavoritesAsync(userId);
+
+            return RedirectToAction("Favorites", "Cat");
+        }
+
 
         public async Task<IActionResult> Favorites()
         {

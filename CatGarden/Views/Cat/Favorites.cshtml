@@ -29,7 +29,9 @@
 
 <h2 class="text-center">@ViewBag.Title</h2>
 <hr />
-
+<form method="post" asp-controller="Cat" asp-action="ClearFavorites">
+    <button type="submit" class="btn btn-danger" style="background-color:darkred">Clear Favorites</button>
+</form>
 <div class="text-center row">
     @foreach (var cat in Model)
     {
