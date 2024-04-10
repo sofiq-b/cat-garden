@@ -34,6 +34,9 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Cat" asp-action="All">Cats</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Cattery" asp-action="All">Catteries</a>
+                        </li>
                         @if (this.User.Identity?.IsAuthenticated ?? false)
                         {
                             @if (isCatteryOwner)
@@ -51,9 +54,7 @@
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Cat" asp-action="Favorites">Favorites</a>
                                 </li>
                             }
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Cattery" asp-action="All">Catteries</a>
-                            </li>
+                            
                             @if (isCatteryOwner)
                             {
                                 <li class="nav-item">

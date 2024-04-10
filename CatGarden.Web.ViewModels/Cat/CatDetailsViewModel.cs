@@ -11,6 +11,7 @@ namespace CatGarden.ViewModels.Cat
         public string CoatLength { get; set; } = string.Empty;
         public string Color { get; set; } = string.Empty;
         public string CatteryName { get; set; } = string.Empty;
+        public int CatteryId { get; set; }
         public string Description { get; set; } = string.Empty;
         public DateTime DateAdded { get; set; } 
         public string CoverImageUrl { get; set; } = string.Empty;

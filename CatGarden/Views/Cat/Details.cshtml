@@ -1,6 +1,11 @@
 ﻿@model CatGarden.ViewModels.Cat.CatDetailsViewModel
 @using static CatGarden.Common.Enums
+@using CatGarden.Services.Data.Interfaces
 @using CatGarden.Web.Infrastructure.Extensions
+@inject ICatteryOwnerService CatteryOwnerService
+@{
+    bool isCatteryOwner = await CatteryOwnerService.CatteryOwnerExistsByUserIdAsync(User.GetId()!);
+}
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
 <style>
@@ -64,16 +69,17 @@
         justify-content: center;
         align-items: center;
     }
-    .position-relative {
-        position: relative;
-    }
 
+    .custom-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
 </style>
 
 
 
-<div class="container">
-    <div class="row">
+<div class="custom-container">
+    <div class="row" style="display: flex; justify-content: space-between;">
         <div class="col-md-5">
             <div class="project-info-box mt-0">
                 <h5>@Model.Name</h5>
@@ -87,6 +93,22 @@
                 <p><b>Color:</b> @Model.Color</p>
                 <p><b>Coat Length:</b> @Model.CoatLength</p>
             </div><!-- / project-info-box -->
+            
+            <!-- Button for sending application -->
+            <div>
+                @if (this.User.Identity?.IsAuthenticated ?? false)
+                {
+                    @if (!isCatteryOwner)
+                    {
+                        <a asp-controller="AdoptionApplication" asp-action="SendApplication" asp-route-id="@Model.Id" class="btn btn-success mb-2 w-100 p-3 fw-bold">Adopt</a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Cat" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning mb-2 w-100 p-3 fw-bold">Edit</a>
+                        <a asp-controller="Cat" asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger mb-2 w-100 p-3 fw-bold">Delete</a>
+                    }
+                }
+            </div>
         </div>
 
         <div class="right-column">
@@ -96,41 +118,52 @@
                     <!-- Image -->
                     <img src="@Model.CoverImageUrl" alt="project-image" class="rounded">
                     <!-- Heart icon -->
-                    
-                    @if (Model.isFavorite)
+                    <!-- Display heart icon if user is NOT a cattery owner -->
+                    @if (!isCatteryOwner && (User.Identity?.IsAuthenticated ?? false))
                     {
-                        <form method="post" asp-controller="Cat" asp-action="RemoveFavorite" asp-route-catId="@Model.Id">
-                            <button type="submit" class="btn btn-warning heart-button position-absolute top-0 end-0 m-2">
-                                <i class="fas fa-heart heart-icon"></i>
-                            </button>
-                        </form>
+                        @if (Model.isFavorite)
+                        {
+                            <form method="post" asp-controller="Cat" asp-action="RemoveFavorite" asp-route-catId="@Model.Id">
+                                <button type="submit" class="btn btn-warning heart-button position-absolute top-0 end-0 m-2">
+                                    <i class="fas fa-heart heart-icon"></i>
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form method="post" asp-controller="Cat" asp-action="AddFavorite" asp-route-catId="@Model.Id">
+                                <button type="submit" class="btn btn-warning heart-button position-absolute top-0 end-0 m-2">
+                                    <i class="far fa-heart heart-icon"></i>
+                                </button>
+                            </form>
+                        }
                     }
-                    else
-                    {
-                        <form method="post" asp-controller="Cat" asp-action="AddFavorite" asp-route-catId="@Model.Id">
-                            <button type="submit" class="btn btn-warning heart-button position-absolute top-0 end-0 m-2">
-                                <i class="far fa-heart heart-icon"></i>
-                            </button>
-                        </form>
-                    }
+
 
                 </div>
                 <!-- Project info box -->
                 <div class="project-info-box">
                     <p><b>Date Added:</b> @Model.DateAdded.ToShortDateString()</p>
-                    <p><b>Cattery:</b> @Model.CatteryName</p>
+                    <p><b>Cattery:</b> <a asp-controller="Cattery" asp-action="Details" asp-route-id="@Model.CatteryId" style="text-decoration: none; ">@Model.CatteryName</a></p>
+
+
                 </div><!-- / project-info-box -->
-            </div>
-
-
-            <div class="pro-img-list">
-                @foreach (var imageUrl in Model.ImageUrls)
-                {
-                    <a href="#">
-                        <img src="@imageUrl" alt="">
-                    </a>
-                }
             </div>
         </div>
     </div>
+
+    <!-- Move pro-img-list here -->
+    <div class="row pro-img-list" style="display: flex; justify-content: flex-end;">
+        @foreach (var imageUrl in Model.ImageUrls)
+        {
+            <div class="col-md-2">
+                <!-- Adjust the column width as needed -->
+                <a href="#">
+                    <img src="@imageUrl" alt="">
+                </a>
+            </div>
+        }
+    </div>
 </div>
+
+

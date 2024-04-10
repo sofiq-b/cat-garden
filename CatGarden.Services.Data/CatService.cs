@@ -4,7 +4,9 @@ using CatGarden.Services.Data.Interfaces;
 using CatGarden.ViewModels.Cat;
 using CatGarden.Web.ViewModels.Cat;
 using CatGarden.Web.ViewModels.Home;
+using CatGarden.Web.ViewModels.ImageGallery;
 using Microsoft.EntityFrameworkCore;
+using static CatGarden.Common.Enums;
 namespace CatGarden.Services.Data
 {
     public class CatService : ICatService
@@ -91,6 +93,7 @@ namespace CatGarden.Services.Data
                 CoatLength = cat.CoatLength.ToString(),
                 Color = cat.Color.ToString(),
                 CatteryName = cat.Cattery.Name,
+                CatteryId = cat.Cattery.Id,
                 Description = cat.Description,
                 DateAdded = cat.DateAdded,
                 CoverImageUrl = cat.CoverImageUrl,
@@ -181,6 +184,63 @@ namespace CatGarden.Services.Data
 
             await dbContext.SaveChangesAsync();
         }
+
+
+        public async Task<bool> IsCatPartOfOwnedCattery(int catId, string userId)
+        {
+            // Assuming dbContext is your DbContext instance
+            var cat = await dbContext.Cats
+                .Include(c => c.Cattery)
+                    .ThenInclude(c => c.Owner)
+                .FirstOrDefaultAsync(c => c.Id == catId);
+
+
+            // Check if the cat's cattery exists and is owned by the specified owner
+            return cat.Cattery.Owner.UserId.ToString() == userId;
+        }
+
+        public async Task<CatFormModel> GetCatForEdit(int catId, string userId)
+        {
+            // Get the cat details
+            var catDetails = await GetDetailsByIdAsync(catId, userId);
+
+            var images = new List<ImageModel>();
+            var imageData = dbContext.Images.Where(i => i.CatId == catId);
+            foreach (var image in imageData)
+            {
+                // Retrieve image data based on the URL (Assuming you have a method to fetch image data from URL)
+                
+
+                // Create ImageModel instance
+                var imageModel = new ImageModel
+                {
+                    Name = image.Name,
+                    URL = image.URL // Assuming the URL is still valid and accessible
+                };
+
+                // Add to the list of images
+                images.Add(imageModel);
+            }
+
+            // Map the CatDetailsViewModel to CatFormModel
+            var catFormModel = new CatFormModel
+            {
+                Name = catDetails.Name,
+                Age = catDetails.Age,
+                Gender = Enum.Parse<Gender>(catDetails.Gender),
+                Breed = Enum.Parse<Breed>(catDetails.Breed),
+                Color = Enum.Parse<Color>(catDetails.Color),
+                CoatLength = Enum.Parse<CoatLength>(catDetails.CoatLength),
+                Description = catDetails.Description,
+                CoverImageUrl = catDetails.CoverImageUrl,
+                SelectedCatteryId = catDetails.CatteryId,
+                Images = images
+
+            };
+
+            return catFormModel;
+        }
+
 
         public async Task<bool> IsFavoritedByUserWithIdAsync(int catId, string userId)
         {

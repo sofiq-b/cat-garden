@@ -90,37 +90,40 @@ namespace CatGarden.Web.Controllers
                 return View(formModel);
             }
            
-            if (formModel.CoverPhoto != null)
-            {
-                string folder = "cats/cover/";
-                formModel.CoverImageUrl = await imageService.UploadImage(folder, formModel.CoverPhoto);
-            }
-
-            if (formModel.ImageFiles != null)
-            {
-                string folder = "cats/gallery/";
-
-                foreach (var file in formModel.ImageFiles)
-                {
-                    var gallery = new ImageModel()
-                    {
-                        Name = file.FileName,
-                        URL = await imageService.UploadImage(folder, file)
-                    };
-                    formModel.Images.Add(gallery);
-                }
-            }
+            
 
             try
             {
                 int catId = await catService.CreateAndReturnIdAsync(formModel);
 
                 TempData[SuccessMessage] = "Cat was added successfully!";
+
+
+                if (formModel.CoverPhoto != null)
+                {
+                    string folder = "cats/cover/";
+                    formModel.CoverImageUrl = await imageService.UploadImageAsync(folder, formModel.CoverPhoto, catId);
+                }
+
+                if (formModel.ImageFiles != null)
+                {
+                    string folder = "cats/gallery/";
+
+                    foreach (var file in formModel.ImageFiles)
+                    {
+                        var gallery = new ImageModel()
+                        {
+                            Name = file.FileName,
+                            URL = await imageService.UploadImageAsync(folder, file, catId)
+                        };
+                        formModel.Images.Add(gallery);
+                    }
+                }
                 return RedirectToAction("Details", "Cat", new { id = catId });
             }
             catch (Exception)
             {
-                ModelState.AddModelError(string.Empty, "Unexpected error occurred while trying to add your new house!Pleasetryagainlater or contact administrator!");
+                ModelState.AddModelError(string.Empty, "Unexpected error occurred while trying to add your new cat! Please try again later or contact administrator!");
                 formModel.Catteries = await catteryService.AllCatteriesAsync(User.GetId()!);
 
                 return View(formModel);
@@ -167,6 +170,13 @@ namespace CatGarden.Web.Controllers
             // Get the current user's Id
             string userId = User.GetId()!;
 
+            if (await catteryOwnerService.CatteryOwnerExistsByUserIdAsync(userId))
+            {
+                TempData[ErrorMessage] = "Favorites tab is inaccessible to cattery owners.";
+
+                return RedirectToAction("All", "Cat");
+            }
+
             // Check if the cat is already in the user's favorites
             var isFavorite = await catService.IsFavoritedByUserWithIdAsync(catId, userId);
 
@@ -193,6 +203,12 @@ namespace CatGarden.Web.Controllers
             }
             string userId = User.GetId()!;
 
+            if (await catteryOwnerService.CatteryOwnerExistsByUserIdAsync(userId))
+            {
+                TempData[ErrorMessage] = "Favorites tab is inaccessible to cattery owners.";
+
+                return RedirectToAction("All", "Cat");
+            }
             // Check if the cat is favorited by the user
             var isFavorite = await catService.IsFavoritedByUserWithIdAsync(catId, userId);
             if (!isFavorite)
@@ -210,6 +226,12 @@ namespace CatGarden.Web.Controllers
         {
             string userId = User.GetId()!;
 
+            if (await catteryOwnerService.CatteryOwnerExistsByUserIdAsync(userId))
+            {
+                TempData[ErrorMessage] = "Favorites tab is inaccessible to cattery owners.";
+
+                return RedirectToAction("All", "Cat");
+            }
             // Call service method to remove all cats from favorites
             await catService.RemoveAllCatsFromFavoritesAsync(userId);
 
@@ -222,6 +244,12 @@ namespace CatGarden.Web.Controllers
             // Get the current user's ID
             string userId = User.GetId()!;
 
+            if (await catteryOwnerService.CatteryOwnerExistsByUserIdAsync(userId))
+            {
+                TempData[ErrorMessage] = "Favorites tab is inaccessible to cattery owners.";
+
+                return RedirectToAction("All", "Cat");
+            }
             // Retrieve the favorite cats of the user
             var favoriteCats = await catService.GetFavoriteCatsAsync(userId);
 
@@ -232,6 +260,43 @@ namespace CatGarden.Web.Controllers
             }
             return View(favoriteCats);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            string userId = User.GetId()!;
+            // Retrieve the cat details by ID
+            var catDetails = await catService.GetCatForEdit(id, userId);
+
+            // Check if the cat exists
+            if (catDetails == null)
+            {
+                return BadRequest(); // or return NotFound() if you prefer
+            }
+
+            // Check if the current user has permission to edit the cat
+            if (!await catService.IsCatPartOfOwnedCattery(id, userId))
+            {
+                return Unauthorized();
+            }
+            IEnumerable<CatteryViewForCatFormModel> ownedCatteries = await catteryService.AllCatteriesAsync(userId);
+            // Populate the view model with the cat details
+            var model = new CatFormModel()
+            {
+                Name = catDetails.Name,
+                Age = catDetails.Age,
+                Gender = catDetails.Gender,
+                Breed = catDetails.Breed,
+                Color = catDetails.Color,
+                CoatLength = catDetails.CoatLength,
+                Description = catDetails.Description,
+                SelectedCatteryId = catDetails.SelectedCatteryId,
+                Catteries = ownedCatteries // Assuming Catteries property is populated in GetCatForEdit method
+            };
+
+            return View(model);
+        }
+
 
 
         private IActionResult GeneralError()

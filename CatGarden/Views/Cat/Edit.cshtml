@@ -1,0 +1,136 @@
+﻿@model CatGarden.Web.ViewModels.Cat.CatFormModel
+@using static CatGarden.Common.Enums
+@using CatGarden.Web.Infrastructure.Extensions
+
+@{
+    ViewData["Title"] = "Edit Cat";
+}
+
+<div style="display: flex; justify-content: center; align-items: center;">
+    <div style="max-width: 600px; width: 100%;">
+        <h2 class="text-center">@ViewData["Title"]</h2>
+
+        <form asp-action="Edit" method="post" enctype="multipart/form-data">
+
+            <div class="form-group">
+                <label asp-for="Name"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Age"></label>
+                <input asp-for="Age" class="form-control" />
+                <span asp-validation-for="Age" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Gender"></label>
+                <select asp-for="Gender" class="form-control">
+                    <option value="">Select Gender</option>
+                    @foreach (var gender in Enum.GetValues(typeof(Gender)))
+                    {
+                        <option value="@gender">@gender</option>
+                    }
+                </select>
+                <span asp-validation-for="Gender" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Breed"></label>
+                <select asp-for="Breed" class="form-control">
+                    <option value="">Select Breed</option>
+                    @foreach (Breed breed in Enum.GetValues(typeof(Breed)))
+                    {
+                        <option value="@breed.ToString()">@EnumExtensions.GetDisplayName(breed)</option>
+                    }
+                </select>
+                <span asp-validation-for="Breed" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Color"></label>
+                <select asp-for="Color" class="form-control">
+                    <option value="">Select Color</option>
+                    @foreach (var color in Enum.GetValues(typeof(Color)))
+                    {
+                        <option value="@color">@color</option>
+                    }
+                </select>
+                <span asp-validation-for="Color" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="CoatLength"></label>
+                <select asp-for="CoatLength" class="form-control">
+                    <option value="">Select Coat Length</option>
+                    @foreach (var coatLength in Enum.GetValues(typeof(CoatLength)))
+                    {
+                        <option value="@coatLength">@coatLength</option>
+                    }
+                </select>
+                <span asp-validation-for="CoatLength" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Description"></label>
+                <textarea asp-for="Description" class="form-control"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="CoverPhoto" class="control-label"></label>
+                <div class="custom-file">
+                    <input asp-for="CoverPhoto" class="custom-file-input" id="customFile">
+                    <label class="custom-file-label" for="customFile">Edit file</label>
+                </div>
+                <span asp-validation-for="CoverPhoto" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ImageFiles" class="control-label"></label>
+                <div class="custom-file">
+                    <input asp-for="ImageFiles" class="custom-file-input" id="customFile" multiple>
+                    <label class="custom-file-label" for="customFile">Edit file</label>
+                </div>
+                <span asp-validation-for="ImageFiles" class="text-danger"></span>
+            </div>
+
+            <div class="row pro-img-list" style="display: flex; justify-content: flex-end;">
+                @if (Model.Images != null && Model.Images.Any())
+                {
+                    foreach (var image in Model.Images)
+                    {
+                        <div class="col-md-2">
+                            <img src="@image.URL" alt="">
+                            <div>
+                                <a href="#" class="btn btn-sm btn-primary">Edit</a>
+                                <a href="#" class="btn btn-sm btn-danger">Delete</a>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+
+
+
+            <div class="form-group">
+                <label asp-for="SelectedCatteryId"></label>
+                <select asp-for="SelectedCatteryId" class="form-control">
+                    <option value="">Select Cattery</option>
+                    @foreach (var cattery in Model.Catteries)
+                    {
+                        <option value="@cattery.Id">@cattery.Name</option>
+                    }
+                </select>
+                <span asp-validation-for="SelectedCatteryId" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
