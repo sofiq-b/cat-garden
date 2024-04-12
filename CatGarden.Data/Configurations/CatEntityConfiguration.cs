@@ -8,7 +8,10 @@ public class CatEntityConfiguration : IEntityTypeConfiguration<Cat>
 {
     public void Configure(EntityTypeBuilder<Cat> builder)
     {
+       
+
         builder.HasData(this.GenerateCats());
+
     }
 
     private Cat[] GenerateCats()
@@ -28,7 +31,6 @@ public class CatEntityConfiguration : IEntityTypeConfiguration<Cat>
             CoatLength = CoatLength.Medium,
             Description = "White furball, a picture of serenity, absolutely loves lounging around.",
             DateAdded = DateTime.ParseExact("16/03/2024", "dd/MM/yyyy", CultureInfo.InvariantCulture),
-            CoverImageUrl = "/cats/cover/jimmy_cover.jpg",
             CatteryId = 1,
             AvailabilityStatus = AvailabilityStatus.Available
         };
@@ -45,7 +47,6 @@ public class CatEntityConfiguration : IEntityTypeConfiguration<Cat>
             CoatLength = CoatLength.Short,
             Description = "Playful and very energetic, knows how to do a handshake!",
             DateAdded = DateTime.ParseExact("14/02/2024", "dd/MM/yyyy", CultureInfo.InvariantCulture),
-            CoverImageUrl = "/cats/cover/nagi_cover.jpg",
             CatteryId = 1,
             AvailabilityStatus = AvailabilityStatus.Available
         };

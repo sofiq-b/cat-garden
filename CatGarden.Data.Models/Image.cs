@@ -9,11 +9,17 @@ namespace CatGarden.Data.Models
         public string Name { get; set; } = string.Empty;
         public string URL { get; set; } = string.Empty;
 
-        [Required]
-        public int CatId { get; set; }
+        public bool isCover { get; set; }
+        public int? CatId { get; set; }
 
-        [Required]
         [ForeignKey(nameof(CatId))]
-        public Cat Cat { get; set; } = null!;
+        public Cat? Cat { get; set; }
+
+        
+        public int? CatteryId { get; set; }
+
+       
+        [ForeignKey(nameof(CatteryId))]
+        public Cattery? Cattery { get; set; }
     }
 }

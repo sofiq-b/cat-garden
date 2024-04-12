@@ -1,9 +1,10 @@
 ﻿using CatGarden.Services.Data.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
+using static CatGarden.Common.Enums;
 using CatGarden.Data.Models;
 using CatGarden.Data;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 
 namespace CatGarden.Services.Data
@@ -20,7 +21,7 @@ namespace CatGarden.Services.Data
             _webHostEnvironment = webHostEnvironment;
         }
 
-        public async Task<string> UploadImageAsync(string folderPath, IFormFile file, int catId)
+        public async Task<string> UploadImageAsync(string folderPath, IFormFile file, int entityId, EntityTypes entityType)
         {
             folderPath += Guid.NewGuid().ToString() + "_" + file.FileName;
 
@@ -32,9 +33,21 @@ namespace CatGarden.Services.Data
             var image = new Image
             {
                 Name = file.FileName,
-                URL = "/" + folderPath,
-                CatId = catId
+                URL = "/" + folderPath
             };
+
+            // Determine the entity type and set the corresponding foreign key
+            switch (entityType)
+            {
+                case EntityTypes.Cat:
+                    image.CatId = entityId;
+                    break;
+                case EntityTypes.Cattery:
+                    image.CatteryId = entityId;
+                    break;
+                default:
+                    throw new ArgumentException("Invalid entity type");
+            }
 
             // Add the new Image object to the context
             dbContext.Images.Add(image);
@@ -42,10 +55,11 @@ namespace CatGarden.Services.Data
             // Save changes to the database
             await dbContext.SaveChangesAsync();
 
-            return "/" + folderPath;
+            return image.URL;
         }
 
-        public async Task<string> EditImageAsync(string folderPath, int imageId, IFormFile newFile)
+
+        public async Task<string> EditImageAsync(string folderPath, int imageId, IFormFile newFile, EntityTypes entityType, int entityId)
         {
             // Retrieve the existing image entity from the database
             var existingImage = await dbContext.Images.FindAsync(imageId);
@@ -58,7 +72,7 @@ namespace CatGarden.Services.Data
             }
 
             // Upload the new image file
-            string newImagePath = await UploadImageAsync(folderPath, newFile, existingImage.CatId);
+            string newImagePath = await UploadImageAsync(folderPath, newFile, entityId, entityType);
 
             // Update the properties of the existing image entity with the new image information
             existingImage.Name = newFile.FileName;
@@ -69,6 +83,7 @@ namespace CatGarden.Services.Data
 
             return newImagePath;
         }
+
 
         public async Task DeleteImageAsync(int imageId)
         {
@@ -82,6 +97,18 @@ namespace CatGarden.Services.Data
                 File.Delete(imagePath);
             }
 
+            // Remove the image entity from the associated entity's image list
+            if (existingImage.CatId != null)
+            {
+                var cat = await dbContext.Cats.FindAsync(existingImage.CatId);
+                cat.Images.Remove(existingImage);
+            }
+            else 
+            {
+                var cattery = await dbContext.Catteries.FindAsync(existingImage.CatteryId);
+                cattery.Images.Remove(existingImage);
+            }
+
             // Remove the image entity from the context
             dbContext.Images.Remove(existingImage);
 
@@ -89,5 +116,8 @@ namespace CatGarden.Services.Data
             await dbContext.SaveChangesAsync();
         }
 
+
     }
+
 }
+

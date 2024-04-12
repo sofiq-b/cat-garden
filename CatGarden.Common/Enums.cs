@@ -4,6 +4,12 @@ namespace CatGarden.Common
 {
     public class Enums
     {
+        public enum EntityTypes
+        {
+            Cat,
+            Cattery
+        }
+
         public enum Breed
         {
             Abyssinian,

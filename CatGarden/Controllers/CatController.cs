@@ -8,6 +8,7 @@ using CatGarden.Web.ViewModels.ImageGallery;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static CatGarden.Common.Enums;
 using static CatGarden.Common.NotificationMessagesConstants;
 
 namespace CatGarden.Web.Controllers
@@ -34,8 +35,18 @@ namespace CatGarden.Web.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> All()
         {
-            return View();
+            string userId = User.GetId()!;
+
+            var allCats = await catService.GetAllCatsAsync(userId);
+
+            if (!allCats.Any())
+            {
+                return View("NoCatsFound");
+            }
+
+            return View(allCats);
         }
+
 
         [HttpGet]
         public async Task<IActionResult> Add()
@@ -102,7 +113,7 @@ namespace CatGarden.Web.Controllers
                 if (formModel.CoverPhoto != null)
                 {
                     string folder = "cats/cover/";
-                    formModel.CoverImageUrl = await imageService.UploadImageAsync(folder, formModel.CoverPhoto, catId);
+                    formModel.CoverImageUrl = await imageService.UploadImageAsync(folder, formModel.CoverPhoto, catId, EntityTypes.Cat);
                 }
 
                 if (formModel.ImageFiles != null)
@@ -114,7 +125,7 @@ namespace CatGarden.Web.Controllers
                         var gallery = new ImageModel()
                         {
                             Name = file.FileName,
-                            URL = await imageService.UploadImageAsync(folder, file, catId)
+                            URL = await imageService.UploadImageAsync(folder, file, catId, EntityTypes.Cat)
                         };
                         formModel.Images.Add(gallery);
                     }

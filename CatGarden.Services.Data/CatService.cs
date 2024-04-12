@@ -6,6 +6,7 @@ using CatGarden.Web.ViewModels.Cat;
 using CatGarden.Web.ViewModels.Home;
 using CatGarden.Web.ViewModels.ImageGallery;
 using Microsoft.EntityFrameworkCore;
+using static CatGarden.Common.EntityValidationConstants;
 using static CatGarden.Common.Enums;
 namespace CatGarden.Services.Data
 {
@@ -28,7 +29,7 @@ namespace CatGarden.Services.Data
                {
                    Id = c.Id,
                    Name = c.Name,
-                   CoverImageUrl = c.CoverImageUrl,
+                   CoverImageUrl = c.Images.FirstOrDefault(i => i.isCover)!.URL,
                })
                .ToArrayAsync();
            return lastThreeCats;
@@ -36,7 +37,7 @@ namespace CatGarden.Services.Data
 
         public async Task<int> CreateAndReturnIdAsync(CatFormModel model)
         {
-            var newCat = new Cat()
+            var newCat = new CatGarden.Data.Models.Cat()
             {
                 Name = model.Name,
                 Age = model.Age,
@@ -46,19 +47,8 @@ namespace CatGarden.Services.Data
                 CoatLength = model.CoatLength,
                 Description = model.Description,
                 DateAdded = DateTime.UtcNow,
-                CoverImageUrl = model.CoverImageUrl,
                 CatteryId = model.SelectedCatteryId
             };
-
-            foreach (var file in model.Images)
-            {
-                newCat.Images.Add(new Image()
-                {
-                    Name = file.Name,
-                    URL = file.URL
-                });
-            }
-
             await dbContext.Cats.AddAsync(newCat);
             await dbContext.SaveChangesAsync();
 
@@ -77,7 +67,7 @@ namespace CatGarden.Services.Data
 
         public async Task<CatDetailsViewModel> GetDetailsByIdAsync(int catId, string userId)
         {
-            Cat cat = await dbContext.Cats
+            CatGarden.Data.Models.Cat cat = await dbContext.Cats
                 .Include(c => c.Cattery)
                 .Include(c => c.Images)
                 .FirstAsync(c => c.Id == catId);
@@ -96,8 +86,8 @@ namespace CatGarden.Services.Data
                 CatteryId = cat.Cattery.Id,
                 Description = cat.Description,
                 DateAdded = cat.DateAdded,
-                CoverImageUrl = cat.CoverImageUrl,
-                ImageUrls = cat.Images.Select(image => image.URL).ToList(),
+                CoverImageUrl = cat.Images.FirstOrDefault(i => i.isCover)!.URL,
+                ImageUrls = cat.Images.Where(i=>i.isCover==false).Select(image => image.URL).ToList(),
                 isFavorite = await IsFavoritedByUserWithIdAsync(catId, userId)
             };
 
@@ -130,14 +120,14 @@ namespace CatGarden.Services.Data
 
         public async Task<CatDisplayViewModel> GetCatDisplayViewModelAsync(int catId)
         {
-            Cat cat = await dbContext.Cats
+            CatGarden.Data.Models.Cat cat = await dbContext.Cats
                 .Include(c => c.Cattery)
                 .FirstAsync(c => c.Id == catId);
 
             return new CatDisplayViewModel
             {
                 Id = catId,
-                CoverImageUrl = cat.CoverImageUrl,
+                CoverImageUrl = cat.Images.FirstOrDefault(i => i.isCover)!.URL,
                 Name = cat.Name,
                 Breed = cat.Breed.ToString(),
                 Gender = cat.Gender.ToString(),
@@ -161,7 +151,7 @@ namespace CatGarden.Services.Data
                 .Select(cat => new CatDisplayViewModel
                 {
                     Id = cat.Id,
-                    CoverImageUrl = cat.CoverImageUrl,
+                    CoverImageUrl = cat.Images.FirstOrDefault(i => i.isCover)!.URL,
                     Name = cat.Name,
                     Breed = cat.Breed.ToString(),
                     Gender = cat.Gender.ToString(),
@@ -239,6 +229,28 @@ namespace CatGarden.Services.Data
             };
 
             return catFormModel;
+        }
+
+        public async Task<IEnumerable<CatDisplayViewModel>> GetAllCatsAsync(string userId)
+        {
+            // Get all cats with their details
+            var allCats = await dbContext.Cats
+                .Include(c => c.Cattery)
+                .Include(c => c.Images)
+                .Select(cat => new CatDisplayViewModel
+                {
+                    Id = cat.Id,
+                    CoverImageUrl = cat.Images.FirstOrDefault(i => i.isCover)!.URL,
+                    Name = cat.Name,
+                    Breed = cat.Breed.ToString(),
+                    Gender = cat.Gender.ToString(),
+                    Age = cat.Age,
+                    IsFavorite = dbContext.UsersFavCats.Any(ufc => ufc.UserId.ToString() == userId && ufc.CatId == cat.Id),
+                    Location = cat.Cattery.City.ToString()
+                })
+                .ToListAsync();
+
+            return allCats;
         }
 
 

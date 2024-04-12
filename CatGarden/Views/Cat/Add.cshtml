@@ -88,14 +88,17 @@
                 <span asp-validation-for="CoverPhoto" class="text-danger"></span>
             </div>
 
-            <div class="form-group">
-                <label asp-for="ImageFiles" class="control-label"></label>
-                <div class="custom-file">
-                    <input asp-for="ImageFiles" class="custom-file-input" id="customFile">
-                    <label class="custom-file-label" for="customFile">Choose file</label>
+            @foreach (var image in Model.Images)
+            {
+                <div class="image-container">
+                    <img src="@image.URL" alt="@image.Name" class="image-preview">
+                    <form method="post" action="/Image/SetAsCover">
+                        <input type="hidden" name="imageId" value="@image.Id" />
+                        <button type="submit" class="btn btn-primary set-as-cover-btn">Set as Cover</button>
+                    </form>
                 </div>
-                <span asp-validation-for="ImageFiles" class="text-danger"></span>
-            </div>
+            }
+
 
             <div class="form-group">
                 <label asp-for="SelectedCatteryId"></label>
@@ -117,3 +120,77 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
+@section Scripts {
+    <script>
+        // Function to handle file input change event
+        function handleFileSelect(event) {
+            const previewContainer = document.getElementById('previewContainer');
+            previewContainer.innerHTML = ''; // Clear existing previews
+
+            const files = event.target.files; // Get the selected files
+
+            // Loop through each selected file
+            for (const file of files) {
+                if (!file.type.match('image.*')) { // Check if the file is an image
+                    continue;
+                }
+
+                const reader = new FileReader(); // Create a FileReader object
+
+                // Define callback function for when the FileReader has loaded the file
+                reader.onload = function (e) {
+                    // Create an img element for the preview
+                    const img = document.createElement('img');
+                    img.src = e.target.result; // Set the src attribute to the loaded file data
+                    img.className = 'preview-image'; // Add a class for styling
+
+                    // Append the img element to the preview container
+                    previewContainer.appendChild(img);
+                };
+
+                // Read the file as a data URL (base64 encoded string)
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Add event listener to the file input element
+        const fileInput = document.getElementById('customFile');
+        fileInput.addEventListener('change', handleFileSelect);
+
+        // Function to handle Set as Cover button click
+        function handleSetAsCover(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const form = event.target.closest('form'); // Find the parent form
+            const formData = new FormData(form); // Create a FormData object from the form
+
+            // Send a POST request to the server
+            fetch('/Image/SetAsCover', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => {
+                    // Handle response
+                    if (response.ok) {
+                        // Handle success
+                        alert('Image set as cover successfully!');
+                    } else {
+                        // Handle error
+                        alert('Failed to set image as cover.');
+                    }
+                })
+                .catch(error => {
+                    // Handle error
+                    console.error('Error:', error);
+                    alert('An error occurred.');
+                });
+        }
+
+        // Add event listener to Set as Cover buttons
+        const setAsCoverButtons = document.querySelectorAll('.set-as-cover-btn');
+        setAsCoverButtons.forEach(button => {
+            button.addEventListener('click', handleSetAsCover);
+        });
+    </script>
+}
+

@@ -38,10 +38,8 @@ namespace CatGarden.Data.Models
         [Required]
         public DateTime DateAdded { get; set; }
 
-        [Required]
-        public string CoverImageUrl { get; set; } = string.Empty;
+        //Image added after cat is created
 
-        [Required]
         public ICollection<Image> Images { get; set; } = new List<Image>();
 
         [Required]

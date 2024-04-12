@@ -97,16 +97,18 @@
             </div>
 
             <div class="row pro-img-list" style="display: flex; justify-content: flex-end;">
-                @if (Model.Images != null && Model.Images.Any())
+                @if (Model.Images.Any())
                 {
                     foreach (var image in Model.Images)
                     {
                         <div class="col-md-2">
-                            <img src="@image.URL" alt="">
-                            <div>
-                                <a href="#" class="btn btn-sm btn-primary">Edit</a>
-                                <a href="#" class="btn btn-sm btn-danger">Delete</a>
-                            </div>
+                            <a href="#">
+                                <img src="@image.URL" alt="">
+                                <div>
+                                    <a href="#" class="btn btn-sm btn-primary">Edit</a>
+                                    <a href="#" class="btn btn-sm btn-danger">Delete</a>
+                                </div>
+                            </a>
                         </div>
                     }
                 }

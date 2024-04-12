@@ -1,4 +1,5 @@
 ﻿@model CatGarden.ViewModels.Cat.CatDetailsViewModel
+
 @using static CatGarden.Common.Enums
 @using CatGarden.Services.Data.Interfaces
 @using CatGarden.Web.Infrastructure.Extensions
@@ -6,6 +7,11 @@
 @{
     bool isCatteryOwner = await CatteryOwnerService.CatteryOwnerExistsByUserIdAsync(User.GetId()!);
 }
+
+<partial name="DeleteConfirmation" />
+
+<script src="path/to/jquery.js"></script>
+<script src="path/to/bootstrap.js"></script>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
 <style>
@@ -105,7 +111,7 @@
                     else
                     {
                         <a asp-controller="Cat" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning mb-2 w-100 p-3 fw-bold">Edit</a>
-                        <a asp-controller="Cat" asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger mb-2 w-100 p-3 fw-bold">Delete</a>
+                        <button id="deleteButton" class="btn btn-danger mb-2 w-100 p-3 fw-bold" data-cat-id="@Model.Id">Delete</button>
                     }
                 }
             </div>
@@ -166,4 +172,17 @@
     </div>
 </div>
 
+<script>
+    $(document).ready(function () {
+        $('#deleteButton').click(function () {
+            $('#deleteConfirmationModal').modal('show');
+        });
 
+        $('#deleteConfirmationModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var catId = $('#deleteButton').data('cat-id');
+            var form = $('#deleteForm');
+            form.attr('action', '/Cat/Delete/' + catId);
+        });
+    });
+</script>
