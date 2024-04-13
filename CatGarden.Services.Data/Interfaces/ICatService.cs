@@ -1,4 +1,4 @@
-﻿
+﻿using CatGarden.Data.Models;
 using CatGarden.ViewModels.Cat;
 using CatGarden.Web.ViewModels.Cat;
 using CatGarden.Web.ViewModels.Home;
@@ -25,6 +25,9 @@ namespace CatGarden.Services.Data.Interfaces
 
         Task<IEnumerable<CatDisplayViewModel>> GetAllCatsAsync(string userId);
 
+        Task UpdateCatLikesAsync(Cat cat);
+
+        Task<Cat> GetByIdAsync(int catId);
         Task<CatFormModel> GetCatForEdit(int catId, string userId);
         Task<bool> IsCatPartOfOwnedCattery(int catId, string ownerId);
         Task<bool> IsFavoritedByUserWithIdAsync(int catId, string userId);

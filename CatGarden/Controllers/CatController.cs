@@ -1,4 +1,5 @@
 ﻿using CatGarden.Data.Models;
+using CatGarden.Services.Data;
 using CatGarden.Services.Data.Interfaces;
 using CatGarden.ViewModels.Cat;
 using CatGarden.Web.Infrastructure.Extensions;
@@ -169,38 +170,37 @@ namespace CatGarden.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> AddFavorite(int catId)
         {
-            bool catExists = await catService
-                .ExistsByIdAsync(catId);
+            bool catExists = await catService.ExistsByIdAsync(catId);
             if (!catExists)
             {
                 TempData[ErrorMessage] = "Cat with the provided id does not exist!";
-
-                return RedirectToAction("All", "Cat");
+                return NotFound();
             }
 
-            // Get the current user's Id
             string userId = User.GetId()!;
 
             if (await catteryOwnerService.CatteryOwnerExistsByUserIdAsync(userId))
             {
                 TempData[ErrorMessage] = "Favorites tab is inaccessible to cattery owners.";
-
-                return RedirectToAction("All", "Cat");
+                return Forbid();
             }
 
-            // Check if the cat is already in the user's favorites
             var isFavorite = await catService.IsFavoritedByUserWithIdAsync(catId, userId);
 
-            if (!isFavorite)
+            if (isFavorite)
             {
-                // Add the cat to the user's favorites
+                await catService.RemoveFavoriteAsync(catId, userId);
+
+                var cat = await catService.GetByIdAsync(catId);
+                return Json(new { LikesCount = cat.LikesCount });
+            }
+            else
+            {
                 await catService.AddCatToFavoritesAsync(catId, userId);
 
-                return RedirectToAction("Favorites", "Cat");
-
+                var cat = await catService.GetByIdAsync(catId);
+                return Json(new { LikesCount = cat.LikesCount });
             }
-
-            return RedirectToAction("RemoveFavorite", "Cat");
         }
 
         [HttpPost]
@@ -210,26 +210,28 @@ namespace CatGarden.Web.Controllers
             if (!catExists)
             {
                 TempData[ErrorMessage] = "Cat with the provided id does not exist!";
-                return RedirectToAction("All", "Cat");
+                return NotFound();
             }
+
             string userId = User.GetId()!;
 
             if (await catteryOwnerService.CatteryOwnerExistsByUserIdAsync(userId))
             {
                 TempData[ErrorMessage] = "Favorites tab is inaccessible to cattery owners.";
-
-                return RedirectToAction("All", "Cat");
+                return Forbid();
             }
-            // Check if the cat is favorited by the user
+
             var isFavorite = await catService.IsFavoritedByUserWithIdAsync(catId, userId);
             if (!isFavorite)
             {
                 TempData[ErrorMessage] = "Unauthorized to remove cat from favorites!";
-
-                return RedirectToAction("All", "Cat");
+                return Forbid();
             }
+
             await catService.RemoveFavoriteAsync(catId, userId);
-            return RedirectToAction("Favorites", "Cat");
+
+            var cat = await catService.GetByIdAsync(catId);
+            return Json(new { LikesCount = cat.LikesCount });
         }
 
         [HttpPost]
@@ -271,6 +273,10 @@ namespace CatGarden.Web.Controllers
             }
             return View(favoriteCats);
         }
+
+       
+
+
 
         [HttpGet]
         public async Task<IActionResult> Edit(int id)

@@ -15,6 +15,7 @@ namespace CatGarden.Web.ViewModels.Cat
         public string Breed { get; set; } = string.Empty;
         public string Gender { get; set; } = string.Empty;
         public int Age { get; set; }
+        public int LikesCount { get; set; }
         public string Location { get; set; } = string.Empty;
     }
 }

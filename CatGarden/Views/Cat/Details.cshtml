@@ -66,20 +66,47 @@
     }
 
     .heart-button {
-        background-color: rgba(0, 0, 0, 0.3); 
-        border: none;
-        border-radius: 50%; 
-        width: 60px; 
-        height: 60px; 
         display: flex;
         justify-content: center;
         align-items: center;
+        background-color: rgba(0, 0, 0, 0.3);
+        border: none;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        color: lightgreen;
     }
 
     .custom-container {
         max-width: 1000px;
         margin: 0 auto;
     }
+
+    .likes-count {
+        display: none;
+        position: absolute;
+        top: calc(100% + 15px);
+        right: 1px;
+        transform: translateX(-50%);
+        background-color: rgba(0, 0, 0, 0.3);
+        color: #fff;
+        padding: 5px 10px;
+        border-radius: 5px;
+        z-index: 999;
+        width:180px;
+    }
+
+    .heart-button-container:hover .likes-count {
+        display: block;
+    }
+
+    .heart-button-container {
+        position: absolute;
+        top: 10px; 
+        right: 10px; 
+        z-index: 999; 
+    }
+    
 </style>
 
 
@@ -123,28 +150,32 @@
                 <div class=" position-relative">
                     <!-- Image -->
                     <img src="@Model.CoverImageUrl" alt="project-image" class="rounded">
-                    <!-- Heart icon -->
-                    <!-- Display heart icon if user is NOT a cattery owner -->
+                    <!-- Heart button -->
                     @if (!isCatteryOwner && (User.Identity?.IsAuthenticated ?? false))
                     {
-                        @if (Model.isFavorite)
-                        {
-                            <form method="post" asp-controller="Cat" asp-action="RemoveFavorite" asp-route-catId="@Model.Id">
-                                <button type="submit" class="btn btn-warning heart-button position-absolute top-0 end-0 m-2">
-                                    <i class="fas fa-heart heart-icon"></i>
-                                </button>
-                            </form>
-                        }
-                        else
-                        {
-                            <form method="post" asp-controller="Cat" asp-action="AddFavorite" asp-route-catId="@Model.Id">
-                                <button type="submit" class="btn btn-warning heart-button position-absolute top-0 end-0 m-2">
-                                    <i class="far fa-heart heart-icon"></i>
-                                </button>
-                            </form>
-                        }
+                        <div class="heart-button-container">
+                            @if (Model.IsFavorite)
+                            {
+                                <form method="post" class="favorite-form favorite position-absolute top-0 end-0 m-2">
+                                    <input type="hidden" class="cat-id" value="@Model.Id" />
+                                    <button type="submit" class="btn btn-warning heart-button">
+                                        <i class="fas fa-heart heart-icon"></i>
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <form method="post" class="favorite-form position-absolute top-0 end-0 m-2">
+                                    <input type="hidden" class="cat-id" value="@Model.Id" />
+                                    <button type="submit" class="btn btn-warning heart-button">
+                                        <i class="far fa-heart heart-icon"></i>
+                                    </button>
+                                </form>
+                            }
+                            <!-- Likes count -->
+                            <span class="likes-count">@Model.Name has been favorited @Model.LikesCount times!</span>
+                        </div>
                     }
-
 
                 </div>
                 <!-- Project info box -->
@@ -183,6 +214,44 @@
             var catId = $('#deleteButton').data('cat-id');
             var form = $('#deleteForm');
             form.attr('action', '/Cat/Delete/' + catId);
+        });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $('.favorite-form').submit(function (event) {
+            event.preventDefault(); // Prevent the form from submitting normally
+
+            var form = $(this);
+            var catId = form.find('.cat-id').val();
+            var isFavorite = form.hasClass('favorite');
+            var actionUrl = isFavorite ? '@Url.Action("RemoveFavorite", "Cat")' : '@Url.Action("AddFavorite", "Cat")';
+
+            $.ajax({
+                type: 'POST',
+                url: actionUrl,
+                data: { catId: catId },
+                success: function (response) {
+                    // Toggle the 'favorite' class on the form to indicate whether the cat is now a favorite
+                    form.toggleClass('favorite');
+
+                    // Toggle the heart icon based on whether the cat is now a favorite
+                    var heartIcon = form.find('.heart-icon');
+                    heartIcon.toggleClass('far fa-heart fas fa-heart');
+
+                    // Get the name of the cat
+                    var catName = '@Model.Name';
+
+                    // Update the likes count displayed next to the heart icon
+                    var likesCount = form.closest('.right-column').find('.likes-count');
+                    likesCount.text(catName + ' has been favorited ' + response.likesCount + ' times!');
+                },
+
+                error: function (xhr, status, error) {
+                    console.error(xhr.responseText);
+                    // Handle error appropriately
+                }
+            });
         });
     });
 </script>

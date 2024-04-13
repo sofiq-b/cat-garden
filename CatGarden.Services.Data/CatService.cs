@@ -6,7 +6,6 @@ using CatGarden.Web.ViewModels.Cat;
 using CatGarden.Web.ViewModels.Home;
 using CatGarden.Web.ViewModels.ImageGallery;
 using Microsoft.EntityFrameworkCore;
-using static CatGarden.Common.EntityValidationConstants;
 using static CatGarden.Common.Enums;
 namespace CatGarden.Services.Data
 {
@@ -37,7 +36,7 @@ namespace CatGarden.Services.Data
 
         public async Task<int> CreateAndReturnIdAsync(CatFormModel model)
         {
-            var newCat = new CatGarden.Data.Models.Cat()
+            var newCat = new Cat()
             {
                 Name = model.Name,
                 Age = model.Age,
@@ -67,7 +66,7 @@ namespace CatGarden.Services.Data
 
         public async Task<CatDetailsViewModel> GetDetailsByIdAsync(int catId, string userId)
         {
-            CatGarden.Data.Models.Cat cat = await dbContext.Cats
+            Cat cat = await dbContext.Cats
                 .Include(c => c.Cattery)
                 .Include(c => c.Images)
                 .FirstAsync(c => c.Id == catId);
@@ -88,7 +87,8 @@ namespace CatGarden.Services.Data
                 DateAdded = cat.DateAdded,
                 CoverImageUrl = cat.Images.FirstOrDefault(i => i.isCover)!.URL,
                 ImageUrls = cat.Images.Where(i=>i.isCover==false).Select(image => image.URL).ToList(),
-                isFavorite = await IsFavoritedByUserWithIdAsync(catId, userId)
+                IsFavorite = await IsFavoritedByUserWithIdAsync(catId, userId),
+                LikesCount = cat.LikesCount
             };
 
             return viewModel;
@@ -102,25 +102,28 @@ namespace CatGarden.Services.Data
                 CatId = catId,
                 UserId = Guid.Parse(userId)
             });
-
+            var cat = await GetByIdAsync(catId);
+            cat.LikesCount++;
+            await UpdateCatLikesAsync(cat);
             await dbContext.SaveChangesAsync();
         }
 
         public async Task RemoveFavoriteAsync(int catId, string userId)
         {
-            // Find the existing favorite entry
             var favorite = await dbContext.UsersFavCats
                 .FirstOrDefaultAsync(f => f.CatId == catId && f.UserId.ToString() == userId);
 
-            // Remove the favorite entry
             dbContext.UsersFavCats.Remove(favorite!);
+            var cat = await GetByIdAsync(catId);
+            cat.LikesCount--;
+            await UpdateCatLikesAsync(cat);
             await dbContext.SaveChangesAsync();
             
         }
 
         public async Task<CatDisplayViewModel> GetCatDisplayViewModelAsync(int catId)
         {
-            CatGarden.Data.Models.Cat cat = await dbContext.Cats
+            Cat cat = await dbContext.Cats
                 .Include(c => c.Cattery)
                 .FirstAsync(c => c.Id == catId);
 
@@ -138,13 +141,11 @@ namespace CatGarden.Services.Data
 
         public async Task<IEnumerable<CatDisplayViewModel>> GetFavoriteCatsAsync(string userId)
         {
-            // Get the IDs of cats favorited by the user
             var favoriteCatIds = await dbContext.UsersFavCats
                 .Where(ufc => ufc.UserId.ToString() == userId)
                 .Select(ufc => ufc.CatId)
                 .ToListAsync();
 
-            // Retrieve the details of cats in the user's favorites
             var favoriteCats = await dbContext.Cats
                 .Include(c => c.Cattery)
                 .Where(c => favoriteCatIds.Contains(c.Id)) // Filter by favorite cat IDs
@@ -157,7 +158,8 @@ namespace CatGarden.Services.Data
                     Gender = cat.Gender.ToString(),
                     Age = cat.Age,
                     IsFavorite = true,
-                    Location = cat.Cattery.City.ToString()
+                    Location = cat.Cattery.City.ToString(),
+                    LikesCount = cat.LikesCount
                 })
                 .ToListAsync();
 
@@ -170,9 +172,41 @@ namespace CatGarden.Services.Data
                 .Where(ufc => ufc.UserId.ToString() == userId)
                 .ToList();
 
+            foreach (var favorite in userFavorites)
+            {
+                var cat = await GetByIdAsync(favorite.CatId);
+                if (cat != null && cat.LikesCount > 0)
+                {
+                    cat.LikesCount--;
+                    await UpdateCatLikesAsync(cat);
+                }
+            }
+
             dbContext.UsersFavCats.RemoveRange(userFavorites);
 
             await dbContext.SaveChangesAsync();
+        }
+
+
+
+
+
+        public async Task UpdateCatLikesAsync(Cat cat)
+        {
+            var existingCat = await GetByIdAsync(cat.Id);
+
+            if (existingCat != null)
+            {
+                existingCat.LikesCount = cat.LikesCount;
+
+                await dbContext.SaveChangesAsync();
+            }
+        }
+
+
+        public async Task<Cat> GetByIdAsync(int catId)
+        {
+            return await dbContext.Cats.FirstOrDefaultAsync(c => c.Id == catId);
         }
 
 
@@ -185,7 +219,6 @@ namespace CatGarden.Services.Data
                 .FirstOrDefaultAsync(c => c.Id == catId);
 
 
-            // Check if the cat's cattery exists and is owned by the specified owner
             return cat.Cattery.Owner.UserId.ToString() == userId;
         }
 
@@ -246,7 +279,8 @@ namespace CatGarden.Services.Data
                     Gender = cat.Gender.ToString(),
                     Age = cat.Age,
                     IsFavorite = dbContext.UsersFavCats.Any(ufc => ufc.UserId.ToString() == userId && ufc.CatId == cat.Id),
-                    Location = cat.Cattery.City.ToString()
+                    Location = cat.Cattery.City.ToString(),
+                    LikesCount = cat.LikesCount
                 })
                 .ToListAsync();
 
