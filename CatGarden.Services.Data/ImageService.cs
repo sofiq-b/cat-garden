@@ -5,6 +5,7 @@ using static CatGarden.Common.Enums;
 using CatGarden.Data.Models;
 using CatGarden.Data;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace CatGarden.Services.Data
@@ -57,6 +58,26 @@ namespace CatGarden.Services.Data
 
             return image.URL;
         }
+
+        public async Task SetImageAsCoverAsync(int imageId)
+        {
+            var image = await dbContext.Images.FirstOrDefaultAsync(i => i.Id == imageId);
+
+            if (image != null)
+            {
+                // Set the IsCover property to true for the selected image
+                image.IsCover = true;
+
+                // Save changes to the database
+                await dbContext.SaveChangesAsync();
+            }
+            else
+            {
+                // Handle the case when the image with the specified ID is not found
+                throw new ArgumentException("Image not found");
+            }
+        }
+
 
 
         public async Task<string> EditImageAsync(string folderPath, int imageId, IFormFile newFile, EntityTypes entityType, int entityId)

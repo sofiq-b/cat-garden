@@ -28,7 +28,7 @@ namespace CatGarden.Services.Data
                {
                    Id = c.Id,
                    Name = c.Name,
-                   CoverImageUrl = c.Images.FirstOrDefault(i => i.isCover)!.URL,
+                   CoverImageUrl = c.Images.FirstOrDefault(i => i.IsCover)!.URL,
                })
                .ToArrayAsync();
            return lastThreeCats;
@@ -85,8 +85,8 @@ namespace CatGarden.Services.Data
                 CatteryId = cat.Cattery.Id,
                 Description = cat.Description,
                 DateAdded = cat.DateAdded,
-                CoverImageUrl = cat.Images.FirstOrDefault(i => i.isCover)!.URL,
-                ImageUrls = cat.Images.Where(i=>i.isCover==false).Select(image => image.URL).ToList(),
+                CoverImageUrl = cat.Images.FirstOrDefault(i => i.IsCover)!.URL,
+                ImageUrls = cat.Images.Where(i=>i.IsCover==false).Select(image => image.URL).ToList(),
                 IsFavorite = await IsFavoritedByUserWithIdAsync(catId, userId),
                 LikesCount = cat.LikesCount
             };
@@ -130,7 +130,7 @@ namespace CatGarden.Services.Data
             return new CatDisplayViewModel
             {
                 Id = catId,
-                CoverImageUrl = cat.Images.FirstOrDefault(i => i.isCover)!.URL,
+                CoverImageUrl = cat.Images.FirstOrDefault(i => i.IsCover)!.URL,
                 Name = cat.Name,
                 Breed = cat.Breed.ToString(),
                 Gender = cat.Gender.ToString(),
@@ -152,7 +152,7 @@ namespace CatGarden.Services.Data
                 .Select(cat => new CatDisplayViewModel
                 {
                     Id = cat.Id,
-                    CoverImageUrl = cat.Images.FirstOrDefault(i => i.isCover)!.URL,
+                    CoverImageUrl = cat.Images.FirstOrDefault(i => i.IsCover)!.URL,
                     Name = cat.Name,
                     Breed = cat.Breed.ToString(),
                     Gender = cat.Gender.ToString(),
@@ -273,7 +273,7 @@ namespace CatGarden.Services.Data
                 .Select(cat => new CatDisplayViewModel
                 {
                     Id = cat.Id,
-                    CoverImageUrl = cat.Images.FirstOrDefault(i => i.isCover)!.URL,
+                    CoverImageUrl = cat.Images.FirstOrDefault(i => i.IsCover)!.URL,
                     Name = cat.Name,
                     Breed = cat.Breed.ToString(),
                     Gender = cat.Gender.ToString(),

@@ -72,7 +72,7 @@ public class ImageEntityConfiguration : IEntityTypeConfiguration<Image>
             CatId = 1,
             Name = "jimmy_cover.jpg",
             URL = "/cats/cover/jimmy_cover.jpg",
-            isCover = true
+            IsCover = true
         };
         images.Add(image);
 
@@ -82,7 +82,7 @@ public class ImageEntityConfiguration : IEntityTypeConfiguration<Image>
             CatId = 2,
             Name = "nagi_cover.jpg",
             URL = "/cats/cover/nagi_cover.jpg",
-            isCover = true
+            IsCover = true
         };
         images.Add(image);
 
@@ -92,7 +92,7 @@ public class ImageEntityConfiguration : IEntityTypeConfiguration<Image>
             CatteryId = 2,
             Name = "simone-nolgo-WMeQtoH-a3w-unsplash.jpg",
             URL = "/catteris/cover/simone-nolgo-WMeQtoH-a3w-unsplash.jpg",
-            isCover = true
+            IsCover = true
         };
         images.Add(image);
 
@@ -102,7 +102,7 @@ public class ImageEntityConfiguration : IEntityTypeConfiguration<Image>
             CatteryId = 1,
             Name = "ries-bosch-sj16pUqOoco-unsplash.jpg",
             URL = "/catteries/cover/ries-bosch-sj16pUqOoco-unsplash.jpg",
-            isCover = true
+            IsCover = true
         };
         images.Add(image);
 

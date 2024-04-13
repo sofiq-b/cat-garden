@@ -17,7 +17,7 @@ namespace CatGarden.Web.Controllers
     [Authorize]
     public class CatController : Controller
     {
-        private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ICatteryService catteryService;
         private readonly ICatteryOwnerService catteryOwnerService;
         private readonly ICatService catService;
@@ -30,7 +30,7 @@ namespace CatGarden.Web.Controllers
             this.catteryOwnerService = catteryOwnerService;
             this.catService = catService;
             this.imageService = imageService;
-            _webHostEnvironment = webHostEnvironment;
+            this.webHostEnvironment = webHostEnvironment;
         }
 
         [AllowAnonymous]
