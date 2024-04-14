@@ -1,12 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.IO;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using CatGarden.Services.Data.Interfaces;
-using CatGarden.Web.ViewModels.ImageGallery;
+﻿using CatGarden.Services.Data.Interfaces;
+using System.Text.Json;
+
 using CatGarden.Web.Infrastructure.Extensions;
+using CatGarden.Web.ViewModels.Image;
+using CatGarden.Web.ViewModels.ImageGallery;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CatGarden.Web.Controllers
 {
@@ -53,6 +51,47 @@ namespace CatGarden.Web.Controllers
             }
         }
 
+
+        [HttpPost]
+        public IActionResult UpdateIsCoverForFile([FromBody] UpdateIsCoverRequest request)
+        {
+            // Retrieve uploaded images from session
+            var uploadedImages = HttpContext.Session.Get<List<ImageModel>>("UploadedImages");
+            if (uploadedImages != null)
+            {
+                // Find the corresponding ImageModel object and update its isCover property
+                var imageModel = uploadedImages.Find(image => image.Name == request.Name && image.URL == request.Url);
+                if (imageModel != null)
+                {
+                    imageModel.IsCover = request.IsCover;
+                    // Store the updated uploaded images back in the session
+                    HttpContext.Session.Set("UploadedImages", uploadedImages);
+                    return Json(new { success = true });
+                }
+            }
+            return Json(new { success = false });
+        }
+
+        [HttpPost]
+        public IActionResult RemoveImageModel([FromBody] RemoveImageRequest request)
+        {
+            // Retrieve uploaded images from session
+            var uploadedImages = HttpContext.Session.Get<List<ImageModel>>("UploadedImages");
+            if (uploadedImages != null)
+            {
+                // Find the index of the corresponding ImageModel object
+                var index = uploadedImages.FindIndex(image => image.Name == request.Name && image.URL == request.Url);
+                if (index != -1)
+                {
+                    // Remove the ImageModel from the array
+                    uploadedImages.RemoveAt(index);
+                    // Store the updated uploaded images back in the session
+                    HttpContext.Session.Set("UploadedImages", uploadedImages);
+                    return Json(new { success = true });
+                }
+            }
+            return Json(new { success = false });
+        }
 
         [HttpPut("{imageId}")]
         public async Task<IActionResult> Edit(int imageId, IFormFile newFile)

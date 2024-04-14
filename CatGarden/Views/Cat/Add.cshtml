@@ -14,7 +14,6 @@
 
 <style>
     .set-as-cover-btn {
-        background-color: yellowgreen; /* Green color */
         color: #fff; /* White text */
         border: none;
         padding: 5px 10px;
@@ -23,7 +22,32 @@
     }
 
         .set-as-cover-btn.btn-success {
-            background-color: #218838; /* Yellow green color */
+            padding: 5px 28px;
+        }
+
+    .dropzone .dz-preview .dz-image {
+        border-radius: 20px;
+        overflow: hidden;
+        width: 160px;
+        height: 160px;
+        position: relative;
+        display: block;
+        z-index: 10;
+    }
+
+    .dropzone .dz-preview {
+        position: relative;
+        display: inline-block;
+        vertical-align: top;
+        margin: 10px;
+        min-height: 100px;
+    }
+
+        .dropzone .dz-preview .dz-image img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 </style>
 
@@ -133,7 +157,7 @@
             var myDropzone = new Dropzone("#dropzone", {
                 url: '@Url.Action("UploadImage", "Image")', // Specify the upload URL
                 maxFilesize: 5, // Maximum file size in MB
-                maxFiles: 5, // Maximum number of files allowed
+                maxFiles: 6, // Maximum number of files allowed
                 acceptedFiles: 'image/*', // Specify accepted file types (e.g., images)
                 addRemoveLinks: false, // Disable default "Remove file" links
                 dictDefaultMessage: "Drop files here or click to upload", // Set default message
@@ -142,17 +166,23 @@
 
             // Variable to store the file currently set as cover
             var currentCoverFile = null;
+            var imageUrl;
 
             // Customize the file preview template
-            myDropzone.on("addedfile", function (file) {
+            myDropzone.on("success", function (file, response) {
+
+                imageUrl = response;
+
                 // Remove the default "Remove file" link
                 $(file.previewElement).find('.dz-remove').remove();
+                // Store the image URL as a data attribute
+                $(file.previewElement).attr('data-image-url', imageUrl);
 
                 var removeButton = Dropzone.createElement("<button class='btn btn-danger btn-sm'>Remove</button>");
                 var setAsCoverButton = Dropzone.createElement("<button type='button' class='btn btn-primary btn-sm set-as-cover-btn'>Set as Cover</button>");
-
                 // Listen for click event on "Set as Cover" button
                 setAsCoverButton.addEventListener("click", function () {
+                    var fileUrl = $(file.previewElement).attr('data-image-url');
                     // Check if another file is currently set as cover
                     if (currentCoverFile !== null && currentCoverFile !== file) {
                         // Reset isCover property for the previous cover file
@@ -179,6 +209,9 @@
                     }
                     // Update the currentCoverFile variable
                     currentCoverFile = file;
+
+                    // Update isCover property in the session data
+                    updateIsCoverForFileInSession(file, fileUrl);
                 });
 
                 file.previewElement.appendChild(removeButton);
@@ -189,12 +222,66 @@
                     e.preventDefault();
                     e.stopPropagation();
                     myDropzone.removeFile(file);
+                    // Remove the corresponding ImageModel from session
+                    removeImageModelFromSession(file);
                     // Check if the removed file was set as cover
                     if (file === currentCoverFile) {
                         // Reset the currentCoverFile variable
                         currentCoverFile = null;
                     }
                 });
+                // Function to update isCover property for a file in the session data
+                function updateIsCoverForFileInSession(file, fileUrl) {
+                    $.ajax({
+                        url: '/Image/UpdateIsCoverForFile',
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ name: file.name, url: fileUrl, isCover: file.isCover }),
+                        success: function (response) {
+                            if (response.success) {
+                                console.log('isCover updated successfully.');
+                            } else {
+                                console.error('Failed to update isCover.');
+                            }
+                        },
+                        error: function () {
+                            console.error('Failed to update isCover. Server error.');
+                        }
+                    });
+                }
+
+                // Function to remove ImageModel from session
+                function removeImageModelFromSession(file) {
+                    var fileUrl = $(file.previewElement).attr('data-image-url');
+
+                    $.ajax({
+                        url: '/Image/RemoveImageModel',
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ name: file.name, url: fileUrl }),
+                        success: function (response) {
+                            if (response.success) {
+                                console.log('ImageModel removed from session successfully.');
+                            } else {
+                                console.error('Failed to remove ImageModel from session.');
+                            }
+                        },
+                        error: function () {
+                            console.error('Failed to remove ImageModel from session. Server error.');
+                        }
+                    });
+                }
+            });
+
+            // Form submission event
+            $('#catForm').submit(function (event) {
+                // Check if no image is set as cover
+                if (!currentCoverFile) {
+                    // Prevent form submission
+                    event.preventDefault();
+                    // Show alert or error message
+                    alert('Please set an image as cover before submitting the form.');
+                }
             });
         });
     </script>
