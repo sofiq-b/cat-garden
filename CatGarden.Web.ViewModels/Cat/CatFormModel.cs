@@ -40,14 +40,10 @@ namespace CatGarden.Web.ViewModels.Cat
 
         public DateTime DateAdded { get; set; } = DateTime.Now;
 
-        [Required(ErrorMessage = CatAttributeRequired)]
-        [Display(Name = "Choose the cover photo of your cat")]
-        public IFormFile CoverPhoto { get; set; } = null!;
-        public string CoverImageUrl { get; set; } = string.Empty;
+        public string CoverImageFileName { get; set; } = string.Empty;
 
-        [Display(Name = "Choose the gallery images of your cat")]
-        [Required]
-        public IFormFileCollection ImageFiles { get; set; } = null!;
+        
+        public IFormFileCollection? ImageFiles { get; set; } 
 
         public List<ImageModel> Images { get; set; } = new List<ImageModel>();
 

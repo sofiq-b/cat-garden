@@ -12,6 +12,8 @@ namespace CatGarden.Web.ViewModels.ImageGallery
         public string Name { get; set; }
         public string URL { get; set; }
         public bool IsCover { get; set; }
+        public int? CatId { get; set; }
+        public int? CatteryId { get; set; }
     }
 }
     

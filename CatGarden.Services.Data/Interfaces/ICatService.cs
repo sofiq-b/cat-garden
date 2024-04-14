@@ -2,6 +2,7 @@
 using CatGarden.ViewModels.Cat;
 using CatGarden.Web.ViewModels.Cat;
 using CatGarden.Web.ViewModels.Home;
+using CatGarden.Web.ViewModels.ImageGallery;
 
 namespace CatGarden.Services.Data.Interfaces
 {
@@ -20,13 +21,13 @@ namespace CatGarden.Services.Data.Interfaces
         Task<CatDisplayViewModel> GetCatDisplayViewModelAsync(int catId);
 
         Task<IEnumerable<CatDisplayViewModel>> GetFavoriteCatsAsync(string userId);
-
+        Task<int> CreateCatAsync(CatFormModel formModel, List<ImageModel> uploadedImages);
         Task RemoveAllCatsFromFavoritesAsync(string userId);
 
         Task<IEnumerable<CatDisplayViewModel>> GetAllCatsAsync(string userId);
 
         Task UpdateCatLikesAsync(Cat cat);
-
+        Task AddImagesToCatAsync(int catId, List<Image> images);
         Task<Cat> GetByIdAsync(int catId);
         Task<CatFormModel> GetCatForEdit(int catId, string userId);
         Task<bool> IsCatPartOfOwnedCattery(int catId, string ownerId);

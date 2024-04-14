@@ -33,6 +33,12 @@ builder.Services.AddApplicationServices(typeof(ICatService));
 
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddSession(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
 WebApplication app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -53,6 +59,8 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseSession();
 
 app.MapDefaultControllerRoute();
 app.MapRazorPages();

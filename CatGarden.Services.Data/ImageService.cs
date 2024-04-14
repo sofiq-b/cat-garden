@@ -22,7 +22,7 @@ namespace CatGarden.Services.Data
             _webHostEnvironment = webHostEnvironment;
         }
 
-        public async Task<string> UploadImageAsync(string folderPath, IFormFile file, int entityId, EntityTypes entityType)
+        public async Task<string> UploadImageAsync(string folderPath, IFormFile file)
         {
             folderPath += Guid.NewGuid().ToString() + "_" + file.FileName;
 
@@ -37,19 +37,6 @@ namespace CatGarden.Services.Data
                 URL = "/" + folderPath
             };
 
-            // Determine the entity type and set the corresponding foreign key
-            switch (entityType)
-            {
-                case EntityTypes.Cat:
-                    image.CatId = entityId;
-                    break;
-                case EntityTypes.Cattery:
-                    image.CatteryId = entityId;
-                    break;
-                default:
-                    throw new ArgumentException("Invalid entity type");
-            }
-
             // Add the new Image object to the context
             dbContext.Images.Add(image);
 
@@ -59,28 +46,11 @@ namespace CatGarden.Services.Data
             return image.URL;
         }
 
-        public async Task SetImageAsCoverAsync(int imageId)
-        {
-            var image = await dbContext.Images.FirstOrDefaultAsync(i => i.Id == imageId);
-
-            if (image != null)
-            {
-                // Set the IsCover property to true for the selected image
-                image.IsCover = true;
-
-                // Save changes to the database
-                await dbContext.SaveChangesAsync();
-            }
-            else
-            {
-                // Handle the case when the image with the specified ID is not found
-                throw new ArgumentException("Image not found");
-            }
-        }
 
 
 
-        public async Task<string> EditImageAsync(string folderPath, int imageId, IFormFile newFile, EntityTypes entityType, int entityId)
+
+        public async Task<string> EditImageAsync(string folderPath, int imageId, IFormFile newFile)
         {
             // Retrieve the existing image entity from the database
             var existingImage = await dbContext.Images.FindAsync(imageId);
@@ -93,7 +63,7 @@ namespace CatGarden.Services.Data
             }
 
             // Upload the new image file
-            string newImagePath = await UploadImageAsync(folderPath, newFile, entityId, entityType);
+            string newImagePath = await UploadImageAsync(folderPath, newFile);
 
             // Update the properties of the existing image entity with the new image information
             existingImage.Name = newFile.FileName;

@@ -94,6 +94,27 @@ namespace CatGarden.Services.Data
             return viewModel;
         }
 
+        public async Task<int> CreateCatAsync(CatFormModel formModel, List<ImageModel> uploadedImages)
+        {
+            // Create the cat entity
+            int catId = await CreateAndReturnIdAsync(formModel);
+
+            // Associate uploaded images with the cat entity
+            foreach (var imageData in uploadedImages)
+            {
+                // Create Image entity and associate it with the cat
+                var image = new Image { Name = imageData.Name, URL = imageData.URL, CatId = catId };
+                dbContext.Images.Add(image);
+            }
+
+            // Save changes to the database
+            await dbContext.SaveChangesAsync();
+
+            return catId;
+        }
+
+
+
         public async Task AddCatToFavoritesAsync(int catId, string userId)
         {
             // Create a new entry in the UserFavCat table linking the user and the cat
@@ -255,7 +276,6 @@ namespace CatGarden.Services.Data
                 Color = Enum.Parse<Color>(catDetails.Color),
                 CoatLength = Enum.Parse<CoatLength>(catDetails.CoatLength),
                 Description = catDetails.Description,
-                CoverImageUrl = catDetails.CoverImageUrl,
                 SelectedCatteryId = catDetails.CatteryId,
                 Images = images
 
@@ -286,6 +306,19 @@ namespace CatGarden.Services.Data
 
             return allCats;
         }
+
+        public async Task AddImagesToCatAsync(int catId, List<Image> images)
+        {
+            var cat = await dbContext.Cats.FindAsync(catId);
+
+            foreach (var image in images)
+            {
+                cat!.Images.Add(image);
+            }
+
+            await dbContext.SaveChangesAsync();
+        }
+
 
 
         public async Task<bool> IsFavoritedByUserWithIdAsync(int catId, string userId)

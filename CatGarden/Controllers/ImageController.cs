@@ -1,55 +1,91 @@
-﻿using CatGarden.Services.Data;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
+using System.IO;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using CatGarden.Services.Data.Interfaces;
-using Microsoft.AspNetCore.Mvc;
-using static CatGarden.Common.Enums;
+using CatGarden.Web.ViewModels.ImageGallery;
+using CatGarden.Web.Infrastructure.Extensions;
 
 namespace CatGarden.Web.Controllers
 {
     public class ImageController : Controller
     {
-        private readonly IImageService imageService;
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IImageService _imageService;
 
-        public ImageController(IImageService imageService)
+        public ImageController(IWebHostEnvironment webHostEnvironment, IImageService imageService)
         {
-            this.imageService = imageService;
+            _webHostEnvironment = webHostEnvironment;
+            _imageService = imageService;
         }
 
         [HttpPost]
-        public async Task<IActionResult> Upload(int entityId, string entityType, IFormFile file, string folderPath)
-        {
-            if (file == null || file.Length == 0)
-            {
-                return BadRequest("File is empty");
-            }
-
-            if (!Enum.TryParse(entityType, out EntityTypes entityTypeValue))
-            {
-                return BadRequest("Invalid entity type");
-            }
-
-            var imageUrl = await imageService.UploadImageAsync(folderPath,file, entityId, entityTypeValue);
-
-            return Ok(new { imageUrl });
-        }
-        [HttpPost]
-        public async Task<IActionResult> SetAsCover(int imageId)
+        public IActionResult UploadImage(IFormFile file)
         {
             try
             {
-                // Call a service method to update the IsCover property of the image
-                await imageService.SetImageAsCoverAsync(imageId);
+                // Generate a unique filename
+                string uniqueFileName = $"{Guid.NewGuid()}_{file.FileName}";
 
-                // Optionally, return a success response
-                return Ok(new { message = "Image set as cover successfully" });
+                // Define the folder path where the image will be stored
+                string folderPath = "images/";
+
+                // Combine the folder path and the unique filename to create the full URL
+                string imageUrl = $"{folderPath}{uniqueFileName}";
+
+                // Retrieve uploaded images from session or create a new list if it doesn't exist
+                var uploadedImages = HttpContext.Session.Get<List<ImageModel>>("UploadedImages") ?? new List<ImageModel>();
+
+                // Add the new image to the list
+                uploadedImages.Add(new ImageModel { Name = file.FileName, URL = imageUrl, IsCover = false, CatId = null, CatteryId = null });
+
+                // Store the updated list back in the session
+                HttpContext.Session.Set("UploadedImages", uploadedImages);
+
+                // Return the generated image URL
+                return Ok(imageUrl);
             }
             catch (Exception ex)
             {
-                // Handle any exceptions and return an error response
-                return StatusCode(500, new { message = "An error occurred while setting image as cover", error = ex.Message });
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
 
 
-    }
+        [HttpPut("{imageId}")]
+        public async Task<IActionResult> Edit(int imageId, IFormFile newFile)
+        {
+            try
+            {
+                if (newFile == null || newFile.Length == 0)
+                    return BadRequest("Invalid file");
 
+                string folderPath = "images/";
+
+                string newImageUrl = await _imageService.EditImageAsync(folderPath, imageId, newFile);
+
+                return Ok(newImageUrl);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpDelete("{imageId}")]
+        public async Task<IActionResult> Delete(int imageId)
+        {
+            try
+            {
+                await _imageService.DeleteImageAsync(imageId);
+                return Ok("Image deleted successfully");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+    }
 }
