@@ -46,9 +46,32 @@ namespace CatGarden.Services.Data
             return image.URL;
         }
 
+        public bool DeleteImageByNameAndCatId(string imageName, int catId)
+        {
+            try
+            {
+                // Find the image by name and catId
+                var image = dbContext.Images.FirstOrDefault(i => i.Name == imageName && i.CatId == catId);
 
-
-
+                if (image != null)
+                {
+                    // Remove the image from the database
+                    dbContext.Images.Remove(image);
+                    dbContext.SaveChanges();
+                    return true;
+                }
+                else
+                {
+                    // Image not found
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception or handle it as needed
+                throw ex;
+            }
+        }
 
         public async Task<string> EditImageAsync(string folderPath, int imageId, IFormFile newFile)
         {
@@ -81,31 +104,16 @@ namespace CatGarden.Services.Data
             // Retrieve the existing image entity from the database
             var existingImage = await dbContext.Images.FindAsync(imageId);
 
-            // Delete the existing image file from the server
-            string imagePath = Path.Combine(_webHostEnvironment.WebRootPath, existingImage.URL.TrimStart('/'));
-            if (File.Exists(imagePath))
+            if (existingImage != null)
             {
-                File.Delete(imagePath);
-            }
+                // Remove the image entity from the context
+                dbContext.Images.Remove(existingImage);
 
-            // Remove the image entity from the associated entity's image list
-            if (existingImage.CatId != null)
-            {
-                var cat = await dbContext.Cats.FindAsync(existingImage.CatId);
-                cat.Images.Remove(existingImage);
+                // Save changes to the database
+                await dbContext.SaveChangesAsync();
             }
-            else 
-            {
-                var cattery = await dbContext.Catteries.FindAsync(existingImage.CatteryId);
-                cattery.Images.Remove(existingImage);
-            }
-
-            // Remove the image entity from the context
-            dbContext.Images.Remove(existingImage);
-
-            // Save changes to the database
-            await dbContext.SaveChangesAsync();
         }
+
 
 
     }

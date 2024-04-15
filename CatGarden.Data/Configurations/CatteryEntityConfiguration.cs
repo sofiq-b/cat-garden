@@ -10,6 +10,8 @@ namespace CatGarden.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<Cattery> builder)
         {
+           
+
             builder
                 .HasOne(e => e.Owner)
                 .WithMany(e => e.Catteries)

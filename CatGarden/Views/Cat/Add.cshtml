@@ -161,25 +161,23 @@
                 acceptedFiles: 'image/*', // Specify accepted file types (e.g., images)
                 addRemoveLinks: false, // Disable default "Remove file" links
                 dictDefaultMessage: "Drop files here or click to upload", // Set default message
+                parallelUploads: 1, // Upload files sequentially
+                timeout: 0,
                 // Other options...
             });
 
             // Variable to store the file currently set as cover
             var currentCoverFile = null;
-            var imageUrl;
 
             // Customize the file preview template
             myDropzone.on("success", function (file, response) {
+                // Store the image URL as a data attribute directly on the file element
+                $(file.previewElement).attr('data-image-url', response);
 
-                imageUrl = response;
-
-                // Remove the default "Remove file" link
-                $(file.previewElement).find('.dz-remove').remove();
-                // Store the image URL as a data attribute
-                $(file.previewElement).attr('data-image-url', imageUrl);
-
+                // Customize the file preview template
                 var removeButton = Dropzone.createElement("<button class='btn btn-danger btn-sm'>Remove</button>");
                 var setAsCoverButton = Dropzone.createElement("<button type='button' class='btn btn-primary btn-sm set-as-cover-btn'>Set as Cover</button>");
+
                 // Listen for click event on "Set as Cover" button
                 setAsCoverButton.addEventListener("click", function () {
                     var fileUrl = $(file.previewElement).attr('data-image-url');
@@ -230,48 +228,50 @@
                         currentCoverFile = null;
                     }
                 });
-                // Function to update isCover property for a file in the session data
-                function updateIsCoverForFileInSession(file, fileUrl) {
-                    $.ajax({
-                        url: '/Image/UpdateIsCoverForFile',
-                        method: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify({ name: file.name, url: fileUrl, isCover: file.isCover }),
-                        success: function (response) {
-                            if (response.success) {
-                                console.log('isCover updated successfully.');
-                            } else {
-                                console.error('Failed to update isCover.');
-                            }
-                        },
-                        error: function () {
-                            console.error('Failed to update isCover. Server error.');
-                        }
-                    });
-                }
-
-                // Function to remove ImageModel from session
-                function removeImageModelFromSession(file) {
-                    var fileUrl = $(file.previewElement).attr('data-image-url');
-
-                    $.ajax({
-                        url: '/Image/RemoveImageModel',
-                        method: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify({ name: file.name, url: fileUrl }),
-                        success: function (response) {
-                            if (response.success) {
-                                console.log('ImageModel removed from session successfully.');
-                            } else {
-                                console.error('Failed to remove ImageModel from session.');
-                            }
-                        },
-                        error: function () {
-                            console.error('Failed to remove ImageModel from session. Server error.');
-                        }
-                    });
-                }
             });
+
+            // Function to update isCover property for a file in the session data
+            function updateIsCoverForFileInSession(file, fileUrl) {
+                $.ajax({
+                    url: '/Image/UpdateIsCoverForFile',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ name: file.name, url: fileUrl, isCover: file.isCover }),
+                    success: function (response) {
+                        if (response.success) {
+                            console.log('isCover updated successfully.');
+                        } else {
+                            console.error('Failed to update isCover.');
+                        }
+                    },
+                    error: function () {
+                        console.error('Failed to update isCover. Server error.');
+                    }
+                });
+            }
+
+            // Function to remove ImageModel from session
+            function removeImageModelFromSession(file) {
+                var fileUrl = $(file.previewElement).attr('data-image-url');
+
+                $.ajax({
+                    url: '/Image/RemoveImageModel',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ name: file.name, url: fileUrl }),
+                    success: function (response) {
+                        if (response.success) {
+                            console.log('ImageModel removed from session successfully.');
+                        } else {
+                            console.error('Failed to remove ImageModel from session.');
+                        }
+                    },
+                    error: function () {
+                        console.error('Failed to remove ImageModel from session. Server error.');
+                    }
+                });
+            }
+
 
             // Form submission event
             $('#catForm').submit(function (event) {
@@ -283,6 +283,7 @@
                     alert('Please set an image as cover before submitting the form.');
                 }
             });
+
         });
     </script>
 

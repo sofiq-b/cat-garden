@@ -7,18 +7,19 @@ public class ImageEntityConfiguration : IEntityTypeConfiguration<Image>
 {
     public void Configure(EntityTypeBuilder<Image> builder)
     {
+        // Configuration for Cat relationship
         builder
-       .HasOne(i => i.Cat)
-       .WithMany(cat => cat.Images)
-       .HasForeignKey(image => image.CatId)
-       .OnDelete(DeleteBehavior.Restrict);
+            .HasOne(image => image.Cat)
+            .WithMany(cat => cat.Images)
+            .HasForeignKey(image => image.CatId)
+            .OnDelete(DeleteBehavior.Restrict); 
 
+        // Configuration for Cattery relationship
         builder
-       .HasOne(i => i.Cattery)
-       .WithMany(cattery => cattery.Images)
-       .HasForeignKey(image => image.CatteryId)
-       .OnDelete(DeleteBehavior.Restrict);
-
+            .HasOne(image => image.Cattery)
+            .WithMany(cattery => cattery.Images)
+            .HasForeignKey(image => image.CatteryId)
+            .OnDelete(DeleteBehavior.Restrict); 
 
 
         builder.HasData(this.GenerateImages());
@@ -35,7 +36,7 @@ public class ImageEntityConfiguration : IEntityTypeConfiguration<Image>
             Id = 1,
             CatId = 1,  
             Name = "jimmy_image2.jpg",
-            URL = "/cats/gallery/jimmy_image2.jpg"
+            URL = "/cats/jimmy_1/jimmy_image2.jpg"
         };
         images.Add(image);
 
@@ -44,7 +45,7 @@ public class ImageEntityConfiguration : IEntityTypeConfiguration<Image>
             Id = 2,
             CatId = 1,
             Name = "jimmy_image3.jpg",
-            URL = "/cats/gallery/jimmy_image3.jpg"
+            URL = "/cats/jimmy_1/jimmy_image3.jpg"
         };
         images.Add(image);
 
@@ -53,7 +54,7 @@ public class ImageEntityConfiguration : IEntityTypeConfiguration<Image>
             Id = 3,
             CatId = 2,
             Name = "nagi_image2.jpg",
-            URL = "/cats/gallery/nagi_image2.jpg"
+            URL = "/cats/nagi_2/nagi_image2.jpg"
         };
         images.Add(image);
 
@@ -62,7 +63,7 @@ public class ImageEntityConfiguration : IEntityTypeConfiguration<Image>
             Id = 4,
             CatId = 2,
             Name = "nagi_image3.jpg",
-            URL = "/cats/gallery/nagi_image3.jpg"
+            URL = "/cats/nagi_2/nagi_image3.jpg"
         };
         images.Add(image);
 
@@ -71,7 +72,7 @@ public class ImageEntityConfiguration : IEntityTypeConfiguration<Image>
             Id = 5,
             CatId = 1,
             Name = "jimmy_cover.jpg",
-            URL = "/cats/cover/jimmy_cover.jpg",
+            URL = "/cats/jimmy_1/jimmy_cover.jpg",
             IsCover = true
         };
         images.Add(image);
@@ -81,7 +82,7 @@ public class ImageEntityConfiguration : IEntityTypeConfiguration<Image>
             Id = 6,
             CatId = 2,
             Name = "nagi_cover.jpg",
-            URL = "/cats/cover/nagi_cover.jpg",
+            URL = "/cats/nagi_2/nagi_cover.jpg",
             IsCover = true
         };
         images.Add(image);
@@ -91,7 +92,7 @@ public class ImageEntityConfiguration : IEntityTypeConfiguration<Image>
             Id = 7,
             CatteryId = 2,
             Name = "simone-nolgo-WMeQtoH-a3w-unsplash.jpg",
-            URL = "/catteris/cover/simone-nolgo-WMeQtoH-a3w-unsplash.jpg",
+            URL = "/catteries/purrfect-paws_2/simone-nolgo-WMeQtoH-a3w-unsplash.jpg",
             IsCover = true
         };
         images.Add(image);
@@ -101,7 +102,7 @@ public class ImageEntityConfiguration : IEntityTypeConfiguration<Image>
             Id = 8,
             CatteryId = 1,
             Name = "ries-bosch-sj16pUqOoco-unsplash.jpg",
-            URL = "/catteries/cover/ries-bosch-sj16pUqOoco-unsplash.jpg",
+            URL = "/catteries/whisker-haven_1/ries-bosch-sj16pUqOoco-unsplash.jpg",
             IsCover = true
         };
         images.Add(image);

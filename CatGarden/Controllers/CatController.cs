@@ -6,6 +6,7 @@ using CatGarden.Web.ViewModels.Cattery;
 using CatGarden.Web.ViewModels.ImageGallery;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using static CatGarden.Common.NotificationMessagesConstants;
 
 namespace CatGarden.Web.Controllers
@@ -48,10 +49,8 @@ namespace CatGarden.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Add()
         {
-            // Get the current user's ID
             string userId = User.GetId()!;
 
-            // Check if the user is a cattery owner
             bool isCatteryOwner =
                 await catteryOwnerService.CatteryOwnerExistsByUserIdAsync(User.GetId()!);
             //If user is not cattery owner redirect to become one
@@ -95,23 +94,32 @@ namespace CatGarden.Web.Controllers
                 formModel.Catteries = await catteryService.AllCatteriesAsync(User.GetId()!);
                 return View(formModel);
             }
+            var uploadedImages = HttpContext.Session.Get<List<ImageModel>>("UploadedImages");
+            if (!uploadedImages.Any())
+            {
+                TempData[ErrorMessage] = "Please upload at least one image before submitting the form.";
+                formModel.Catteries = await catteryService.AllCatteriesAsync(User.GetId()!);
+                return View(formModel);
+            }
 
             try
             {
-                var uploadedImages = HttpContext.Session.Get<List<ImageModel>>("UploadedImages");
+                // Associate the image URLs with the cat model
+                formModel.Images = uploadedImages;
 
-
-                int catId = await catService.CreateCatAsync(formModel, uploadedImages);
+                int catId = await catService.InsertImagesAndReturnCatIdAsync(formModel);
                 TempData[SuccessMessage] = "Cat was added successfully!";
-
                 // Remove temporarily stored image data
                 HttpContext.Session.Remove("UploadedImages");
 
                 return RedirectToAction("Details", "Cat", new { id = catId });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, "An unexpected error occurred while trying to add your new cat. Please try again later or contact the administrator.");
+                
+                TempData[ErrorMessage] = ex.ToString();
+                // Delete cat images folder and image entities
+               
                 formModel.Catteries = await catteryService.AllCatteriesAsync(User.GetId()!);
                 return View(formModel);
             }
@@ -252,47 +260,49 @@ namespace CatGarden.Web.Controllers
             return View(favoriteCats);
         }
 
-       
-
-
-
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
             string userId = User.GetId()!;
-            // Retrieve the cat details by ID
-            var catDetails = await catService.GetCatForEdit(id, userId);
+            // Load data for editing the cat
+            var model = await catService.LoadEditCatAsync(id, userId);
 
-            // Check if the cat exists
-            if (catDetails == null)
+            if (model == null)
             {
-                return BadRequest(); // or return NotFound() if you prefer
+                TempData[ErrorMessage] = "Cat with the selected id doesn't exist.";
+
+                return RedirectToAction("All", "Cat");
             }
-
-            // Check if the current user has permission to edit the cat
-            if (!await catService.IsCatPartOfOwnedCattery(id, userId))
+            var isOwnedByUser = await catService.IsCatPartOfOwnedCattery(id, userId);
+            if (!isOwnedByUser)
             {
+                TempData[ErrorMessage] = "Unauthorized to edit cat!";
                 return Unauthorized();
             }
-            IEnumerable<CatteryViewForCatFormModel> ownedCatteries = await catteryService.AllCatteriesAsync(userId);
-            // Populate the view model with the cat details
-            var model = new CatFormModel()
-            {
-                Name = catDetails.Name,
-                Age = catDetails.Age,
-                Gender = catDetails.Gender,
-                Breed = catDetails.Breed,
-                Color = catDetails.Color,
-                CoatLength = catDetails.CoatLength,
-                Description = catDetails.Description,
-                SelectedCatteryId = catDetails.SelectedCatteryId,
-                Catteries = ownedCatteries // Assuming Catteries property is populated in GetCatForEdit method
-            };
 
             return View(model);
         }
 
 
+        
+
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var isDeleted = await catService.DeleteCatAsync(id);
+
+            if (isDeleted)
+            {
+                TempData[SuccessMessage] = "Cat was deleted successfully!";
+                return RedirectToAction(nameof(All));
+            }
+            else
+            {
+                TempData[ErrorMessage] = "Cat not found or deletion failed!";
+                return RedirectToAction(nameof(All));
+            }
+        }
 
         private IActionResult GeneralError()
         {

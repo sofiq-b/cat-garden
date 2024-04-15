@@ -5,34 +5,47 @@ using CatGarden.ViewModels.Cat;
 using CatGarden.Web.ViewModels.Cat;
 using CatGarden.Web.ViewModels.Home;
 using CatGarden.Web.ViewModels.ImageGallery;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using static CatGarden.Common.EntityValidationConstants;
 using static CatGarden.Common.Enums;
+using Cat = CatGarden.Data.Models.Cat;
+using Image = CatGarden.Data.Models.Image;
 namespace CatGarden.Services.Data
 {
     public class CatService : ICatService
     {
         private readonly CatGardenDbContext dbContext;
-
-        public CatService(CatGardenDbContext dbContext)
+        private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly IImageService imageService;
+        private readonly ICatteryService catteryService;
+        public CatService(CatGardenDbContext dbContext, IWebHostEnvironment webHostEnvironment, IImageService imageService, ICatteryService catteryService)
         {
             this.dbContext = dbContext;
+            this.webHostEnvironment = webHostEnvironment;
+            this.imageService = imageService;
+            this.catteryService = catteryService;
         }
 
-       public async Task<IEnumerable<IndexViewModel>>LastThreeCatsAsync()
-       {
-           IEnumerable<IndexViewModel> lastThreeCats = await this.dbContext
-               .Cats
-               .OrderByDescending(c => c.DateAdded)
-               .Take(3)
-               .Select(c => new IndexViewModel
-               {
-                   Id = c.Id,
-                   Name = c.Name,
-                   CoverImageUrl = c.Images.FirstOrDefault(i => i.IsCover)!.URL,
-               })
-               .ToArrayAsync();
-           return lastThreeCats;
-       }
+        public async Task<IEnumerable<IndexViewModel>> LastThreeCatsAsync()
+        {
+            var lastThreeCats = await this.dbContext
+                .Cats
+                .OrderByDescending(c => c.DateAdded)
+                .Take(3)
+                .Select(c => new IndexViewModel
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    CoverImageUrl = c.Images.FirstOrDefault(i => i.IsCover) != null ? c.Images.FirstOrDefault(i => i.IsCover)!.URL : "alternative_text_here"
+                })
+                .ToArrayAsync();
+
+            return lastThreeCats;
+        }
+
+
+
 
         public async Task<int> CreateAndReturnIdAsync(CatFormModel model)
         {
@@ -52,7 +65,6 @@ namespace CatGarden.Services.Data
             await dbContext.SaveChangesAsync();
 
             return newCat.Id;
-
         }
 
         public async Task<bool> ExistsByIdAsync(int catId)
@@ -85,35 +97,59 @@ namespace CatGarden.Services.Data
                 CatteryId = cat.Cattery.Id,
                 Description = cat.Description,
                 DateAdded = cat.DateAdded,
-                CoverImageUrl = cat.Images.FirstOrDefault(i => i.IsCover)!.URL,
-                ImageUrls = cat.Images.Where(i=>i.IsCover==false).Select(image => image.URL).ToList(),
                 IsFavorite = await IsFavoritedByUserWithIdAsync(catId, userId),
                 LikesCount = cat.LikesCount
             };
+            
+            viewModel.CoverImageUrl = cat.Images.FirstOrDefault(i => i.IsCover)?.URL ?? "alternative_text_here";
+           
+
+            // Update image URLs
+            viewModel.ImageUrls = cat.Images.Where(i => !i.IsCover).Select(image =>
+                Path.Combine("\\cats", GenerateCatDirectory(cat), image.URL)).ToList();
 
             return viewModel;
         }
 
-        public async Task<int> CreateCatAsync(CatFormModel formModel, List<ImageModel> uploadedImages)
+        public async Task<int> InsertImagesAndReturnCatIdAsync(CatFormModel formModel)
         {
-            // Create the cat entity
             int catId = await CreateAndReturnIdAsync(formModel);
-
+            var cat = await GetByIdAsync(catId);
             // Associate uploaded images with the cat entity
-            foreach (var imageData in uploadedImages)
+            foreach (ImageModel imageModel in formModel.Images)
             {
+                string uniqueFileName = $"{Guid.NewGuid()}_{imageModel.Name}";
+                // Construct the destination folder path (e.g., based on cat ID)
+                string destinationFolderPath = Path.Combine(webHostEnvironment.WebRootPath, "cats", GenerateCatDirectory(cat));
+
+                // Ensure that the destination folder exists; if not, create it
+                Directory.CreateDirectory(destinationFolderPath);
+
+                // Construct the destination file path
+                string destinationFilePath = Path.Combine(destinationFolderPath, uniqueFileName);
+
+                // Move the file from the temporary location to the permanent location
+                System.IO.File.Move(imageModel.URL, destinationFilePath);
+
+                // Update the URL property of the ImageModel to contain the relative path within wwwroot
+                imageModel.URL = Path.Combine("\\cats", GenerateCatDirectory(cat), uniqueFileName);
+
                 // Create Image entity and associate it with the cat
-                var image = new Image { Name = imageData.Name, URL = imageData.URL, CatId = catId };
+                var image = new Image { Name = imageModel.Name, URL = imageModel.URL, CatId = catId, IsCover = imageModel.IsCover };
+                cat.Images.Add(image);
                 dbContext.Images.Add(image);
             }
-
             // Save changes to the database
             await dbContext.SaveChangesAsync();
-
+            string tempFolderPath = Path.Combine(webHostEnvironment.WebRootPath,"images", "temp");
+            if (Directory.Exists(tempFolderPath))
+            {
+                Directory.Delete(tempFolderPath, true);
+            }
             return catId;
         }
 
-
+        
 
         public async Task AddCatToFavoritesAsync(int catId, string userId)
         {
@@ -151,7 +187,7 @@ namespace CatGarden.Services.Data
             return new CatDisplayViewModel
             {
                 Id = catId,
-                CoverImageUrl = cat.Images.FirstOrDefault(i => i.IsCover)!.URL,
+                CoverImageUrl = cat.Images.FirstOrDefault(i => i.IsCover)?.URL ?? "alternative_text_here",
                 Name = cat.Name,
                 Breed = cat.Breed.ToString(),
                 Gender = cat.Gender.ToString(),
@@ -173,17 +209,17 @@ namespace CatGarden.Services.Data
                 .Select(cat => new CatDisplayViewModel
                 {
                     Id = cat.Id,
-                    CoverImageUrl = cat.Images.FirstOrDefault(i => i.IsCover)!.URL,
                     Name = cat.Name,
                     Breed = cat.Breed.ToString(),
                     Gender = cat.Gender.ToString(),
                     Age = cat.Age,
                     IsFavorite = true,
                     Location = cat.Cattery.City.ToString(),
-                    LikesCount = cat.LikesCount
+                    LikesCount = cat.LikesCount,
+                    CoverImageUrl = cat.Images.FirstOrDefault(i => i.IsCover) != null ? cat.Images.FirstOrDefault(i => i.IsCover)!.URL : "alternative_text_here"
+
                 })
                 .ToListAsync();
-
             return favoriteCats;
         }
 
@@ -286,40 +322,95 @@ namespace CatGarden.Services.Data
 
         public async Task<IEnumerable<CatDisplayViewModel>> GetAllCatsAsync(string userId)
         {
-            // Get all cats with their details
             var allCats = await dbContext.Cats
                 .Include(c => c.Cattery)
                 .Include(c => c.Images)
-                .Select(cat => new CatDisplayViewModel
-                {
-                    Id = cat.Id,
-                    CoverImageUrl = cat.Images.FirstOrDefault(i => i.IsCover)!.URL,
-                    Name = cat.Name,
-                    Breed = cat.Breed.ToString(),
-                    Gender = cat.Gender.ToString(),
-                    Age = cat.Age,
-                    IsFavorite = dbContext.UsersFavCats.Any(ufc => ufc.UserId.ToString() == userId && ufc.CatId == cat.Id),
-                    Location = cat.Cattery.City.ToString(),
-                    LikesCount = cat.LikesCount
-                })
-                .ToListAsync();
+                .ToListAsync(); 
 
-            return allCats;
+            var catViewModels = allCats.Select(cat => new CatDisplayViewModel
+            {
+                Id = cat.Id,
+                Name = cat.Name,
+                Breed = cat.Breed.ToString(),
+                Gender = cat.Gender.ToString(),
+                Age = cat.Age,
+                IsFavorite = dbContext.UsersFavCats.Any(ufc => ufc.UserId.ToString() == userId && ufc.CatId == cat.Id),
+                Location = cat.Cattery.City.ToString(),
+                LikesCount = cat.LikesCount,
+                CoverImageUrl = cat.Images.FirstOrDefault(i => i.IsCover)?.URL ?? "alternative_text_here"
+        }).ToList();
+
+            return catViewModels;
         }
 
-        public async Task AddImagesToCatAsync(int catId, List<Image> images)
+        public async Task<bool> DeleteCatAsync(int catId)
         {
-            var cat = await dbContext.Cats.FindAsync(catId);
+            Cat cat = await GetByIdAsync(catId);
+
+            var catFolderPath = Path.Combine(webHostEnvironment.WebRootPath, "cats", GenerateCatDirectory(cat));
+
+            if (Directory.Exists(catFolderPath))
+            {
+                Directory.Delete(catFolderPath, true);
+            }
+            //Remove from favorite
+            var favCats = dbContext.UsersFavCats.Where(x => x.CatId == catId).ToList();
+            dbContext.UsersFavCats.RemoveRange(favCats);
+
+            var imagesToDelete = dbContext.Images.Where(image => image.CatId == catId);
+            //Remove images from db
+            dbContext.RemoveRange(imagesToDelete);
+
+            // Remove the cat itself
+            dbContext.Cats.Remove(cat);
+
+            await dbContext.SaveChangesAsync();
+            return true; // Deletion successful
+        }
+        public async Task<CatFormEditViewModel> LoadEditCatAsync(int catId, string userId)
+        {
+            var cat = await GetByIdAsync(catId);
+            
+            var model = new CatFormEditViewModel()
+            {
+                Name = cat.Name,
+                Age = cat.Age,
+                Gender = cat.Gender,
+                Breed = cat.Breed,
+                Color = cat.Color,
+                CoatLength = cat.CoatLength,
+                Description = cat.Description,
+                SelectedCatteryId = cat.CatteryId,
+
+            };
+            var images = cat.Images.ToList();
+
+            model.CoverImageUrl = images.FirstOrDefault(i => i.IsCover)?.URL ?? "alternative_text_here";
 
             foreach (var image in images)
             {
-                cat!.Images.Add(image);
-            }
+                var imageModel = new ImageModel
+                {
+                    Name = image.Name,
+                    URL = image.URL,
+                    IsCover = image.IsCover,
+                    CatId = image.CatId
+                };
 
-            await dbContext.SaveChangesAsync();
+                model.Images.Add(imageModel);
+            }
+            model.FolderPathUrl = $"cats/{GenerateCatDirectory(cat)}";
+            model.Id = catId;
+
+            model.Catteries = await catteryService.AllCatteriesAsync(userId);
+
+            return model;
         }
 
-
+        public string GenerateCatDirectory(Cat cat)
+        {
+            return $"{cat.Name.ToLower().Replace(" ", "-")}_{cat.Id}"; 
+        }
 
         public async Task<bool> IsFavoritedByUserWithIdAsync(int catId, string userId)
         {

@@ -1,1 +1,347 @@
-﻿
+﻿@model CatGarden.Web.ViewModels.Cat.CatFormEditViewModel
+@using static CatGarden.Common.Enums
+@using CatGarden.Services.Data.Interfaces
+@using CatGarden.Web.Infrastructure.Extensions
+@inject IImageService ImageService
+
+@{
+    ViewData["Title"] = "Edit Cat";
+}
+<!-- Include Dropzone.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.2/min/dropzone.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.2/min/dropzone.min.css" />
+
+
+<style>
+    .set-as-cover-btn {
+        color: #fff; /* White text */
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+        .set-as-cover-btn.btn-success {
+            padding: 5px 28px;
+        }
+
+    .dropzone .dz-preview .dz-image {
+        border-radius: 20px;
+        overflow: hidden;
+        width: 160px;
+        height: 160px;
+        position: relative;
+        display: block;
+        z-index: 10;
+    }
+
+    .dropzone .dz-preview {
+        position: relative;
+        display: inline-block;
+        vertical-align: top;
+        margin: 10px;
+        min-height: 100px;
+    }
+
+        .dropzone .dz-preview .dz-image img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+</style>
+
+
+<div style="display: flex; justify-content: center; align-items: center;">
+    <div style="max-width: 600px; width: 100%;">
+        <h2 class="text-center">@ViewData["Title"]</h2>
+
+        <form id="catForm" asp-action="Edit" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label asp-for="Name"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Age"></label>
+                <input asp-for="Age" class="form-control" />
+                <span asp-validation-for="Age" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Gender"></label>
+                <select asp-for="Gender" class="form-control">
+                    <option value="">Select Gender</option>
+                    @foreach (var gender in Enum.GetValues(typeof(Gender)))
+                    {
+                        <option value="@gender">@gender</option>
+                    }
+                </select>
+                <span asp-validation-for="Gender" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Breed"></label>
+                <select asp-for="Breed" class="form-control">
+                    <option value="">Select Breed</option>
+                    @foreach (Breed breed in Enum.GetValues(typeof(Breed)))
+                    {
+                        <option value="@breed.ToString()">@EnumExtensions.GetDisplayName(breed)</option>
+                    }
+                </select>
+                <span asp-validation-for="Breed" class="text-danger"></span>
+            </div>
+
+
+
+            <div class="form-group">
+                <label asp-for="Color"></label>
+                <select asp-for="Color" class="form-control">
+                    <option value="">Select Color</option>
+                    @foreach (var color in Enum.GetValues(typeof(Color)))
+                    {
+                        <option value="@color">@color</option>
+                    }
+                </select>
+                <span asp-validation-for="Color" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="CoatLength"></label>
+                <select asp-for="CoatLength" class="form-control">
+                    <option value="">Select Coat Length</option>
+                    @foreach (var coatLength in Enum.GetValues(typeof(CoatLength)))
+                    {
+                        <option value="@coatLength">@coatLength</option>
+                    }
+                </select>
+                <span asp-validation-for="CoatLength" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Description"></label>
+                <textarea asp-for="Description" class="form-control"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+
+            <div class="form-group">
+                <label asp-for="SelectedCatteryId"></label>
+                <select asp-for="SelectedCatteryId" class="form-control">
+                    <option value="">Select Cattery</option>
+                    @foreach (var cattery in Model.Catteries)
+                    {
+                        <option value="@cattery.Id">@cattery.Name</option>
+                    }
+                </select>
+                <span asp-validation-for="SelectedCatteryId" class="text-danger"></span>
+            </div>
+
+            <div id="dropzone" class="dropzone"></div>
+
+
+            <button type="submit" id="submitButton" class="btn btn-primary">Add Cat</button>
+        </form>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script type="text/javascript">
+        Dropzone.autoDiscover = false;
+        $(document).ready(function () {
+            var myDropzone = new Dropzone("#dropzone", {
+                url: '@Url.Action("UploadImage", "Image")', // Specify the upload URL
+                maxFilesize: 5, // Maximum file size in MB
+                maxFiles: 6, // Maximum number of files allowed
+                acceptedFiles: 'image/*', // Specify accepted file types (e.g., images)
+                addRemoveLinks: false, // Enable default "Remove file" links
+                dictDefaultMessage: "Drop files here or click to upload", // Set default message
+                parallelUploads: 1, // Upload files sequentially
+                timeout: 0,
+                // Other options...
+            });
+
+            // Count the number of server files
+            var serverFileCount = 0;
+
+            // AJAX request to get file info from server
+            $.getJSON('@Url.Action("GetImageInfo", "Image")', { folderPath: '@Model.FolderPathUrl' }, function (data) {
+                // Loop through the file info data
+                $.each(data, function (index, fileInfo) {
+                    // Create a mock file
+                    var mockFile = { name: fileInfo.name, size: fileInfo.size };
+
+                    // Increment the server file count
+                    serverFileCount++;
+
+                    // Construct the full image path
+                    var imagePath = '@Url.Content("~")' + '/' + '@Model.FolderPathUrl' + '/' + fileInfo.name;
+
+                    // Call the default addedfile event handler
+                    myDropzone.emit("addedfile", mockFile);
+
+                    myDropzone.emit("complete", mockFile);
+                    // And optionally show the thumbnail of the file:
+                    myDropzone.emit("thumbnail", mockFile, imagePath);
+
+                    // Create remove button
+                    var removeButton = Dropzone.createElement("<button class='btn btn-danger btn-sm'>Remove</button>");
+                    removeButton.addEventListener("click", function () {
+                        myDropzone.removeFile(mockFile);
+                        // Remove the corresponding ImageModel from session
+                        removeImageModelFromSession(mockFile);
+                        // Update the server file count
+                        serverFileCount--;
+                    });
+
+                    // Create set as cover button
+                    var setAsCoverButton = Dropzone.createElement("<button class='btn btn-primary btn-sm'>Set as Cover</button>");
+                    setAsCoverButton.addEventListener("click", function () {
+                        // Implement set as cover functionality here
+                        alert('Set as Cover functionality goes here');
+                    });
+
+                    // Append buttons to thumbnail
+                    mockFile.previewElement.appendChild(removeButton);
+                    mockFile.previewElement.appendChild(setAsCoverButton);
+                });
+
+                // Update maxFiles option to include server files
+                myDropzone.options.maxFiles = 6 - serverFileCount;
+            });
+
+
+
+
+
+            // Variable to store the file currently set as cover
+            var currentCoverFile = null;
+
+            // Customize the file preview template
+            myDropzone.on("success", function (file, response) {
+                // Store the image URL as a data attribute directly on the file element
+                $(file.previewElement).attr('data-image-url', response);
+
+                // Customize the file preview template
+                var removeButton = Dropzone.createElement("<button class='btn btn-danger btn-sm'>Remove</button>");
+                var setAsCoverButton = Dropzone.createElement("<button type='button' class='btn btn-primary btn-sm set-as-cover-btn'>Set as Cover</button>");
+
+                // Listen for click event on "Set as Cover" button
+                setAsCoverButton.addEventListener("click", function () {
+                    var fileUrl = $(file.previewElement).attr('data-image-url');
+                    // Check if another file is currently set as cover
+                    if (currentCoverFile !== null && currentCoverFile !== file) {
+                        // Reset isCover property for the previous cover file
+                        currentCoverFile.isCover = false;
+                        // Update UI for the previous cover file
+                        $(currentCoverFile.previewElement).find('.set-as-cover-btn').text("Set as Cover");
+                        $(currentCoverFile.previewElement).find('.set-as-cover-btn').removeClass("btn-success").addClass("btn-primary");
+                    }
+                    // Toggle between "Set as Cover" and "Cover" text
+                    if (file.isCover) {
+                        // Set isCover property to false for the current file
+                        file.isCover = false;
+                        // Update UI for the current file
+                        setAsCoverButton.innerText = "Set as Cover";
+                        setAsCoverButton.classList.remove("btn-success");
+                        setAsCoverButton.classList.add("btn-primary");
+                    } else {
+                        // Set isCover property to true for the current file
+                        file.isCover = true;
+                        // Update UI for the current file
+                        setAsCoverButton.innerText = "Cover";
+                        setAsCoverButton.classList.remove("btn-primary");
+                        setAsCoverButton.classList.add("btn-success");
+                    }
+                    // Update the currentCoverFile variable
+                    currentCoverFile = file;
+
+                    // Update isCover property in the session data
+                    updateIsCoverForFileInSession(file, fileUrl);
+                });
+
+                file.previewElement.appendChild(removeButton);
+                file.previewElement.appendChild(setAsCoverButton);
+
+                // Remove file event
+                removeButton.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    myDropzone.removeFile(file);
+                    // Remove the corresponding ImageModel from session
+                    removeImageModelFromSession(file);
+                    // Check if the removed file was set as cover
+                    if (file === currentCoverFile) {
+                        // Reset the currentCoverFile variable
+                        currentCoverFile = null;
+                    }
+                });
+            });
+
+            // Function to update isCover property for a file in the session data
+            function updateIsCoverForFileInSession(file, fileUrl) {
+                $.ajax({
+                    url: '/Image/UpdateIsCoverForFile',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ name: file.name, url: fileUrl, isCover: file.isCover }),
+                    success: function (response) {
+                        if (response.success) {
+                            console.log('isCover updated successfully.');
+                        } else {
+                            console.error('Failed to update isCover.');
+                        }
+                    },
+                    error: function () {
+                        console.error('Failed to update isCover. Server error.');
+                    }
+                });
+            }
+
+            // Function to remove ImageModel from session
+            function removeImageModelFromSession(file) {
+                
+                $.ajax({
+                    url: '/Image/RemoveServerImage',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ name: file.name, url: '@Model.FolderPathUrl' }),
+                    success: function (response) {
+                        if (response.success) {
+                            console.log('ImageModel removed from session successfully.');
+                        } else {
+                            console.error('Failed to remove ImageModel from session.');
+                        }
+                    },
+                    error: function () {
+                        console.error('Failed to remove ImageModel from session. Server error.');
+                    }
+                });
+            }
+
+
+            // Form submission event
+            $('#catForm').submit(function (event) {
+                // Check if no image is set as cover
+                if (!currentCoverFile) {
+                    // Prevent form submission
+                    event.preventDefault();
+                    // Show alert or error message
+                    alert('Please set an image as cover before submitting the form.');
+                }
+            });
+        });
+    </script>
+}
+
+
+
+
+
+
+

@@ -26,7 +26,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\catteries\gallery\" />
     <Folder Include="wwwroot\images\" />
   </ItemGroup>
 

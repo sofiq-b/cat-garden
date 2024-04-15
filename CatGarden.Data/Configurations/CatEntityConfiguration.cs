@@ -9,6 +9,7 @@ public class CatEntityConfiguration : IEntityTypeConfiguration<Cat>
     public void Configure(EntityTypeBuilder<Cat> builder)
     {
        
+        
 
         builder.HasData(this.GenerateCats());
 

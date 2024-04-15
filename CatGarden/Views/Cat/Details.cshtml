@@ -7,7 +7,9 @@
 @{
     bool isCatteryOwner = await CatteryOwnerService.CatteryOwnerExistsByUserIdAsync(User.GetId()!);
 }
-
+@{
+    ViewData["Title"] = Model.Name;
+}
 <partial name="DeleteConfirmation" />
 
 <script src="path/to/jquery.js"></script>

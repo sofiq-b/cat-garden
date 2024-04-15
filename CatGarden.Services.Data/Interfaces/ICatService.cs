@@ -11,25 +11,23 @@ namespace CatGarden.Services.Data.Interfaces
         Task<IEnumerable<IndexViewModel>> LastThreeCatsAsync();
 
         Task<int> CreateAndReturnIdAsync(CatFormModel formModel);
-
+        Task<int> InsertImagesAndReturnCatIdAsync(CatFormModel formModel);
         Task<bool> ExistsByIdAsync(int catId);
 
         Task<CatDetailsViewModel> GetDetailsByIdAsync(int catId, string userId);
-
+        Task<bool> DeleteCatAsync(int catId);
         Task AddCatToFavoritesAsync(int catId, string userId);
         Task RemoveFavoriteAsync(int catId, string userId);
         Task<CatDisplayViewModel> GetCatDisplayViewModelAsync(int catId);
 
         Task<IEnumerable<CatDisplayViewModel>> GetFavoriteCatsAsync(string userId);
-        Task<int> CreateCatAsync(CatFormModel formModel, List<ImageModel> uploadedImages);
+        
         Task RemoveAllCatsFromFavoritesAsync(string userId);
 
         Task<IEnumerable<CatDisplayViewModel>> GetAllCatsAsync(string userId);
-
         Task UpdateCatLikesAsync(Cat cat);
-        Task AddImagesToCatAsync(int catId, List<Image> images);
         Task<Cat> GetByIdAsync(int catId);
-        Task<CatFormModel> GetCatForEdit(int catId, string userId);
+        Task<CatFormEditViewModel> LoadEditCatAsync(int catId, string userId);
         Task<bool> IsCatPartOfOwnedCattery(int catId, string ownerId);
         Task<bool> IsFavoritedByUserWithIdAsync(int catId, string userId);
 
