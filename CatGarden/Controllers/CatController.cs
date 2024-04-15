@@ -283,8 +283,49 @@ namespace CatGarden.Web.Controllers
             return View(model);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Edit(CatFormEditViewModel model)
+        {
+            // Check if the model state is valid
+            if (!ModelState.IsValid)
+            {
+                // If the model state is not valid, return the view with the model to display validation errors
+                return View(model);
+            }
 
-        
+            // Check if the cat exists
+            var existingCat = await catService.GetByIdAsync(model.Id);
+
+            if (existingCat == null)
+            {
+                TempData[ErrorMessage] = "Cat with the selected id doesn't exist.";
+                return RedirectToAction("All", "Cat");
+            }
+
+            string userId = User.GetId()!;
+
+            // Check if the user is authorized to edit the cat
+            var isOwnedByUser = await catService.IsCatPartOfOwnedCattery(model.Id, userId);
+            if (!isOwnedByUser)
+            {
+                TempData[ErrorMessage] = "Unauthorized to edit cat!";
+                return Unauthorized();
+            }
+
+            try
+            {
+                // Update the cat data
+                await catService.UpdateCatAsync(model);
+                TempData[SuccessMessage] = "Cat updated successfully.";
+                return RedirectToAction("Details", "Cat", new { id = model.Id });
+            }
+            catch (Exception)
+            {
+                TempData[ErrorMessage] = "An error occurred while updating the cat.";
+                return RedirectToAction("Details", "Cat", new { id = model.Id });
+            }
+        }
+
 
 
         [HttpPost]

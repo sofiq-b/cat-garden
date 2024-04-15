@@ -6,6 +6,7 @@ using CatGarden.Data.Models;
 using CatGarden.Data;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.EntityFrameworkCore;
+using CatGarden.Web.ViewModels.ImageGallery;
 
 
 namespace CatGarden.Services.Data
@@ -99,6 +100,24 @@ namespace CatGarden.Services.Data
         }
 
 
+        public async Task UpdateImageAsync(Image image)
+        {
+            // Ensure the image entity is tracked by the context
+            dbContext.Entry(image).State = EntityState.Modified;
+
+            try
+            {
+                // Save changes to the database
+                await dbContext.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                // Handle exception, if necessary
+                throw; // Or handle the exception and return false or throw a custom exception
+            }
+        }
+
+
         public async Task DeleteImageAsync(int imageId)
         {
             // Retrieve the existing image entity from the database
@@ -114,7 +133,47 @@ namespace CatGarden.Services.Data
             }
         }
 
+        public async Task<int?> FindImageIdByFileNameAsync(string fileUrl)
+        {
+            try
+            {
+                int catsIndex = fileUrl.IndexOf("/cats");
 
+                // Extract the portion of the URL starting from "/cats"
+                string relativeUrl = fileUrl.Substring(catsIndex);
+                // Find the image by file name in the database
+                var image = await dbContext.Images.FirstOrDefaultAsync(i => i.URL == relativeUrl);
+
+                // Return the image ID if found, otherwise return null
+                return image?.Id;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception or handle it as needed
+                throw ex;
+            }
+        }
+
+        public async Task<List<ImageModel>> GetCatImagesAsync(Cat cat)
+        {
+            var imagesData = await dbContext.Images.Where(i=>i.CatId == cat.Id).ToListAsync();
+
+            // Map the data to ImageModel objects
+            var images = new List<ImageModel>();
+            foreach (var imageData in imagesData)
+            {
+                var imageModel = new ImageModel
+                {
+                    Id = imageData.Id,
+                    Name = imageData.Name,
+                    URL = imageData.URL,
+                    IsCover = imageData.IsCover,
+                };
+                images.Add(imageModel);
+            }
+
+            return images;
+        }
 
     }
 

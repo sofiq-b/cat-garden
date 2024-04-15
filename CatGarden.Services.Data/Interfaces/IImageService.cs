@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using static CatGarden.Common.Enums;
+﻿using CatGarden.Data.Models;
+using CatGarden.Web.ViewModels.ImageGallery;
+using Microsoft.AspNetCore.Http;
 
 namespace CatGarden.Services.Data.Interfaces
 {
@@ -9,6 +9,9 @@ namespace CatGarden.Services.Data.Interfaces
         Task<string> UploadImageAsync(string folderPath, IFormFile file );
         Task<string> EditImageAsync(string folderPath, int imageId, IFormFile newFile);
         bool DeleteImageByNameAndCatId(string imageName, int catId);
+        Task UpdateImageAsync(Image image);
+        Task<int?> FindImageIdByFileNameAsync(string fileUrl);
+        Task<List<ImageModel>> GetCatImagesAsync(Cat cat);
         Task DeleteImageAsync(int imageId);
     }
 }

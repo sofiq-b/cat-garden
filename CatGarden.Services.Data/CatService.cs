@@ -120,19 +120,19 @@ namespace CatGarden.Services.Data
             {
                 string uniqueFileName = $"{Guid.NewGuid()}_{imageModel.Name}";
                 // Construct the destination folder path (e.g., based on cat ID)
-                string destinationFolderPath = Path.Combine(webHostEnvironment.WebRootPath, "cats", GenerateCatDirectory(cat));
+                string destinationFolderPath = Path.Combine(webHostEnvironment.WebRootPath, "cats", GenerateCatDirectory(cat)).Replace('\\', '/');
 
                 // Ensure that the destination folder exists; if not, create it
                 Directory.CreateDirectory(destinationFolderPath);
 
                 // Construct the destination file path
-                string destinationFilePath = Path.Combine(destinationFolderPath, uniqueFileName);
+                string destinationFilePath = Path.Combine(destinationFolderPath, uniqueFileName).Replace('\\', '/');
 
                 // Move the file from the temporary location to the permanent location
                 System.IO.File.Move(imageModel.URL, destinationFilePath);
 
                 // Update the URL property of the ImageModel to contain the relative path within wwwroot
-                imageModel.URL = Path.Combine("\\cats", GenerateCatDirectory(cat), uniqueFileName);
+                imageModel.URL = Path.Combine("/cats", GenerateCatDirectory(cat), uniqueFileName).Replace('\\', '/');
 
                 // Create Image entity and associate it with the cat
                 var image = new Image { Name = imageModel.Name, URL = imageModel.URL, CatId = catId, IsCover = imageModel.IsCover };
@@ -370,9 +370,10 @@ namespace CatGarden.Services.Data
         public async Task<CatFormEditViewModel> LoadEditCatAsync(int catId, string userId)
         {
             var cat = await GetByIdAsync(catId);
-            
+
             var model = new CatFormEditViewModel()
             {
+                Id = cat.Id,
                 Name = cat.Name,
                 Age = cat.Age,
                 Gender = cat.Gender,
@@ -381,31 +382,32 @@ namespace CatGarden.Services.Data
                 CoatLength = cat.CoatLength,
                 Description = cat.Description,
                 SelectedCatteryId = cat.CatteryId,
-
             };
-            var images = cat.Images.ToList();
-
-            model.CoverImageUrl = images.FirstOrDefault(i => i.IsCover)?.URL ?? "alternative_text_here";
-
-            foreach (var image in images)
-            {
-                var imageModel = new ImageModel
-                {
-                    Name = image.Name,
-                    URL = image.URL,
-                    IsCover = image.IsCover,
-                    CatId = image.CatId
-                };
-
-                model.Images.Add(imageModel);
-            }
-            model.FolderPathUrl = $"cats/{GenerateCatDirectory(cat)}";
-            model.Id = catId;
-
+            
+            model.FolderPathUrl = Path.Combine(webHostEnvironment.WebRootPath, "cats", GenerateCatDirectory(cat)).Replace('\\', '/');
             model.Catteries = await catteryService.AllCatteriesAsync(userId);
-
+            model.Images = await imageService.GetCatImagesAsync(cat);
             return model;
         }
+
+        public async Task UpdateCatAsync(CatFormEditViewModel model)
+        {
+            var existingCat = await GetByIdAsync(model.Id);
+
+            // Update the cat entity with the data from the view model
+            existingCat.Name = model.Name;
+            existingCat.Age = model.Age;
+            existingCat.Gender = model.Gender;
+            existingCat.Breed = model.Breed;
+            existingCat.Color = model.Color;
+            existingCat.CoatLength = model.CoatLength;
+            existingCat.Description = model.Description;
+            existingCat.CatteryId = model.SelectedCatteryId;
+
+            // Save changes to the database
+            await dbContext.SaveChangesAsync();
+        }
+
 
         public string GenerateCatDirectory(Cat cat)
         {
