@@ -1,0 +1,68 @@
+﻿@model IEnumerable<CatGarden.Web.ViewModels.Cattery.CatteryDisplayViewModel>
+@using CatGarden.Services.Data.Interfaces
+@using CatGarden.Web.Infrastructure.Extensions
+@using static CatGarden.Common.Enums
+@inject ICatteryOwnerService CatteryOwnerService
+@inject ICatteryService CatteryService
+@{
+    bool isCatteryOwner = await CatteryOwnerService.CatteryOwnerExistsByUserIdAsync(User.GetId()!);
+}
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<partial name="DeleteConfirmation" />
+<script src="path/to/jquery.js"></script>
+<script src="path/to/bootstrap.js"></script>
+
+<style>
+    
+</style>
+
+@{
+    ViewBag.Title = "All Catteries";
+}
+
+<h2 class="text-center">@ViewBag.Title</h2>
+<hr />
+
+<div class="text-center row">
+    @foreach (var cattery in Model)
+    {
+        <div class="card col-4" style="width: 20rem; position: relative; padding-top: 12px;">
+
+            <!-- Card content -->
+            <img src="@cattery.CoverImageUrl" class="card-img-top" alt="Cattery Image">
+            <div class="card-body">
+                <h5 class="card-title mt-1">@cattery.Name</h5>
+                <p class="mb-0"><span class="fw-bold">City: </span>@EnumExtensions.GetDisplayName(Enum.Parse<City>(cattery.City))</p>
+                <p class="mb-0"><span class="fw-bold">Address: </span>@cattery.Address</p>
+                <p class="mb-0"><span class="fw-bold">Establishment Date: </span>@cattery.EstablishmentDate.ToShortDateString()</p>
+            </div>
+
+            <!-- Details button -->
+            <a asp-controller="Cattery" asp-action="Details" asp-route-id="@cattery.Id" class="btn btn-success mb-2 w-100 p-3 fw-bold">Details</a>
+
+            <!-- Delete button -->
+            @if (await CatteryService.IsCatteryOwnedByUserAsync(User.GetId()!, cattery.Id))
+            {
+                <button id="deleteButton-@cattery.Id" class="btn btn-danger mb-2 w-100 p-3 fw-bold deleteButton" data-cattery-id="@cattery.Id">Delete</button>
+            }
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            $('.deleteButton').click(function () {
+                var catteryId = $(this).data('cattery-id');
+                $('#deleteConfirmationModal').modal('show');
+
+                var deleteUrl = '@Url.Action("Delete", "Cattery")' + '/' + catteryId;
+                $('#deleteForm').attr('action', deleteUrl);
+            });
+        });
+    </script>
+}

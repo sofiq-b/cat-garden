@@ -1,16 +1,28 @@
-﻿@model CatGarden.Web.ViewModels.Cat.CatFormModel
+﻿@model CatGarden.Web.ViewModels.Cattery.CatteryFormModel
 @using static CatGarden.Common.Enums
 @using CatGarden.Services.Data.Interfaces
 @using CatGarden.Web.Infrastructure.Extensions
 @inject IImageService ImageService
 
 @{
-    ViewData["Title"] = "Add Cat";
+    ViewData["Title"] = "Add Cattery";
 }
-<!-- Include Dropzone.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.2/min/dropzone.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.2/min/dropzone.min.css" />
+<header>
+	<!-- Include Dropzone.js -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.2/min/dropzone.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.2/min/dropzone.min.css" />
+	
 
+    <!-- jQuery library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <!-- Bootstrap Datepicker CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+
+    <!-- Bootstrap Datepicker JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+
+</header>
 
 <style>
     .set-as-cover-btn {
@@ -21,9 +33,9 @@
         cursor: pointer;
     }
 
-        .set-as-cover-btn.btn-success {
-            padding: 5px 28px;
-        }
+    .set-as-cover-btn.btn-success {
+        padding: 5px 28px;
+    }
 
     .dropzone .dz-preview .dz-image {
         border-radius: 20px;
@@ -43,12 +55,12 @@
         min-height: 100px;
     }
 
-        .dropzone .dz-preview .dz-image img {
-            display: block;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+    .dropzone .dz-preview .dz-image img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
 </style>
 
 
@@ -56,7 +68,7 @@
     <div style="max-width: 600px; width: 100%;">
         <h2 class="text-center">@ViewData["Title"]</h2>
 
-        <form id="catForm" asp-action="Add" method="post" enctype="multipart/form-data">
+        <form id="catteryForm" asp-action="Add" method="post" enctype="multipart/form-data">
             <div class="form-group">
                 <label asp-for="Name"></label>
                 <input asp-for="Name" class="form-control" />
@@ -64,89 +76,35 @@
             </div>
 
             <div class="form-group">
-                <label asp-for="Age"></label>
-                <input asp-for="Age" class="form-control" />
-                <span asp-validation-for="Age" class="text-danger"></span>
+                <label asp-for="Address"></label>
+                <input asp-for="Address" class="form-control" />
+                <span asp-validation-for="Address" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label asp-for="Gender"></label>
-                <select asp-for="Gender" class="form-control">
-                    <option value="">Select Gender</option>
-                    @foreach (var gender in Enum.GetValues(typeof(Gender)))
+                <label asp-for="City"></label>
+                <select asp-for="City" class="form-control">
+                    <option value="">Select City</option>
+                    @foreach (City city in Enum.GetValues(typeof(City)))
                     {
-                        <option value="@gender">@gender</option>
+                        <option value="@city.ToString()">@EnumExtensions.GetDisplayName(city)</option>
                     }
                 </select>
-                <span asp-validation-for="Gender" class="text-danger"></span>
+                <span asp-validation-for="City" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label asp-for="Breed"></label>
-                <select asp-for="Breed" class="form-control">
-                    <option value="">Select Breed</option>
-                    @foreach (Breed breed in Enum.GetValues(typeof(Breed)))
-                    {
-                        <option value="@breed.ToString()">@EnumExtensions.GetDisplayName(breed)</option>
-                    }
-                </select>
-                <span asp-validation-for="Breed" class="text-danger"></span>
-            </div>
-
-
-
-            <div class="form-group">
-                <label asp-for="Color"></label>
-                <select asp-for="Color" class="form-control">
-                    <option value="">Select Color</option>
-                    @foreach (var color in Enum.GetValues(typeof(Color)))
-                    {
-                        <option value="@color">@color</option>
-                    }
-                </select>
-                <span asp-validation-for="Color" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="CoatLength"></label>
-                <select asp-for="CoatLength" class="form-control">
-                    <option value="">Select Coat Length</option>
-                    @foreach (var coatLength in Enum.GetValues(typeof(CoatLength)))
-                    {
-                        <option value="@coatLength">@coatLength</option>
-                    }
-                </select>
-                <span asp-validation-for="CoatLength" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="Description"></label>
-                <textarea asp-for="Description" class="form-control"></textarea>
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-
-
-            <div class="form-group">
-                <label asp-for="SelectedCatteryId"></label>
-                <select asp-for="SelectedCatteryId" class="form-control">
-                    <option value="">Select Cattery</option>
-                    @foreach (var cattery in Model.Catteries)
-                    {
-                        <option value="@cattery.Id">@cattery.Name</option>
-                    }
-                </select>
-                <span asp-validation-for="SelectedCatteryId" class="text-danger"></span>
+                <label asp-for="EstablishmentDate"></label>
+                <input id="establishmentDateInput" class="form-control" type="text" value="@Model.EstablishmentDate.ToString("dd/MM/yyyy")" />
+                <span asp-validation-for="EstablishmentDate" class="text-danger"></span>
             </div>
 
             <div id="dropzone" class="dropzone"></div>
 
-
-            <button type="submit" id="submitButton" class="btn btn-primary">Add Cat</button>
+            <button type="submit" id="submitButton" class="btn btn-primary">Add Cattery</button>
         </form>
     </div>
 </div>
-
-
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
@@ -273,7 +231,7 @@
             }
 
             // Form submission event
-            $('#catForm').submit(function (event) {
+            $('#catteryForm').submit(function (event) {
                 // Check if no image is set as cover
                 if (!currentCoverFile) {
                     // Prevent form submission
@@ -282,13 +240,14 @@
                     alert('Please set an image as cover before submitting the form.');
                 }
             });
+            $('#establishmentDateInput').datepicker({
+                format: 'dd/mm/yyyy',
+                autoclose: true,
+                todayHighlight: true,
+                startDate: '01/01/0001', // Set the start date to January 1, 0001
+                endDate: new Date() // Restrict dates to today and before
+            });
 
         });
     </script>
 }
-
-
-
-
-
-

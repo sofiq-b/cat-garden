@@ -24,8 +24,8 @@ namespace CatGarden.Data.Models
         public ApplicationUser User { get; set; } = null!;
 
         [Required]
-        [Range(0.0, 5.0)] 
-        public double Rating { get; set; }
+        [Range(1, 5)] 
+        public int Rating { get; set; }
 
         [MaxLength(CommentMaxLength)]
         public string? Comment { get; set; }

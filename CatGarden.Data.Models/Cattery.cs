@@ -18,8 +18,6 @@ namespace CatGarden.Data.Models
         [ForeignKey(nameof(OwnerId))]
         public CatteryOwner Owner { get; set; } = null!;
 
-        //Image added after cattery is created
-
         public ICollection<Image> Images { get; set; } = new List<Image>();
 
         [Required]

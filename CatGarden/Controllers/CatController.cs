@@ -62,7 +62,7 @@ namespace CatGarden.Web.Controllers
             }
 
             // If the user is a cattery owner, check if they have any owned catteries
-            IEnumerable<CatteryViewForCatFormModel> ownedCatteries = await catteryService.AllCatteriesAsync(userId);
+            IEnumerable<CatteryViewForCatFormModel> ownedCatteries = await catteryService.OwnedCatteriesAsync(userId);
 
             // If the cattery owner doesn't have any catteries, display an error message or redirect them
             if (!ownedCatteries.Any())
@@ -91,14 +91,14 @@ namespace CatGarden.Web.Controllers
         {
             if (!ModelState.IsValid)
             {
-                formModel.Catteries = await catteryService.AllCatteriesAsync(User.GetId()!);
+                formModel.Catteries = await catteryService.OwnedCatteriesAsync(User.GetId()!);
                 return View(formModel);
             }
             var uploadedImages = HttpContext.Session.Get<List<ImageModel>>("UploadedImages");
             if (!uploadedImages.Any())
             {
                 TempData[ErrorMessage] = "Please upload at least one image before submitting the form.";
-                formModel.Catteries = await catteryService.AllCatteriesAsync(User.GetId()!);
+                formModel.Catteries = await catteryService.OwnedCatteriesAsync(User.GetId()!);
                 return View(formModel);
             }
 
@@ -120,7 +120,7 @@ namespace CatGarden.Web.Controllers
                 TempData[ErrorMessage] = ex.ToString();
                 // Delete cat images folder and image entities
                
-                formModel.Catteries = await catteryService.AllCatteriesAsync(User.GetId()!);
+                formModel.Catteries = await catteryService.OwnedCatteriesAsync(User.GetId()!);
                 return View(formModel);
             }
         }
@@ -204,14 +204,14 @@ namespace CatGarden.Web.Controllers
             if (await catteryOwnerService.CatteryOwnerExistsByUserIdAsync(userId))
             {
                 TempData[ErrorMessage] = "Favorites tab is inaccessible to cattery owners.";
-                return Forbid();
+                return BadRequest();
             }
 
             var isFavorite = await catService.IsFavoritedByUserWithIdAsync(catId, userId);
             if (!isFavorite)
             {
                 TempData[ErrorMessage] = "Unauthorized to remove cat from favorites!";
-                return Forbid();
+                return BadRequest();
             }
 
             await catService.RemoveFavoriteAsync(catId, userId);
@@ -277,7 +277,7 @@ namespace CatGarden.Web.Controllers
             if (!isOwnedByUser)
             {
                 TempData[ErrorMessage] = "Unauthorized to edit cat!";
-                return Unauthorized();
+                return BadRequest();
             }
 
             return View(model);
@@ -309,7 +309,7 @@ namespace CatGarden.Web.Controllers
             if (!isOwnedByUser)
             {
                 TempData[ErrorMessage] = "Unauthorized to edit cat!";
-                return Unauthorized();
+                return BadRequest();
             }
 
             try
@@ -331,6 +331,13 @@ namespace CatGarden.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
+            // Check if the user is authorized to edit the cat
+            var isOwnedByUser = await catService.IsCatPartOfOwnedCattery(id, User.GetId()!);
+            if (!isOwnedByUser)
+            {
+                TempData[ErrorMessage] = "Unauthorized to delete cat!";
+                return BadRequest();
+            }
             var isDeleted = await catService.DeleteCatAsync(id);
 
             if (isDeleted)

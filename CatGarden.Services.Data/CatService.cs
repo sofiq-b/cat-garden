@@ -385,7 +385,7 @@ namespace CatGarden.Services.Data
             };
             
             model.FolderPathUrl = Path.Combine(webHostEnvironment.WebRootPath, "cats", GenerateCatDirectory(cat)).Replace('\\', '/');
-            model.Catteries = await catteryService.AllCatteriesAsync(userId);
+            model.Catteries = await catteryService.OwnedCatteriesAsync(userId);
             model.Images = await imageService.GetCatImagesAsync(cat);
             return model;
         }
