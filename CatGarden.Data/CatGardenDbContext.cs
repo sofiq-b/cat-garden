@@ -17,7 +17,6 @@ namespace CatGarden.Data
         public DbSet<Cat> Cats { get; set; } = null!;
         public DbSet<Cattery> Catteries { get; set; } = null!;
         public DbSet<AdoptionApplication> AdoptionApplications { get; set; } = null!;
-        public DbSet<Article> Articles { get; set; } = null!;
         public DbSet<CatteryOwner> CatteryOwners { get; set; } = null!;
         public DbSet<UserFavCat> UsersFavCats { get; set; } = null!;
         public DbSet<Review> Reviews { get; set; } = null!;

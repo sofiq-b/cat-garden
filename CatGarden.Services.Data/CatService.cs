@@ -58,7 +58,7 @@ namespace CatGarden.Services.Data
                 Color = model.Color,
                 CoatLength = model.CoatLength,
                 Description = model.Description,
-                DateAdded = DateTime.UtcNow,
+                DateAdded = DateTime.Now,
                 CatteryId = model.SelectedCatteryId
             };
             await dbContext.Cats.AddAsync(newCat);

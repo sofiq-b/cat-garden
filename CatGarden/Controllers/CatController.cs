@@ -7,6 +7,7 @@ using CatGarden.Web.ViewModels.ImageGallery;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
 using static CatGarden.Common.NotificationMessagesConstants;
 
 namespace CatGarden.Web.Controllers
@@ -80,10 +81,11 @@ namespace CatGarden.Web.Controllers
 
                 return View(formModel);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return GeneralError();
+                return HandleException(ex);
             }
+
         }
 
         [HttpPost]
@@ -147,10 +149,11 @@ namespace CatGarden.Web.Controllers
                     .GetDetailsByIdAsync(id, User.GetId()!);
                 return View(viewModel);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return GeneralError();
+                return HandleException(ex);
             }
+
         }
 
         [HttpPost]
@@ -319,11 +322,11 @@ namespace CatGarden.Web.Controllers
                 TempData[SuccessMessage] = "Cat updated successfully.";
                 return RedirectToAction("Details", "Cat", new { id = model.Id });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                TempData[ErrorMessage] = "An error occurred while updating the cat.";
-                return RedirectToAction("Details", "Cat", new { id = model.Id });
+                return HandleException(ex);
             }
+
         }
 
 
@@ -352,12 +355,22 @@ namespace CatGarden.Web.Controllers
             }
         }
 
-        private IActionResult GeneralError()
+        private IActionResult HandleException(Exception ex)
         {
-            TempData[ErrorMessage] =
-                "Unexpected error occurred! Please try again later or contact administrator";
+            if (ex is WebException we)
+            {
+                // Get the status code from the HTTP response
+                HttpStatusCode statusCode = ((HttpWebResponse)we.Response).StatusCode;
 
-            return RedirectToAction("Index", "Home");
+                // Redirect to the error handler action with the status code
+                return RedirectToAction("HttpStatusCodeHandler", "Error", new { statusCode = (int)statusCode });
+            }
+            else
+            {
+                TempData[ErrorMessage] = "Unexpected error occurred! Please try again later or contact administrator";
+                return RedirectToAction("Index", "Home");
+            }
         }
+
     }
 }

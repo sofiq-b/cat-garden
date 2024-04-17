@@ -11,8 +11,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using static CatGarden.Common.EntityValidationConstants;
+using static System.Net.Mime.MediaTypeNames;
 using Cattery = CatGarden.Data.Models.Cattery;
 using CatteryOwner = CatGarden.Data.Models.CatteryOwner;
+using Image = CatGarden.Data.Models.Image;
 
 namespace CatGarden.Services.Data
 {
@@ -20,12 +22,10 @@ namespace CatGarden.Services.Data
     {
         private readonly CatGardenDbContext dbContext;
         private readonly IWebHostEnvironment webHostEnvironment;
-        private readonly IImageService imageService;
-        public CatteryService(CatGardenDbContext dbContext, IWebHostEnvironment webHostEnvironment, IImageService imageService)
+        public CatteryService(CatGardenDbContext dbContext, IWebHostEnvironment webHostEnvironment)
         {
             this.dbContext = dbContext;
             this.webHostEnvironment = webHostEnvironment;
-            this.imageService = imageService;
         }
 
 
@@ -72,7 +72,8 @@ namespace CatGarden.Services.Data
                 Address = model.Address,
                 City = model.City,
                 EstablishmentDate = model.EstablishmentDate,
-                OwnerId = owner.Id
+                OwnerId = owner.Id,
+                Owner = owner,
             };
             await dbContext.Catteries.AddAsync(newCattery);
             await dbContext.SaveChangesAsync();
@@ -122,8 +123,10 @@ namespace CatGarden.Services.Data
         {
             Cattery cattery = await dbContext.Catteries
                 .Include(c => c.Cats)
-                    .ThenInclude(c => c.AdoptionApplications)
-                        .ThenInclude(app => app.User) // Include the user information for each application
+                    .ThenInclude(cat => cat.Images)
+                .Include(c => c.Cats) // Include adoption applications for each cat
+                    .ThenInclude(cat => cat.AdoptionApplications)
+                    .ThenInclude(app => app.User)
                 .Include(c => c.Reviews)
                     .ThenInclude(r => r.User) // Include the user information for each review
                 .Include(c => c.Images)
@@ -133,6 +136,7 @@ namespace CatGarden.Services.Data
 
             var viewModel = new CatteryDetailsViewModel
             {
+                Id = catteryId,
                 Name = cattery.Name,
                 City = cattery.City.ToString(),
                 Address = cattery.Address,
@@ -146,11 +150,18 @@ namespace CatGarden.Services.Data
                 IsCover = image.IsCover,
                 CatteryId = catteryId,
             }).ToList();
+            
 
             viewModel.Cats = cattery.Cats.Select(cat => new CatWithAdoptionApplicationViewModel
             {
                 Id = cat.Id,
-                CoverImageUrl = cat.Images.FirstOrDefault(i => i.IsCover)?.URL ?? "alternative_text_here",
+                CoverImageUrl = cat.Images.Select(i => new ImageModel
+                {
+                    Name = i.Name,
+                    URL = i.URL,
+                    IsCover = i.IsCover,
+                    CatId = cat.Id,
+                }).FirstOrDefault(i => i.IsCover)?.URL ?? "alternative_text_here",
                 Name = cat.Name,
                 Breed = cat.Breed.ToString(),
                 Gender = cat.Gender.ToString(),
@@ -167,8 +178,11 @@ namespace CatGarden.Services.Data
                       .ToList()
             }).ToList();
 
+           
             viewModel.Reviews = cattery.Reviews.Select(review => new ReviewDisplayViewModel
             {
+                Id = review.Id,
+                UserId = review.User.Id.ToString(),
                 Username = review.User.UserName,
                 Rating = review.Rating,
                 Comment = review.Comment,
@@ -200,10 +214,16 @@ namespace CatGarden.Services.Data
 
         public async Task<bool> IsCatteryOwnedByUserAsync(string userId, int catteryId)
         {
+            var catteryOwner = await dbContext.CatteryOwners.FirstOrDefaultAsync(c => c.UserId.ToString() == userId);
             // Retrieve the cattery from the database
             var cattery = await dbContext.Catteries.FirstOrDefaultAsync(c => c.Id == catteryId);
 
-            if (cattery != null && cattery.OwnerId.ToString() == userId)
+            if (catteryOwner == null)
+            {
+                return false;
+            }
+
+            if (cattery != null && cattery.OwnerId == catteryOwner.Id)
             {
                 return true; // The cattery is owned by the user
             }

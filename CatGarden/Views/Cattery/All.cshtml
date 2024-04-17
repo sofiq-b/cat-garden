@@ -6,6 +6,7 @@
 @inject ICatteryService CatteryService
 @{
     bool isCatteryOwner = await CatteryOwnerService.CatteryOwnerExistsByUserIdAsync(User.GetId()!);
+    
 }
 
 
@@ -42,9 +43,11 @@
 
             <!-- Details button -->
             <a asp-controller="Cattery" asp-action="Details" asp-route-id="@cattery.Id" class="btn btn-success mb-2 w-100 p-3 fw-bold">Details</a>
-
+            @{
+                bool catteryIsOwnedByUser = await CatteryService.IsCatteryOwnedByUserAsync(User.GetId()!, cattery.Id);
+            }
             <!-- Delete button -->
-            @if (await CatteryService.IsCatteryOwnedByUserAsync(User.GetId()!, cattery.Id))
+            @if ((User.Identity?.IsAuthenticated ?? false) && (catteryIsOwnedByUser))
             {
                 <button id="deleteButton-@cattery.Id" class="btn btn-danger mb-2 w-100 p-3 fw-bold deleteButton" data-cattery-id="@cattery.Id">Delete</button>
             }

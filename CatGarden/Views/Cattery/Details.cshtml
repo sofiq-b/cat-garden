@@ -1,18 +1,38 @@
-﻿@model CatGarden.Web.ViewModels.Cattery.CatteryDetailsViewModel
-
+﻿@using CatGarden.Services.Data.Interfaces
+@using CatGarden.Web.Infrastructure.Extensions
+@using static CatGarden.Common.Enums
+@model CatGarden.Web.ViewModels.Cattery.CatteryDetailsViewModel
+@inject ICatteryOwnerService CatteryOwnerService
+@inject ICatService CatService
+@inject ICatteryService CatteryService
+@{
+    bool isCatteryOwner = await CatteryOwnerService.CatteryOwnerExistsByUserIdAsync(User.GetId()!);
+    bool catteryIsOwnedByUser = await CatteryService.IsCatteryOwnedByUserAsync(User.GetId()!, Model.Id);
+}
 @{
     ViewData["Title"] = "Cattery Details";
 }
 
+<style>
+    .carousel-item img{
+        width: 1300px;
+        height: 500px;
+        object-fit: cover;
+    }
+
+    #catteryCarouselControls {
+        width: 1300px; /* Adjust as needed */
+    }
+</style>
 <!-- Wide Image Carousel -->
-<div id="catteryCarouselControls" class="carousel slide d-inline-block" data-bs-ride="carousel" style="width: fit-content;">
+<div id="catteryCarouselControls" class="carousel slide d-inline-block" data-bs-ride="carousel" >
     <div class="carousel-inner">
         @if (Model.Images != null && Model.Images.Any())
         {
             @foreach (var image in Model.Images)
             {
                 <div class="carousel-item @(image.IsCover ? "active" : string.Empty)">
-                    <img class="d-block mx-auto" style="max-height: 400px; max-width: 100%; object-fit: contain;" src="@image.URL" alt="Cattery Image">
+                    <img class="d-block mx-auto" src="@image.URL" alt="Cattery Image">
                 </div>
             }
         }
@@ -29,20 +49,20 @@
 
 
 
-<!-- Tabs -->
 <ul class="nav nav-tabs mt-3" id="myTab" role="tablist">
     <li class="nav-item">
-        <a class="nav-link active" id="cats-tab" data-toggle="tab" href="#cats" role="tab" aria-controls="cats" aria-selected="true">Cats</a>
+        <a class="nav-link active" id="cats-tab" data-bs-toggle="tab" href="#cats" role="tab" aria-controls="cats" aria-selected="true">Cats</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" id="reviews-tab" data-toggle="tab" href="#reviews" role="tab" aria-controls="reviews" aria-selected="false">Reviews</a>
+        <a class="nav-link" id="reviews-tab" data-bs-toggle="tab" href="#reviews" role="tab" aria-controls="reviews" aria-selected="false">Reviews</a>
     </li>
-    @if (User.IsInRole("CatteryOwner"))
+    @if (isCatteryOwner && catteryIsOwnedByUser)
     {
         <li class="nav-item">
-            <a class="nav-link" id="applications-tab" data-toggle="tab" href="#applications" role="tab" aria-controls="applications" aria-selected="false">Adoption Applications</a>
+        <a class="nav-link" id="adoptionApplications-tab" data-bs-toggle="tab" href="#adoptionApplications" role="tab" aria-controls="adoptionApplications" aria-selected="false">Adoption Applications</a>
         </li>
     }
+    
 </ul>
 
 <!-- Tab Content -->
@@ -52,15 +72,24 @@
         <div class="row mt-3">
             @foreach (var cat in Model.Cats)
             {
-                <div class="col-md-4 mb-4">
-                    <div class="card">
-                        <img class="card-img-top" src="@cat.CoverImageUrl" alt="Cat Image">
-                        <div class="card-body">
-                            <h5 class="card-title">@cat.Name</h5>
-                            <p class="card-text">@cat.Breed</p>
-                            <!-- Add more cat details as needed -->
-                        </div>
+                <div class="card col-4" style="width: 20rem; position: relative; padding-top: 12px;">
+                     <img src="@cat.CoverImageUrl" class="card-img-top" alt="Cat Image">
+                     <div class="card-body">
+                         <h5 class="card-title mt-1">@cat.Name</h5>
+                         <h6 class="card-title mt-1">@EnumExtensions.GetDisplayName(Enum.Parse<Breed>(cat.Breed))</h6>
+                         <p class="mb-0"><span class="fw-bold">Gender: </span>@cat.Gender</p>
+                         <p class="mb-0"><span class="fw-bold">Age: </span>@cat.Age</p>
+                         <p class="mb-0"><span class="fw-bold">City: </span>@cat.Location</p>
                     </div>
+
+                    <!-- Details button -->
+                    <a asp-controller="Cat" asp-action="Details" asp-route-id="@cat.Id" class="btn btn-success mb-2 w-100 p-3 fw-bold">Details</a>
+
+                    <!-- Delete button -->
+                    @if (isCatteryOwner && await CatService.IsCatPartOfOwnedCattery(cat.Id, User.GetId()!))
+                    {
+                        <button id="deleteButton-@cat.Id" class="btn btn-danger mb-2 w-100 p-3 fw-bold deleteButton" data-cat-id="@cat.Id">Delete</button>
+                    }
                 </div>
             }
         </div>
@@ -75,29 +104,45 @@
                         <h5 class="card-title">@review.Username</h5>
                         <p class="card-text">Rating: @review.Rating</p>
                         <p class="card-text">@review.Comment</p>
-                        <p class="card-text"><small class="text-muted">Posted on @review.DatePosted.ToShortDateString()</small></p>
+                        <p class="card-text">
+                            <small class="text-muted">Posted on @review.DatePosted.ToString("dd-MM-yyyy")</small>
+                        </p>
                     </div>
+                    @if (User.GetId() == review.UserId)
+                    {
+                        <div>
+                            <a asp-controller="Review" asp-action="Edit" asp-route-id="@review.Id" class="btn btn-primary">Edit</a>
+                            <button class="btn btn-danger deleteReviewButton" data-review-id="@review.Id">Delete</button>
+                        </div>
+                    }
                 </div>
+            }
+            @if (!isCatteryOwner && !catteryIsOwnedByUser)
+            {
+                <a asp-controller="Review" asp-action="Add" asp-route-id="@Model.Id" class="btn btn-primary">Add a Review</a>
             }
         </div>
     </div>
+    
     <!-- Adoption Applications Tab -->
-    @if (User.IsInRole("CatteryOwner"))
+    @if (isCatteryOwner && catteryIsOwnedByUser)
     {
-        <div class="tab-pane fade" id="applications" role="tabpanel" aria-labelledby="applications-tab">
+        <div class="tab-pane fade" id="adoptionApplications" role="tabpanel" aria-labelledby="adoptionApplications-tab">
             <div class="mt-3">
-                <!-- Add adoption applications display here -->
-                <!-- Example: -->
                 @foreach (var cat in Model.Cats)
                 {
-                    foreach (var app in cat.AdoptionApplications)
+                    @foreach (var application in cat.AdoptionApplications)
                     {
-                        <div class="card mb-3">
+                        <div class="card mb-3" style="width: 500px; height: 300px;">
                             <div class="card-body">
-                                <h5 class="card-title">Adoption Application for @cat.Name</h5>
-                                <p class="card-text">Username: @app.Username</p>
-                                <p class="card-text">Application Date: @app.ApplicationDate.ToShortDateString()</p>
-                                <p class="card-text">Application Status: @app.ApplicationStatus</p>
+                                <h5 class="card-title">Application for @application.CatName</h5>
+                                <p class="card-text">Applicant: @application.Username</p>
+                                <p class="card-text">Application Date: @application.ApplicationDate.ToShortDateString()</p>
+                                <p class="card-text">Status: @application.ApplicationStatus</p>
+                                <div>
+                                    <button class="btn btn-success">Accept</button>
+                                    <button class="btn btn-danger">Reject</button>
+                                </div>
                             </div>
                         </div>
                     }
@@ -105,4 +150,5 @@
             </div>
         </div>
     }
+
 </div>

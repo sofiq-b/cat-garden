@@ -187,7 +187,7 @@
                 </div>
                 <!-- Project info box -->
                 <div class="project-info-box">
-                    <p><b>Date Added:</b> @Model.DateAdded.ToShortDateString()</p>
+                    <p><b>Date Added:</b> @Model.DateAdded.ToString("dd-MM-yyyy")</p>
                     <p><b>Cattery:</b> <a asp-controller="Cattery" asp-action="Details" asp-route-id="@Model.CatteryId" style="text-decoration: none; ">@Model.CatteryName</a></p>
 
 

@@ -29,9 +29,9 @@ namespace CatGarden.Web.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> All()
         {
-            string userId = User.GetId()!;
             var allCatteries = await catteryService.AllCatteriesAsync();
 
             if (!allCatteries.Any())
@@ -60,18 +60,11 @@ namespace CatGarden.Web.Controllers
 
                 return View(formModel);
             }
-            catch (WebException we)
+            catch (Exception ex)
             {
-                // Get the status code from the HTTP response
-                HttpStatusCode statusCode = ((HttpWebResponse)we.Response).StatusCode;
+                return HandleException(ex);
+            }
 
-                // Redirect to the error handler action with the status code
-                return RedirectToAction("HttpStatusCodeHandler", "Error", new { statusCode = (int)statusCode });
-            }
-            catch (Exception)
-            {
-                return GeneralError();
-            }
 
         }
 
@@ -112,18 +105,11 @@ namespace CatGarden.Web.Controllers
 
                 return RedirectToAction("Details", "Cattery", new { id = catteryId });
             }
-            catch (WebException we)
+            catch (Exception ex)
             {
-                // Get the status code from the HTTP response
-                HttpStatusCode statusCode = ((HttpWebResponse)we.Response).StatusCode;
+                return HandleException(ex);
+            }
 
-                // Redirect to the error handler action with the status code
-                return RedirectToAction("HttpStatusCodeHandler", "Error", new { statusCode = (int)statusCode });
-            }
-            catch (Exception)
-            {
-                return GeneralError();
-            }
         }
 
         [HttpGet]
@@ -145,21 +131,32 @@ namespace CatGarden.Web.Controllers
                     .GetDetailsByIdAsync(id);
                 return View(viewModel);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return GeneralError();
+                return HandleException(ex);
+            }
+
+        }
+
+
+
+
+        private IActionResult HandleException(Exception ex)
+        {
+            if (ex is WebException we)
+            {
+                // Get the status code from the HTTP response
+                HttpStatusCode statusCode = ((HttpWebResponse)we.Response).StatusCode;
+
+                // Redirect to the error handler action with the status code
+                return RedirectToAction("HttpStatusCodeHandler", "Error", new { statusCode = (int)statusCode });
+            }
+            else
+            {
+                TempData[ErrorMessage] = "Unexpected error occurred! Please try again later or contact administrator";
+                return RedirectToAction("Index", "Home");
             }
         }
 
-        
-
-
-        private IActionResult GeneralError()
-        {
-            TempData[ErrorMessage] =
-                "Unexpected error occurred! Please try again later or contact administrator";
-            return RedirectToAction("Index", "Home");
-
-        }
     }
 }
