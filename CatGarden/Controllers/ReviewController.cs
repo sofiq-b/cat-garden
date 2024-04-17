@@ -1,5 +1,4 @@
-﻿using CatGarden.Services.Data;
-using CatGarden.Services.Data.Interfaces;
+﻿using CatGarden.Services.Data.Interfaces;
 using CatGarden.Web.Infrastructure.Extensions;
 using CatGarden.Web.ViewModels.Review;
 using Microsoft.AspNetCore.Authorization;
@@ -218,9 +217,6 @@ namespace CatGarden.Web.Controllers
 
             return RedirectToAction("Details", "Cattery", new { id = review.CatteryId });
         }
-
-
-
 
         private IActionResult HandleException(Exception ex)
         {

@@ -8,8 +8,5 @@ namespace CatGarden.Data.Models
         {
             this.Id = Guid.NewGuid();
         }
-
-        public IList<Cat> AdoptedCats { get; set; } = new List<Cat>();
-
     }
 }

@@ -1,0 +1,33 @@
+﻿@model IEnumerable<CatGarden.Web.ViewModels.AdoptionApplication.AdoptionApplicationOfUserViewModel>
+@{
+    ViewBag.Title = "My Adoption Applications";
+}
+
+<div class="container">
+    <div class="row">
+        @foreach (var application in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            @Html.ActionLink(application.CatName, "Details", "Cat", new { id = application.CatId }, new { @class = "no-decoration" })
+                        </h5>
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            @Html.ActionLink(application.CatteryName, "Details", "Cattery", new { id = application.CatteryId }, new { @class = "no-decoration" })
+                        </h6>
+                        <p class="card-text">Application Date: @application.ApplicationDate.ToString("dd/MM/yyyy")</p>
+                        <p class="card-text">Application Status: @application.ApplicationStatus</p>
+                        @if (application.ApplicationStatus == "Pending")
+                        {
+                            <form asp-action="Delete" asp-route-id="@application.Id" method="post">
+                                <button type="submit" class="btn btn-danger btn-sm float-right">Delete</button>
+                            </form>
+                        }
+                    </div>
+                    <img src="@application.CoverImageUrl" class="card-img-bottom" alt="Cat Cover Image">
+                </div>
+            </div>
+        }
+    </div>
+</div>

@@ -168,7 +168,7 @@ namespace CatGarden.Services.Data
                 Age = cat.Age,
                 Location = cat.Cattery.City.ToString(),
                 AdoptionApplications = cat.AdoptionApplications
-                      .Select(app => new AdoptionApplicationViewModel   
+                      .Select(app => new AdoptionApplicationOfUserViewModel   
                       {
                           Username = app.User.UserName,
                           CatName = cat.Name,

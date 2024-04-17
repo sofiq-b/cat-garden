@@ -408,6 +408,15 @@ namespace CatGarden.Services.Data
             await dbContext.SaveChangesAsync();
         }
 
+        public async Task<bool> IsAdoptedAsync(int catId)
+        {
+            return await dbContext.Cats
+                                .Where(c => c.Id == catId)
+                                .SelectMany(c => c.AdoptionApplications)
+                                .AnyAsync(app => app.ApplicationStatus == ApplicationStatus.Accepted);
+        }
+
+
 
         public string GenerateCatDirectory(Cat cat)
         {

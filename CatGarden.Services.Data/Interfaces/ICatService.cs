@@ -30,6 +30,7 @@ namespace CatGarden.Services.Data.Interfaces
         Task<CatFormEditViewModel> LoadEditCatAsync(int catId, string userId);
         Task<bool> IsCatPartOfOwnedCattery(int catId, string ownerId);
         Task<bool> IsFavoritedByUserWithIdAsync(int catId, string userId);
+        Task<bool> IsAdoptedAsync(int catId);
         Task UpdateCatAsync(CatFormEditViewModel model);
     }
 }

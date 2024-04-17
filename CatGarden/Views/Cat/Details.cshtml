@@ -8,6 +8,7 @@
 @{
     bool isCatteryOwner = await CatteryOwnerService.CatteryOwnerExistsByUserIdAsync(User.GetId()!);
     bool isPartOfCattery = await CatService.IsCatPartOfOwnedCattery(Model.Id, User.GetId()!);
+    bool isAdopted = await CatService.IsAdoptedAsync(Model.Id);
 }
 @{
     ViewData["Title"] = Model.Name;
@@ -137,7 +138,18 @@
                 {
                     @if (!isCatteryOwner)
                     {
-                        <a asp-controller="AdoptionApplication" asp-action="SendApplication" asp-route-id="@Model.Id" class="btn btn-success mb-2 w-100 p-3 fw-bold">Adopt</a>
+                        @if (isAdopted)
+                        {
+                            <div class="alert alert-warning" role="alert">
+                                This cat has already been adopted.
+                            </div>
+                        }
+                        else
+                        {
+                            <form asp-controller="AdoptionApplication" asp-action="SendApplication" asp-route-catId="@Model.Id">
+                                <input type="submit" class="btn btn-success mb-2 w-100 p-3 fw-bold" value="Adopt" />
+                            </form>
+                        }
                     }
                     else
                     {
