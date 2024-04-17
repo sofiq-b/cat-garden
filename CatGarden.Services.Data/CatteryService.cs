@@ -165,6 +165,7 @@ namespace CatGarden.Services.Data
                 AdoptionApplications = cat.AdoptionApplications
                       .Select(app => new AdoptionApplicationOfUserViewModel   
                       {
+                          Id = app.Id.ToString(),
                           Username = app.User.UserName,
                           CatName = cat.Name,
                           ApplicationDate = app.ApplicationDate,

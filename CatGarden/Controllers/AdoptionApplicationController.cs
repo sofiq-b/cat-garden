@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using static CatGarden.Common.NotificationMessagesConstants;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace CatGarden.Web.Controllers
 {
@@ -29,11 +30,6 @@ namespace CatGarden.Web.Controllers
 
             string userId = User.GetId();
 
-            if (userId == null)
-            {
-                TempData[ErrorMessage] = "User not logged in.";
-                return RedirectToAction("Index", "Home");
-            }
             try
             {
                 var cat = await catService.GetByIdAsync(catId);
@@ -67,11 +63,6 @@ namespace CatGarden.Web.Controllers
         {
             var userId = User.GetId();
 
-            if (userId == null)
-            {
-                TempData[ErrorMessage] = "User not logged in.";
-                return RedirectToAction("Index", "Home");
-            }
             try
             {
                 // Call the service method to retrieve the adoption applications of the user
@@ -93,11 +84,6 @@ namespace CatGarden.Web.Controllers
         {
             var userId = User.GetId();
 
-            if (userId == null)
-            {
-                TempData[ErrorMessage] = "User not logged in.";
-                return RedirectToAction("Index", "Home");
-            }
             var application = await adoptionApplicationService.GetAdoptionApplicationByIdAsync(id);
             
             if (!await adoptionApplicationService.HasUserAlreadySentApplicationForCat(new Guid(userId), application.CatId))
@@ -106,19 +92,86 @@ namespace CatGarden.Web.Controllers
                 return RedirectToAction("MyApplications", "AdoptionApplication");
             }
 
-
-            var isDeleted = await adoptionApplicationService.DeleteAdoptionApplicationAsync(id);
-            if (isDeleted)
+            try
             {
-                TempData[SuccessMessage] = "Adoption application was deleted successfully!";
-            }
-            else
-            {
-                TempData[ErrorMessage] = "Adoption application not found or deletion failed!";
-            }
+                var isDeleted = await adoptionApplicationService.DeleteAdoptionApplicationAsync(id);
+                if (isDeleted)
+                {
+                    TempData[SuccessMessage] = "Adoption application was deleted successfully!";
+                }
+                else
+                {
+                    TempData[ErrorMessage] = "Adoption application not found or deletion failed!";
+                }
 
-            return RedirectToAction("MyApplications", "AdoptionApplication");
+                return RedirectToAction("MyApplications", "AdoptionApplication");
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+            
         }
+
+        [HttpPost]
+        public async Task<IActionResult> Accept(Guid id)
+        {
+            var userId = User.GetId()!;
+            
+            var application = await adoptionApplicationService.GetAdoptionApplicationByIdAsync(id);
+            var cat = await catService.GetByIdAsync(application.CatId);
+            if (application == null)
+            {
+                TempData[ErrorMessage] = "Adoption application not found.";
+                return RedirectToAction("All", "Catteries");
+            }
+            if (!await catteryService.IsCatteryOwnedByUserAsync(userId, cat.CatteryId))
+            {
+                TempData[ErrorMessage] = "Unauthorized to manage adopt applications!";
+                return RedirectToAction("All", "Catteries");
+            }
+            try
+            {
+                var result = await adoptionApplicationService.AcceptAdoptionApplicationAsync(id);
+                TempData[SuccessMessage] = "Adoption application accepted!";
+                return RedirectToAction("Details", "Cattery", new { id = cat.CatteryId });
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Reject(Guid id)
+        {
+            var userId = User.GetId()!;
+
+            var application = await adoptionApplicationService.GetAdoptionApplicationByIdAsync(id);
+            var cat = await catService.GetByIdAsync(application.CatId);
+            if (application == null)
+            {
+                TempData[ErrorMessage] = "Adoption application not found.";
+                return RedirectToAction("All", "Catteries");
+            }
+            if (!await catteryService.IsCatteryOwnedByUserAsync(userId, cat.CatteryId))
+            {
+                TempData[ErrorMessage] = "Unauthorized to manage adopt applications!";
+                return RedirectToAction("All", "Catteries");
+            }
+            try
+            {
+                var result = await adoptionApplicationService.RejectAdoptionApplicationAsync(id);
+                TempData[SuccessMessage] = "Adoption application rejected!";
+                return RedirectToAction("Details", "Cattery", new { id = cat.CatteryId });
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+        }
+
+
 
 
         private IActionResult HandleException(Exception ex)

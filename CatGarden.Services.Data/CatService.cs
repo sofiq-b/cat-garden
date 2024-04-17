@@ -280,24 +280,17 @@ namespace CatGarden.Services.Data
 
         public async Task<CatFormModel> GetCatForEdit(int catId, string userId)
         {
-            // Get the cat details
             var catDetails = await GetDetailsByIdAsync(catId, userId);
 
             var images = new List<ImageModel>();
             var imageData = dbContext.Images.Where(i => i.CatId == catId);
             foreach (var image in imageData)
             {
-                // Retrieve image data based on the URL (Assuming you have a method to fetch image data from URL)
-                
-
-                // Create ImageModel instance
                 var imageModel = new ImageModel
                 {
                     Name = image.Name,
-                    URL = image.URL // Assuming the URL is still valid and accessible
+                    URL = image.URL 
                 };
-
-                // Add to the list of images
                 images.Add(imageModel);
             }
 
@@ -318,6 +311,30 @@ namespace CatGarden.Services.Data
 
             return catFormModel;
         }
+
+        public async Task<CatFormEditViewModel> LoadEditCatAsync(int catId, string userId)
+        {
+            var cat = await GetByIdAsync(catId);
+
+            var model = new CatFormEditViewModel()
+            {
+                Id = cat.Id,
+                Name = cat.Name,
+                Age = cat.Age,
+                Gender = cat.Gender,
+                Breed = cat.Breed,
+                Color = cat.Color,
+                CoatLength = cat.CoatLength,
+                Description = cat.Description,
+                SelectedCatteryId = cat.CatteryId,
+            };
+
+            model.FolderPathUrl = Path.Combine(webHostEnvironment.WebRootPath, "cats", GenerateCatDirectory(cat)).Replace('\\', '/');
+            model.Catteries = await catteryService.OwnedCatteriesAsync(userId);
+            model.Images = await imageService.GetCatImagesAsync(cat);
+            return model;
+        }
+
 
         public async Task<IEnumerable<CatDisplayViewModel>> GetAllCatsAsync(string userId)
         {
@@ -366,28 +383,7 @@ namespace CatGarden.Services.Data
             await dbContext.SaveChangesAsync();
             return true; // Deletion successful
         }
-        public async Task<CatFormEditViewModel> LoadEditCatAsync(int catId, string userId)
-        {
-            var cat = await GetByIdAsync(catId);
-
-            var model = new CatFormEditViewModel()
-            {
-                Id = cat.Id,
-                Name = cat.Name,
-                Age = cat.Age,
-                Gender = cat.Gender,
-                Breed = cat.Breed,
-                Color = cat.Color,
-                CoatLength = cat.CoatLength,
-                Description = cat.Description,
-                SelectedCatteryId = cat.CatteryId,
-            };
-            
-            model.FolderPathUrl = Path.Combine(webHostEnvironment.WebRootPath, "cats", GenerateCatDirectory(cat)).Replace('\\', '/');
-            model.Catteries = await catteryService.OwnedCatteriesAsync(userId);
-            model.Images = await imageService.GetCatImagesAsync(cat);
-            return model;
-        }
+        
 
         public async Task UpdateCatAsync(CatFormEditViewModel model)
         {

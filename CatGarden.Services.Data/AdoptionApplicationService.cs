@@ -66,14 +66,29 @@ namespace CatGarden.Services.Data
         }
 
 
+        public async Task<bool> AcceptAdoptionApplicationAsync(Guid id)
+        {
+            var application = await GetAdoptionApplicationByIdAsync(id);
+
+            application.ApplicationStatus = ApplicationStatus.Accepted;
+            await dbContext.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> RejectAdoptionApplicationAsync(Guid id)
+        {
+            var application = await GetAdoptionApplicationByIdAsync(id);
+
+            application.ApplicationStatus = ApplicationStatus.Rejected;
+            await dbContext.SaveChangesAsync();
+            return true;
+        }
 
 
 
 
 
 
-
-       
 
         public async Task<AdoptionApplication> GetAdoptionApplicationByIdAsync(Guid applicationId)
         {

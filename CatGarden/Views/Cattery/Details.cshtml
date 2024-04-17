@@ -133,15 +133,28 @@
                 {
                     @foreach (var application in cat.AdoptionApplications)
                     {
-                        <div class="card mb-3" style="width: 500px; height: 300px;">
-                            <div class="card-body">
-                                <h5 class="card-title">Application for @application.CatName</h5>
-                                <p class="card-text">Applicant: @application.Username</p>
-                                <p class="card-text">Application Date: @application.ApplicationDate.ToShortDateString()</p>
-                                <p class="card-text">Status: @application.ApplicationStatus</p>
-                                <div>
-                                    <button class="btn btn-success">Accept</button>
-                                    <button class="btn btn-danger">Reject</button>
+                        <div class="card mb-3" style="width: 500px;">
+                            <div class="row">
+                                <!-- Cat Cover Image -->
+                                <div class="col-md-8" style="width:52.666667%">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Application for @application.CatName</h5>
+                                        <p class="card-text">Applicant: @application.Username</p>
+                                        <p class="card-text">Application Date: @application.ApplicationDate.ToShortDateString()</p>
+                                        <p class="card-text">Status: @application.ApplicationStatus</p>
+                                        <div>
+                                            <form asp-controller="AdoptionApplication" asp-action="Accept" asp-route-id="@application.Id" method="post">
+                                                <button type="submit" class="btn btn-success btn-sm float-right">Accept</button>
+                                            </form>
+
+                                            <form asp-controller="AdoptionApplication" asp-action="Reject" asp-route-id="@application.Id" method="post">
+                                                <button type="submit" class="btn btn-danger btn-sm float-right">Reject</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <img src="@cat.CoverImageUrl" class="card-img-top" alt="Cat Cover Image" style="width: 200px; height: 200px; object-fit: cover;">
                                 </div>
                             </div>
                         </div>
