@@ -1,5 +1,4 @@
-﻿using CatGarden.Services.Data;
-using CatGarden.Services.Data.Interfaces;
+﻿using CatGarden.Services.Data.Interfaces;
 using CatGarden.Web.Infrastructure.Extensions;
 using CatGarden.Web.ViewModels.Home;
 using Microsoft.AspNetCore.Mvc;
@@ -26,12 +25,10 @@ namespace CatGarden.Web.Controllers
 
             if (isCatteryOwner)
             {
-                // User is a cattery owner
                 ViewData["IsCatteryOwner"] = true;
             }
             else
             {
-                // User is not a cattery owner
                 ViewData["IsCatteryOwner"] = false;
             }
             return View(viewModel);

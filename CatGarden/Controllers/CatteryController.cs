@@ -1,18 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using CatGarden.Services.Data.Interfaces;
-using CatGarden.Web.ViewModels.Cattery;
+﻿using CatGarden.Services.Data.Interfaces;
 using CatGarden.Web.Infrastructure.Extensions;
-using Microsoft.AspNetCore.Authorization;
-using System.Threading.Tasks;
-using System;
-using System.Linq;
-using static CatGarden.Common.NotificationMessagesConstants;
-using CatGarden.Web.ViewModels.Cat;
-using CatGarden.Services.Data;
+using CatGarden.Web.ViewModels.Cattery;
 using CatGarden.Web.ViewModels.ImageGallery;
-using CatGarden.ViewModels.Cat;
-using System.Net.Mail;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using static CatGarden.Common.NotificationMessagesConstants;
 
 namespace CatGarden.Web.Controllers
 {
@@ -95,12 +88,10 @@ namespace CatGarden.Web.Controllers
 
             try
             {
-                // Associate the image URLs with the cat model
                 formModel.Images = uploadedImages;
 
                 int catteryId = await catteryService.InsertImagesAndReturnCatteryIdAsync(formModel, User.GetId());
                 TempData[SuccessMessage] = "Cattery was added successfully!";
-                // Remove temporarily stored image data
                 HttpContext.Session.Remove("UploadedImages");
 
                 return RedirectToAction("Details", "Cattery", new { id = catteryId });
@@ -179,7 +170,6 @@ namespace CatGarden.Web.Controllers
 
             string userId = User.GetId()!;
 
-            // Check if the user is authorized to edit the cattery
             var isOwnedByUser = await catteryService.IsCatteryOwnedByUserAsync(userId, model.Id);
             if (!isOwnedByUser)
             {
@@ -202,7 +192,6 @@ namespace CatGarden.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            // Check if the user is authorized to delete the cattery
             var isOwnedByUser = await catteryService.IsCatteryOwnedByUserAsync(User.GetId()!,id);
             if (!isOwnedByUser)
             {
@@ -228,10 +217,8 @@ namespace CatGarden.Web.Controllers
         {
             if (ex is WebException we)
             {
-                // Get the status code from the HTTP response
                 HttpStatusCode statusCode = ((HttpWebResponse)we.Response).StatusCode;
 
-                // Redirect to the error handler action with the status code
                 return RedirectToAction("HttpStatusCodeHandler", "Error", new { statusCode = (int)statusCode });
             }
             else

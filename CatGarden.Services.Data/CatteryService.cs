@@ -25,8 +25,6 @@ namespace CatGarden.Services.Data
             this.webHostEnvironment = webHostEnvironment;
             this.imageService = imageService;
         }
-
-
         public async Task<IEnumerable<CatteryViewForCatFormModel>> OwnedCatteriesAsync(string userId)
         {
             IEnumerable<CatteryViewForCatFormModel> ownedCatteries = await this.dbContext
@@ -83,31 +81,23 @@ namespace CatGarden.Services.Data
         {
             int catteryId = await CreateAndReturnIdAsync(formModel, userId);
             var cattery = await GetByIdAsync(catteryId);
-            // Associate uploaded images with the cat entity
             foreach (ImageModel imageModel in formModel.Images)
             {
                 string uniqueFileName = $"{Guid.NewGuid()}_{imageModel.Name}";
-                // Construct the destination folder path (e.g., based on cat ID)
                 string destinationFolderPath = Path.Combine(webHostEnvironment.WebRootPath, "catteries", GenerateCatteryDirectory(cattery)).Replace('\\', '/');
 
-                // Ensure that the destination folder exists; if not, create it
                 Directory.CreateDirectory(destinationFolderPath);
 
-                // Construct the destination file path
                 string destinationFilePath = Path.Combine(destinationFolderPath, uniqueFileName).Replace('\\', '/');
 
-                // Move the file from the temporary location to the permanent location
                 System.IO.File.Move(imageModel.URL, destinationFilePath);
 
-                // Update the URL property of the ImageModel to contain the relative path within wwwroot
                 imageModel.URL = Path.Combine("/catteries", GenerateCatteryDirectory(cattery), uniqueFileName).Replace('\\', '/');
 
-                // Create Image entity and associate it with the cat
                 var image = new Image { Name = imageModel.Name, URL = imageModel.URL, CatteryId = catteryId, IsCover = imageModel.IsCover };
                 cattery.Images.Add(image);
                 dbContext.Images.Add(image);
             }
-            // Save changes to the database
             await dbContext.SaveChangesAsync();
             string tempFolderPath = Path.Combine(webHostEnvironment.WebRootPath, "images", "temp");
             if (Directory.Exists(tempFolderPath))
@@ -122,11 +112,11 @@ namespace CatGarden.Services.Data
             Cattery cattery = await dbContext.Catteries
                 .Include(c => c.Cats)
                     .ThenInclude(cat => cat.Images)
-                .Include(c => c.Cats) // Include adoption applications for each cat
+                .Include(c => c.Cats) 
                     .ThenInclude(cat => cat.AdoptionApplications)
                     .ThenInclude(app => app.User)
                 .Include(c => c.Reviews)
-                    .ThenInclude(r => r.User) // Include the user information for each review
+                    .ThenInclude(r => r.User)
                 .Include(c => c.Images)
                 .FirstAsync(c => c.Id == catteryId);
 
@@ -209,7 +199,6 @@ namespace CatGarden.Services.Data
                 images.Add(imageModel);
             }
 
-            // Map the CatteryDetailsViewModel to CatteryFormModel
             var catteryFormModel = new CatteryFormModel
             {
                 Name = catteryDetails.Name,
@@ -271,9 +260,6 @@ namespace CatGarden.Services.Data
             await dbContext.SaveChangesAsync();
             return true; 
         }
-
-
-
         public async Task<bool> ExistsByIdAsync(int catteryId)
         {
             bool result = await dbContext
@@ -281,7 +267,6 @@ namespace CatGarden.Services.Data
                 .AnyAsync(c => c.Id == catteryId);
             return result;
         }
-
         public async Task<Cattery> GetByIdAsync(int catteryId)
         {
             return await dbContext.Catteries.FirstOrDefaultAsync(c => c.Id == catteryId);
@@ -305,10 +290,10 @@ namespace CatGarden.Services.Data
 
             if (cattery != null && cattery.OwnerId == catteryOwner.Id)
             {
-                return true; // The cattery is owned by the user
+                return true; 
             }
 
-            return false; // The cattery is not owned by the user or does not exist
+            return false; 
         }
     }
 }

@@ -6,7 +6,6 @@ using CatGarden.Web.ViewModels.Cattery;
 using CatGarden.Web.ViewModels.ImageGallery;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Net;
 using static CatGarden.Common.NotificationMessagesConstants;
 
@@ -54,7 +53,6 @@ namespace CatGarden.Web.Controllers
 
             bool isCatteryOwner =
                 await catteryOwnerService.CatteryOwnerExistsByUserIdAsync(User.GetId()!);
-            //If user is not cattery owner redirect to become one
             if (!isCatteryOwner)
             {
                 TempData[ErrorMessage] = "You must become a cattery owner in order to add new cats!";
@@ -62,10 +60,8 @@ namespace CatGarden.Web.Controllers
                 return RedirectToAction("Become", "CatteryOwner");
             }
 
-            // If the user is a cattery owner, check if they have any owned catteries
             IEnumerable<CatteryViewForCatFormModel> ownedCatteries = await catteryService.OwnedCatteriesAsync(userId);
 
-            // If the cattery owner doesn't have any catteries, display an error message or redirect them
             if (!ownedCatteries.Any())
             {
                 TempData[ErrorMessage] = "You must register a cattery before adding cats!";
@@ -106,12 +102,10 @@ namespace CatGarden.Web.Controllers
 
             try
             {
-                // Associate the image URLs with the cat model
                 formModel.Images = uploadedImages;
 
                 int catId = await catService.InsertImagesAndReturnCatIdAsync(formModel);
                 TempData[SuccessMessage] = "Cat was added successfully!";
-                // Remove temporarily stored image data
                 HttpContext.Session.Remove("UploadedImages");
 
                 return RedirectToAction("Details", "Cat", new { id = catId });
@@ -120,7 +114,6 @@ namespace CatGarden.Web.Controllers
             {
                 
                 TempData[ErrorMessage] = ex.ToString();
-                // Delete cat images folder and image entities
                
                 formModel.Catteries = await catteryService.OwnedCatteriesAsync(User.GetId()!);
                 return View(formModel);
@@ -234,7 +227,6 @@ namespace CatGarden.Web.Controllers
 
                 return RedirectToAction("All", "Cat");
             }
-            // Call service method to remove all cats from favorites
             await catService.RemoveAllCatsFromFavoritesAsync(userId);
 
             return RedirectToAction("Favorites", "Cat");
@@ -243,7 +235,6 @@ namespace CatGarden.Web.Controllers
 
         public async Task<IActionResult> Favorites()
         {
-            // Get the current user's ID
             string userId = User.GetId()!;
 
             if (await catteryOwnerService.CatteryOwnerExistsByUserIdAsync(userId))
@@ -252,7 +243,6 @@ namespace CatGarden.Web.Controllers
 
                 return RedirectToAction("All", "Cat");
             }
-            // Retrieve the favorite cats of the user
             var favoriteCats = await catService.GetFavoriteCatsAsync(userId);
 
             if (!favoriteCats.Any())
@@ -267,7 +257,6 @@ namespace CatGarden.Web.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             string userId = User.GetId()!;
-            // Load data for editing the cat
             var model = await catService.LoadEditCatAsync(id, userId);
 
             if (model == null)
@@ -289,14 +278,11 @@ namespace CatGarden.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(CatFormEditViewModel model)
         {
-            // Check if the model state is valid
             if (!ModelState.IsValid)
             {
-                // If the model state is not valid, return the view with the model to display validation errors
                 return View(model);
             }
 
-            // Check if the cat exists
             var existingCat = await catService.GetByIdAsync(model.Id);
 
             if (existingCat == null)
@@ -307,7 +293,6 @@ namespace CatGarden.Web.Controllers
 
             string userId = User.GetId()!;
 
-            // Check if the user is authorized to edit the cat
             var isOwnedByUser = await catService.IsCatPartOfOwnedCattery(model.Id, userId);
             if (!isOwnedByUser)
             {
@@ -317,7 +302,6 @@ namespace CatGarden.Web.Controllers
 
             try
             {
-                // Update the cat data
                 await catService.UpdateCatAsync(model);
                 TempData[SuccessMessage] = "Cat updated successfully.";
                 return RedirectToAction("Details", "Cat", new { id = model.Id });
@@ -334,7 +318,6 @@ namespace CatGarden.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            // Check if the user is authorized to edit the cat
             var isOwnedByUser = await catService.IsCatPartOfOwnedCattery(id, User.GetId()!);
             if (!isOwnedByUser)
             {
@@ -359,10 +342,8 @@ namespace CatGarden.Web.Controllers
         {
             if (ex is WebException we)
             {
-                // Get the status code from the HTTP response
                 HttpStatusCode statusCode = ((HttpWebResponse)we.Response).StatusCode;
 
-                // Redirect to the error handler action with the status code
                 return RedirectToAction("HttpStatusCodeHandler", "Error", new { statusCode = (int)statusCode });
             }
             else

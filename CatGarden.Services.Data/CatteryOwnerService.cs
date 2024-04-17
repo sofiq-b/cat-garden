@@ -14,7 +14,6 @@ namespace CatGarden.Services.Data
         {
             this.dbContext = dbContext;
         }
-
         public async Task<bool> CatteryOwnerExistsByPhoneNumberAsync(string phoneNumber)
         {
             bool result = await this.dbContext
@@ -23,7 +22,6 @@ namespace CatGarden.Services.Data
 
             return result;
         }
-
         public async Task<bool> CatteryOwnerExistsByUserIdAsync(string userId)
         {
             bool result = await this.dbContext

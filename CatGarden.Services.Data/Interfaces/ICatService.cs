@@ -2,7 +2,6 @@
 using CatGarden.ViewModels.Cat;
 using CatGarden.Web.ViewModels.Cat;
 using CatGarden.Web.ViewModels.Home;
-using CatGarden.Web.ViewModels.ImageGallery;
 
 namespace CatGarden.Services.Data.Interfaces
 {

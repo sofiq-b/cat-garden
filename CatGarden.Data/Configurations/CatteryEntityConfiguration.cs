@@ -11,10 +11,10 @@ namespace CatGarden.Data.Configurations
         public void Configure(EntityTypeBuilder<Cattery> builder)
         {
             builder
-                 .HasMany(c => c.Reviews)           // A Cattery can have many Reviews
-                 .WithOne(r => r.Cattery)           // A Review belongs to one Cattery
-                 .HasForeignKey(r => r.CatteryId)  // Foreign key property in Review entity
-                 .OnDelete(DeleteBehavior.Restrict); // Restrict deletion of Cattery if it has associated Reviews
+                 .HasMany(c => c.Reviews)           
+                 .WithOne(r => r.Cattery)           
+                 .HasForeignKey(r => r.CatteryId)  
+                 .OnDelete(DeleteBehavior.Restrict); 
 
 
             builder

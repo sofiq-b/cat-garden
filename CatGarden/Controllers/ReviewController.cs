@@ -90,7 +90,6 @@ namespace CatGarden.Web.Controllers
                     return RedirectToAction("All", "Cattery");
                 }
 
-                // Add the review to the database
                 await reviewService.AddReviewAsync(viewModel, userId);
 
                 TempData[SuccessMessage] = "Review added successfully!";
@@ -185,8 +184,6 @@ namespace CatGarden.Web.Controllers
             return View(model);
         }
 
-
-
         [HttpPost]
         public async Task<IActionResult> DeleteConfirmed(ReviewFormEditViewModel model)
         {
@@ -222,10 +219,8 @@ namespace CatGarden.Web.Controllers
         {
             if (ex is WebException we)
             {
-                // Get the status code from the HTTP response
                 HttpStatusCode statusCode = ((HttpWebResponse)we.Response).StatusCode;
 
-                // Redirect to the error handler action with the status code
                 return RedirectToAction("HttpStatusCodeHandler", "Error", new { statusCode = (int)statusCode });
             }
             else

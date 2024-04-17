@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CatGarden.Data.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.Globalization;
-using CatGarden.Data.Models;
 using static CatGarden.Common.Enums;
 
 public class CatEntityConfiguration : IEntityTypeConfiguration<Cat>

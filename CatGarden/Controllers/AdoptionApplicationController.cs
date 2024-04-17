@@ -1,11 +1,9 @@
-﻿using CatGarden.Services.Data;
-using CatGarden.Services.Data.Interfaces;
+﻿using CatGarden.Services.Data.Interfaces;
 using CatGarden.Web.Infrastructure.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using static CatGarden.Common.NotificationMessagesConstants;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace CatGarden.Web.Controllers
 {
@@ -65,7 +63,6 @@ namespace CatGarden.Web.Controllers
 
             try
             {
-                // Call the service method to retrieve the adoption applications of the user
                 var applications = await adoptionApplicationService.GetUserAdoptionApplications(new Guid(userId));
                 if (applications == null || applications.Count == 0)
                 {
@@ -178,10 +175,8 @@ namespace CatGarden.Web.Controllers
         {
             if (ex is WebException we)
             {
-                // Get the status code from the HTTP response
                 HttpStatusCode statusCode = ((HttpWebResponse)we.Response).StatusCode;
 
-                // Redirect to the error handler action with the status code
                 return RedirectToAction("HttpStatusCodeHandler", "Error", new { statusCode = (int)statusCode });
             }
             else

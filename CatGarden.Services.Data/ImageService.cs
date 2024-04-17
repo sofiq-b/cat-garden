@@ -1,12 +1,10 @@
-﻿using CatGarden.Services.Data.Interfaces;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Hosting;
-using static CatGarden.Common.Enums;
+﻿using CatGarden.Data;
 using CatGarden.Data.Models;
-using CatGarden.Data;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.EntityFrameworkCore;
+using CatGarden.Services.Data.Interfaces;
 using CatGarden.Web.ViewModels.ImageGallery;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace CatGarden.Services.Data
@@ -31,17 +29,14 @@ namespace CatGarden.Services.Data
 
             await file.CopyToAsync(new FileStream(serverFolder, FileMode.Create));
 
-            // Create a new Image entity object
             var image = new Image
             {
                 Name = file.FileName,
                 URL = "/" + folderPath
             };
 
-            // Add the new Image object to the context
             dbContext.Images.Add(image);
 
-            // Save changes to the database
             await dbContext.SaveChangesAsync();
 
             return image.URL;
@@ -51,87 +46,45 @@ namespace CatGarden.Services.Data
         {
             try
             {
-                // Find the image by name and catId
                 var image = dbContext.Images.FirstOrDefault(i => i.Name == imageName && i.CatId == catId);
 
                 if (image != null)
                 {
-                    // Remove the image from the database
                     dbContext.Images.Remove(image);
                     dbContext.SaveChanges();
                     return true;
                 }
                 else
                 {
-                    // Image not found
                     return false;
                 }
             }
             catch (Exception ex)
             {
-                // Log the exception or handle it as needed
                 throw ex;
             }
         }
 
         public async Task<string> EditImageAsync(string folderPath, int imageId, IFormFile newFile)
         {
-            // Retrieve the existing image entity from the database
             var existingImage = await dbContext.Images.FindAsync(imageId);
 
-            // Delete the existing image file from the server
             string imagePath = Path.Combine(_webHostEnvironment.WebRootPath, existingImage!.URL.TrimStart('/'));
             if (File.Exists(imagePath))
             {
                 File.Delete(imagePath);
             }
 
-            // Upload the new image file
             string newImagePath = await UploadImageAsync(folderPath, newFile);
 
-            // Update the properties of the existing image entity with the new image information
             existingImage.Name = newFile.FileName;
             existingImage.URL = newImagePath;
 
-            // Save changes to the database
             await dbContext.SaveChangesAsync();
 
             return newImagePath;
         }
 
-
-        public async Task UpdateImageAsync(Image image)
-        {
-            // Ensure the image entity is tracked by the context
-            dbContext.Entry(image).State = EntityState.Modified;
-
-            try
-            {
-                // Save changes to the database
-                await dbContext.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                // Handle exception, if necessary
-                throw; // Or handle the exception and return false or throw a custom exception
-            }
-        }
-
-
-        public async Task DeleteImageAsync(int imageId)
-        {
-            // Retrieve the existing image entity from the database
-            var existingImage = await dbContext.Images.FindAsync(imageId);
-
-            if (existingImage != null)
-            {
-                // Remove the image entity from the context
-                dbContext.Images.Remove(existingImage);
-
-                // Save changes to the database
-                await dbContext.SaveChangesAsync();
-            }
-        }
 
         public async Task<int?> FindImageIdByFileNameAsync(string fileUrl)
         {
@@ -147,17 +100,13 @@ namespace CatGarden.Services.Data
                     index = fileUrl.IndexOf("/cats");
                 }
 
-                // Extract the portion of the URL starting from "/cats"
                 string relativeUrl = fileUrl.Substring(index);
-                // Find the image by file name in the database
                 var image = await dbContext.Images.FirstOrDefaultAsync(i => i.URL == relativeUrl);
 
-                // Return the image ID if found, otherwise return null
                 return image?.Id;
             }
             catch (Exception ex)
             {
-                // Log the exception or handle it as needed
                 throw ex;
             }
         }
@@ -166,7 +115,6 @@ namespace CatGarden.Services.Data
         {
             var imagesData = await dbContext.Images.Where(i=>i.CatId == cat.Id).ToListAsync();
 
-            // Map the data to ImageModel objects
             var images = new List<ImageModel>();
             foreach (var imageData in imagesData)
             {
@@ -187,7 +135,6 @@ namespace CatGarden.Services.Data
         {
             var imagesData = await dbContext.Images.Where(i => i.CatteryId == cattery.Id).ToListAsync();
 
-            // Map the data to ImageModel objects
             var images = new List<ImageModel>();
             foreach (var imageData in imagesData)
             {
@@ -200,7 +147,6 @@ namespace CatGarden.Services.Data
                 };
                 images.Add(imageModel);
             }
-
             return images;
         }
 

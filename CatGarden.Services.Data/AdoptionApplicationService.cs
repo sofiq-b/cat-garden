@@ -3,9 +3,6 @@ using CatGarden.Data.Models;
 using CatGarden.Services.Data.Interfaces;
 using CatGarden.Web.ViewModels.AdoptionApplication;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using static CatGarden.Common.Enums;
 
 namespace CatGarden.Services.Data
@@ -27,7 +24,7 @@ namespace CatGarden.Services.Data
                 UserId = userId,
                 CatId = catId,
                 ApplicationDate = DateTime.Now,
-                ApplicationStatus = ApplicationStatus.Pending // Set the default status
+                ApplicationStatus = ApplicationStatus.Pending 
             };
 
             await dbContext.AdoptionApplications.AddAsync(application);
@@ -83,13 +80,6 @@ namespace CatGarden.Services.Data
             await dbContext.SaveChangesAsync();
             return true;
         }
-
-
-
-
-
-
-
         public async Task<AdoptionApplication> GetAdoptionApplicationByIdAsync(Guid applicationId)
         {
             return await dbContext.AdoptionApplications.FindAsync(applicationId);
@@ -100,7 +90,5 @@ namespace CatGarden.Services.Data
             return await dbContext.AdoptionApplications
                                   .AnyAsync(app => app.UserId == userId && app.CatId == catId);
         }
-
-
     }
 }

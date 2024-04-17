@@ -16,7 +16,7 @@ public static class EnumExtensions
         }
         else
         {
-            return enumValue.ToString(); // Fallback to enum's string representation
+            return enumValue.ToString(); 
         }
     }
 }

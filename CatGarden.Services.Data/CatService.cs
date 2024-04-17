@@ -42,10 +42,6 @@ namespace CatGarden.Services.Data
 
             return lastThreeCats;
         }
-
-
-
-
         public async Task<int> CreateAndReturnIdAsync(CatFormModel model)
         {
             var newCat = new Cat()
@@ -65,7 +61,6 @@ namespace CatGarden.Services.Data
 
             return newCat.Id;
         }
-
         public async Task<bool> ExistsByIdAsync(int catId)
         {
             bool result = await dbContext
@@ -74,7 +69,6 @@ namespace CatGarden.Services.Data
 
             return result;
         }
-
         public async Task<CatDetailsViewModel> GetDetailsByIdAsync(int catId, string userId)
         {
             Cat cat = await dbContext.Cats
@@ -102,8 +96,6 @@ namespace CatGarden.Services.Data
             
             viewModel.CoverImageUrl = cat.Images.FirstOrDefault(i => i.IsCover)?.URL ?? "alternative_text_here";
            
-
-            // Update image URLs
             viewModel.ImageUrls = cat.Images.Where(i => !i.IsCover).Select(image =>
                 Path.Combine("\\cats", GenerateCatDirectory(cat), image.URL)).ToList();
 
@@ -114,31 +106,23 @@ namespace CatGarden.Services.Data
         {
             int catId = await CreateAndReturnIdAsync(formModel);
             var cat = await GetByIdAsync(catId);
-            // Associate uploaded images with the cat entity
             foreach (ImageModel imageModel in formModel.Images)
             {
                 string uniqueFileName = $"{Guid.NewGuid()}_{imageModel.Name}";
-                // Construct the destination folder path (e.g., based on cat ID)
                 string destinationFolderPath = Path.Combine(webHostEnvironment.WebRootPath, "cats", GenerateCatDirectory(cat)).Replace('\\', '/');
 
-                // Ensure that the destination folder exists; if not, create it
                 Directory.CreateDirectory(destinationFolderPath);
 
-                // Construct the destination file path
                 string destinationFilePath = Path.Combine(destinationFolderPath, uniqueFileName).Replace('\\', '/');
 
-                // Move the file from the temporary location to the permanent location
                 System.IO.File.Move(imageModel.URL, destinationFilePath);
 
-                // Update the URL property of the ImageModel to contain the relative path within wwwroot
                 imageModel.URL = Path.Combine("/cats", GenerateCatDirectory(cat), uniqueFileName).Replace('\\', '/');
 
-                // Create Image entity and associate it with the cat
                 var image = new Image { Name = imageModel.Name, URL = imageModel.URL, CatId = catId, IsCover = imageModel.IsCover };
                 cat.Images.Add(image);
                 dbContext.Images.Add(image);
             }
-            // Save changes to the database
             await dbContext.SaveChangesAsync();
             string tempFolderPath = Path.Combine(webHostEnvironment.WebRootPath,"images", "temp");
             if (Directory.Exists(tempFolderPath))
@@ -152,7 +136,6 @@ namespace CatGarden.Services.Data
 
         public async Task AddCatToFavoritesAsync(int catId, string userId)
         {
-            // Create a new entry in the UserFavCat table linking the user and the cat
             dbContext.UsersFavCats.Add(new UserFavCat
             {
                 CatId = catId,
@@ -216,7 +199,6 @@ namespace CatGarden.Services.Data
                     Location = cat.Cattery.City.ToString(),
                     LikesCount = cat.LikesCount,
                     CoverImageUrl = cat.Images.FirstOrDefault(i => i.IsCover) != null ? cat.Images.FirstOrDefault(i => i.IsCover)!.URL : "alternative_text_here"
-
                 })
                 .ToListAsync();
             return favoriteCats;
@@ -237,16 +219,10 @@ namespace CatGarden.Services.Data
                     await UpdateCatLikesAsync(cat);
                 }
             }
-
             dbContext.UsersFavCats.RemoveRange(userFavorites);
 
             await dbContext.SaveChangesAsync();
         }
-
-
-
-
-
         public async Task UpdateCatLikesAsync(Cat cat)
         {
             var existingCat = await GetByIdAsync(cat.Id);
@@ -258,22 +234,17 @@ namespace CatGarden.Services.Data
                 await dbContext.SaveChangesAsync();
             }
         }
-
-
         public async Task<Cat> GetByIdAsync(int catId)
         {
             return await dbContext.Cats.FirstOrDefaultAsync(c => c.Id == catId);
         }
 
-
         public async Task<bool> IsCatPartOfOwnedCattery(int catId, string userId)
         {
-            // Assuming dbContext is your DbContext instance
             var cat = await dbContext.Cats
                 .Include(c => c.Cattery)
                     .ThenInclude(c => c.Owner)
                 .FirstOrDefaultAsync(c => c.Id == catId);
-
 
             return cat.Cattery.Owner.UserId.ToString() == userId;
         }
@@ -294,7 +265,6 @@ namespace CatGarden.Services.Data
                 images.Add(imageModel);
             }
 
-            // Map the CatDetailsViewModel to CatFormModel
             var catFormModel = new CatFormModel
             {
                 Name = catDetails.Name,
@@ -334,8 +304,6 @@ namespace CatGarden.Services.Data
             model.Images = await imageService.GetCatImagesAsync(cat);
             return model;
         }
-
-
         public async Task<IEnumerable<CatDisplayViewModel>> GetAllCatsAsync(string userId)
         {
             var allCats = await dbContext.Cats
@@ -369,7 +337,6 @@ namespace CatGarden.Services.Data
             {
                 Directory.Delete(catFolderPath, true);
             }
-            //Remove from favorite
             var favCats = dbContext.UsersFavCats.Where(x => x.CatId == catId).ToList();
             dbContext.UsersFavCats.RemoveRange(favCats);
 
@@ -379,11 +346,10 @@ namespace CatGarden.Services.Data
             var applicationsToDelete = dbContext.AdoptionApplications.Where(ap => ap.CatId == catId);
             dbContext.RemoveRange(applicationsToDelete);
 
-            // Remove the cat itself
             dbContext.Cats.Remove(cat);
 
             await dbContext.SaveChangesAsync();
-            return true; // Deletion successful
+            return true; 
         }
         
 
@@ -391,7 +357,6 @@ namespace CatGarden.Services.Data
         {
             var existingCat = await GetByIdAsync(model.Id);
 
-            // Update the cat entity with the data from the view model
             existingCat.Name = model.Name;
             existingCat.Age = model.Age;
             existingCat.Gender = model.Gender;
@@ -401,20 +366,15 @@ namespace CatGarden.Services.Data
             existingCat.Description = model.Description;
             existingCat.CatteryId = model.SelectedCatteryId;
 
-            // Save changes to the database
             await dbContext.SaveChangesAsync();
         }
-
         public async Task<bool> IsAdoptedAsync(int catId)
         {
             return await dbContext.Cats
-                                .Where(c => c.Id == catId)
-                                .SelectMany(c => c.AdoptionApplications)
-                                .AnyAsync(app => app.ApplicationStatus == ApplicationStatus.Accepted);
+                 .Where(c => c.Id == catId)
+                 .SelectMany(c => c.AdoptionApplications)
+                 .AnyAsync(app => app.ApplicationStatus == ApplicationStatus.Accepted);
         }
-
-
-
         public string GenerateCatDirectory(Cat cat)
         {
             return $"{cat.Name.ToLower().Replace(" ", "-")}_{cat.Id}"; 

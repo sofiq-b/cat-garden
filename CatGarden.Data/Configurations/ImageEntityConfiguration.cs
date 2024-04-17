@@ -1,20 +1,19 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using CatGarden.Data.Models;
 using Microsoft.EntityFrameworkCore;
-using CatGarden.Data.Models;
-using System.Reflection.Emit;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 public class ImageEntityConfiguration : IEntityTypeConfiguration<Image>
 {
     public void Configure(EntityTypeBuilder<Image> builder)
     {
-        // Configuration for Cat relationship
+        
         builder
             .HasOne(image => image.Cat)
             .WithMany(cat => cat.Images)
             .HasForeignKey(image => image.CatId)
             .OnDelete(DeleteBehavior.Restrict); 
 
-        // Configuration for Cattery relationship
+       
         builder
             .HasOne(image => image.Cattery)
             .WithMany(cattery => cattery.Images)

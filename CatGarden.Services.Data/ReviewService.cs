@@ -2,7 +2,6 @@
 using CatGarden.Data.Models;
 using CatGarden.Services.Data.Interfaces;
 using CatGarden.Web.ViewModels.Review;
-using Microsoft.AspNetCore.Hosting;
 
 namespace CatGarden.Services.Data
 {
@@ -15,7 +14,6 @@ namespace CatGarden.Services.Data
             this.dbContext = dbContext;
             this.catteryService = catteryService;
         }
-
         public async Task AddReviewAsync(ReviewFormViewModel reviewForm, string userId)
         {
             var cattery = await catteryService.GetByIdAsync(reviewForm.CatteryId);
@@ -38,9 +36,8 @@ namespace CatGarden.Services.Data
             }
             catch (Exception ex)
             {
-                // Handle any exceptions, log or throw as needed
                 Console.WriteLine($"Error occurred while adding review: {ex.Message}");
-                throw; // Optionally rethrow the exception for the caller to handle
+                throw; 
             }
         }
 
