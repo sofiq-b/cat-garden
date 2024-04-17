@@ -89,6 +89,38 @@ namespace CatGarden.Web.Controllers
            
         }
 
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var userId = User.GetId();
+
+            if (userId == null)
+            {
+                TempData[ErrorMessage] = "User not logged in.";
+                return RedirectToAction("Index", "Home");
+            }
+            var application = await adoptionApplicationService.GetAdoptionApplicationByIdAsync(id);
+            
+            if (!await adoptionApplicationService.HasUserAlreadySentApplicationForCat(new Guid(userId), application.CatId))
+            {
+                TempData[ErrorMessage] = "Adoption application not found.";
+                return RedirectToAction("MyApplications", "AdoptionApplication");
+            }
+
+
+            var isDeleted = await adoptionApplicationService.DeleteAdoptionApplicationAsync(id);
+            if (isDeleted)
+            {
+                TempData[SuccessMessage] = "Adoption application was deleted successfully!";
+            }
+            else
+            {
+                TempData[ErrorMessage] = "Adoption application not found or deletion failed!";
+            }
+
+            return RedirectToAction("MyApplications", "AdoptionApplication");
+        }
+
+
         private IActionResult HandleException(Exception ex)
         {
             if (ex is WebException we)

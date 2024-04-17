@@ -98,7 +98,8 @@ namespace CatGarden.Services.Data
         public async Task<bool> DeleteReviewAsync(int reviewId)
         {
             var review = await GetReviewByIdAsync(reviewId);
-
+            Cattery cattery = await catteryService.GetByIdAsync(review.CatteryId);
+            cattery.Reviews.Remove(review);
             dbContext.Remove(review);
             await dbContext.SaveChangesAsync();
 

@@ -13,10 +13,11 @@ namespace CatGarden.Services.Data
     public class AdoptionApplicationService : IAdoptionApplicationService
     {
         private readonly CatGardenDbContext dbContext;
-
-        public AdoptionApplicationService(CatGardenDbContext dbContext)
+        private readonly ICatService catService;
+        public AdoptionApplicationService(CatGardenDbContext dbContext, ICatService catService)
         {
             this.dbContext = dbContext;
+            this.catService = catService;
         }
 
         public async Task SendApplication(Guid userId, int catId)
@@ -37,6 +38,8 @@ namespace CatGarden.Services.Data
         {
             var application = await GetAdoptionApplicationByIdAsync(applicationId);
 
+            Cat cat = await catService.GetByIdAsync(application.CatId);
+            cat.AdoptionApplications.Remove(application);
             dbContext.AdoptionApplications.Remove(application);
             await dbContext.SaveChangesAsync();
             return true;

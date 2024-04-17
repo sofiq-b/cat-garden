@@ -1,7 +1,5 @@
 ﻿using CatGarden.Data;
-using CatGarden.Data.Models;
 using CatGarden.Services.Data.Interfaces;
-using CatGarden.ViewModels.Cat;
 using CatGarden.Web.ViewModels.AdoptionApplication;
 using CatGarden.Web.ViewModels.Cat;
 using CatGarden.Web.ViewModels.Cattery;
@@ -9,9 +7,6 @@ using CatGarden.Web.ViewModels.ImageGallery;
 using CatGarden.Web.ViewModels.Review;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
-using System.Globalization;
-using static CatGarden.Common.EntityValidationConstants;
-using static System.Net.Mime.MediaTypeNames;
 using Cattery = CatGarden.Data.Models.Cattery;
 using CatteryOwner = CatGarden.Data.Models.CatteryOwner;
 using Image = CatGarden.Data.Models.Image;

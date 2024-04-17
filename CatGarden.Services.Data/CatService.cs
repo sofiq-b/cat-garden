@@ -7,7 +7,6 @@ using CatGarden.Web.ViewModels.Home;
 using CatGarden.Web.ViewModels.ImageGallery;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
-using static CatGarden.Common.EntityValidationConstants;
 using static CatGarden.Common.Enums;
 using Cat = CatGarden.Data.Models.Cat;
 using Image = CatGarden.Data.Models.Image;
