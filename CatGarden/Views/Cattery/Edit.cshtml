@@ -1,0 +1,230 @@
+﻿@model CatGarden.Web.ViewModels.Cattery.CatteryFormEditViewModel
+@using static CatGarden.Common.Enums
+@using CatGarden.Services.Data.Interfaces
+@using CatGarden.Web.Infrastructure.Extensions
+@inject IImageService ImageService
+
+@{
+    ViewData["Title"] = "Edit Cattery";
+}
+<header>
+    <!-- Include Dropzone.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.2/min/dropzone.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.2/min/dropzone.min.css" />
+
+
+    <!-- jQuery library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <!-- Bootstrap Datepicker CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+
+    <!-- Bootstrap Datepicker JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+
+</header>
+
+<style>
+    .set-as-cover-btn {
+        color: #fff; /* White text */
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+        .set-as-cover-btn.btn-success {
+            padding: 5px 28px;
+        }
+
+    .dropzone .dz-preview .dz-image {
+        border-radius: 20px;
+        overflow: hidden;
+        width: 160px;
+        height: 160px;
+        position: relative;
+        display: block;
+        z-index: 10;
+    }
+
+    .dropzone .dz-preview {
+        position: relative;
+        display: inline-block;
+        vertical-align: top;
+        margin: 10px;
+        min-height: 100px;
+    }
+
+        .dropzone .dz-preview .dz-image img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+</style>
+
+
+<div style="display: flex; justify-content: center; align-items: center;">
+    <div style="max-width: 600px; width: 100%;">
+        <h2 class="text-center">@ViewData["Title"]</h2>
+
+        <form id="catteryForm" asp-action="Edit" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label asp-for="Name"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Address"></label>
+                <input asp-for="Address" class="form-control" />
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="City"></label>
+                <select asp-for="City" class="form-control">
+                    <option value="">Select City</option>
+                    @foreach (City city in Enum.GetValues(typeof(City)))
+                    {
+                        <option value="@city.ToString()">@EnumExtensions.GetDisplayName(city)</option>
+                    }
+                </select>
+                <span asp-validation-for="City" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="EstablishmentDate"></label>
+                <input id="establishmentDateInput" class="form-control" type="text" value="@Model.EstablishmentDate.ToString("dd/MM/yyyy")" />
+                <span asp-validation-for="EstablishmentDate" class="text-danger"></span>
+            </div>
+
+            <button type="submit" id="submitButton" class="btn btn-primary">Edit Cattery</button>
+        </form>
+        <div id="dropzone" class="dropzone"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script type="text/javascript">
+        Dropzone.autoDiscover = false;
+        var uploadUrl = '@Url.Action("UploadImage", "Image")';
+        $(document).ready(function () {
+            debugger;
+            var myDropzone = new Dropzone("#dropzone", {
+                url: uploadUrl, // Specify the upload URL
+                maxFilesize: 5, // Maximum file size in MB
+                autoProcessQueue: false,
+                maxFiles: 6,
+                acceptedFiles: 'image/*', // Specify accepted file types (e.g., images)
+                addRemoveLinks: false, // Enable default "Remove file" links
+                dictDefaultMessage: "Drop files here or click to upload", // Set default message
+                parallelUploads: 1, // Upload files sequentially
+                timeout: 0,
+                // Other options...
+            });
+            var serverFileCount = 0;
+            var serverImagesList;
+            $.ajax({
+                url: '@Url.Action("GetImageInfo", "Image")',
+                method: 'GET',
+                data: { folderPath: '@Model.FolderPathUrl' },
+                async: true,
+                success: function (data) {
+                    serverImagesList = data;
+                    // Loop through the file info data
+                    for (var i = 0; i < data.length; i++) {
+                        var fileInfo = data[i]; // Access the current file info object
+                        var fileName = fileInfo.name;
+                        serverFileCount++;
+
+                        var fileMimeType;
+                        if (fileName.toLowerCase().endsWith('.jpg') || fileName.toLowerCase().endsWith('.jpeg')) {
+                            fileMimeType = 'image/jpeg';
+                        }
+                        else if (fileName.toLowerCase().endsWith('.png')) {
+                            fileMimeType = 'image/png';
+                        }
+
+                        var folderPath = '@Model.FolderPathUrl';
+                        var wwwrootIndex = folderPath.indexOf("wwwroot/");
+
+                        // Extract the portion of the path starting from "wwwroot/"
+                        var croppedPath = folderPath.substring(wwwrootIndex + "wwwroot/".length);
+
+                        // Combine the cropped path with the fileName
+                        var finalPath = "/" + croppedPath + "/" + fileName;
+
+                        // Simulate adding a file to Dropzone
+                        var mockFile = { name: fileName, size: fileInfo.size, type: fileMimeType, serverID: fileInfo.serverID, accepted: true };
+                        myDropzone.emit("addedfile", mockFile);
+                        myDropzone.emit("thumbnail", mockFile, finalPath);
+                        myDropzone.emit("success", mockFile);
+                        myDropzone.emit("complete", mockFile);
+                        myDropzone.files.push(mockFile);
+                    }
+                    // Update maxFiles option to include server files
+                    var maxFilesAllowed = 6;
+                    myDropzone.options.maxFiles = maxFilesAllowed - serverFileCount;
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error fetching server images:', error);
+                }
+            });
+            // Customize the file preview template
+            myDropzone.on("success", function (file, response) {
+                // Store the image URL as a data attribute directly on the file element
+                $(file.previewElement).attr('data-image-url', response);
+            });
+
+            function disableUpload() {
+                myDropzone.disable(); // Disable Dropzone
+            }
+
+            // Event handler for when a file is added to Dropzone
+            myDropzone.on("addedfile", function (file) {
+                console.log("File added:", file);
+            });
+
+            // Event handler for when a file is removed from Dropzone
+            myDropzone.on("removedfile", function (file) {
+                console.log("File removed:", file);
+            });
+
+            // Event handler for when a file starts uploading
+            myDropzone.on("sending", function (file, xhr, formData) {
+                console.log("File sending:", file);
+            });
+
+            // Event handler for when a file upload progress is updated
+            myDropzone.on("uploadprogress", function (file, progress, bytesSent) {
+                console.log("File upload progress:", file, progress, bytesSent);
+            });
+
+            // Event handler for when a file upload is completed successfully
+            myDropzone.on("success", function (file, response) {
+                console.log("File upload success:", file, response);
+            });
+
+            // Event handler for when a file upload encounters an error
+            myDropzone.on("error", function (file, errorMessage) {
+                console.log("File upload error:", file, errorMessage);
+            });
+
+            // Event handler for when all files have been uploaded
+            myDropzone.on("complete", function (file) {
+                console.log("File upload complete:", file);
+            });
+
+            $('#establishmentDateInput').datepicker({
+                format: 'dd/mm/yyyy',
+                autoclose: true,
+                todayHighlight: true,
+                startDate: '01/01/0001', // Set the start date to January 1, 0001
+                endDate: new Date() // Restrict dates to today and before
+            });
+        });
+    </script>
+}

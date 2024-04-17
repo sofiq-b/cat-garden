@@ -12,6 +12,7 @@ namespace CatGarden.Services.Data.Interfaces
         Task UpdateImageAsync(Image image);
         Task<int?> FindImageIdByFileNameAsync(string fileUrl);
         Task<List<ImageModel>> GetCatImagesAsync(Cat cat);
+        Task<List<ImageModel>> GetCatteryImagesAsync(Cattery cattery);
         Task DeleteImageAsync(int imageId);
     }
 }

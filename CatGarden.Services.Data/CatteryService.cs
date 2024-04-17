@@ -7,6 +7,7 @@ using CatGarden.Web.ViewModels.ImageGallery;
 using CatGarden.Web.ViewModels.Review;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using static CatGarden.Common.Enums;
 using Cattery = CatGarden.Data.Models.Cattery;
 using CatteryOwner = CatGarden.Data.Models.CatteryOwner;
 using Image = CatGarden.Data.Models.Image;
@@ -17,10 +18,12 @@ namespace CatGarden.Services.Data
     {
         private readonly CatGardenDbContext dbContext;
         private readonly IWebHostEnvironment webHostEnvironment;
-        public CatteryService(CatGardenDbContext dbContext, IWebHostEnvironment webHostEnvironment)
+        private readonly IImageService imageService;
+        public CatteryService(CatGardenDbContext dbContext, IWebHostEnvironment webHostEnvironment, IImageService imageService)
         {
             this.dbContext = dbContext;
             this.webHostEnvironment = webHostEnvironment;
+            this.imageService = imageService;
         }
 
 
@@ -189,6 +192,68 @@ namespace CatGarden.Services.Data
 
             return viewModel;
         }
+
+        public async Task<CatteryFormModel> GetCatteryForEdit(int catteryId, string userId)
+        {
+            var catteryDetails = await GetDetailsByIdAsync(catteryId);
+
+            var images = new List<ImageModel>();
+            var imageData = dbContext.Images.Where(i => i.CatteryId == catteryId);
+            foreach (var image in imageData)
+            {
+                var imageModel = new ImageModel
+                {
+                    Name = image.Name,
+                    URL = image.URL
+                };
+                images.Add(imageModel);
+            }
+
+            // Map the CatteryDetailsViewModel to CatteryFormModel
+            var catteryFormModel = new CatteryFormModel
+            {
+                Name = catteryDetails.Name,
+                Address = catteryDetails.Address,
+                City = Enum.Parse<City>(catteryDetails.City),
+                EstablishmentDate = catteryDetails.EstablishmentDate,
+                Images = images
+            };
+
+            return catteryFormModel;
+        }
+
+        public async Task<CatteryFormEditViewModel> LoadEditCatteryAsync(int catteryId)
+        {
+            var cattery = await GetByIdAsync(catteryId);
+
+            var model = new CatteryFormEditViewModel()
+            {
+                Id = cattery.Id,
+                Name = cattery.Name,
+                City = cattery.City,
+                Address = cattery.Address,
+                EstablishmentDate = cattery.EstablishmentDate,
+            };
+
+            model.FolderPathUrl = Path.Combine(webHostEnvironment.WebRootPath, "catteries", GenerateCatteryDirectory(cattery)).Replace('\\', '/');
+            model.Images = await imageService.GetCatteryImagesAsync(cattery);
+            return model;
+        }
+
+        public async Task UpdateCatteryAsync(CatteryFormEditViewModel model)
+        {
+            var existingCattery = await GetByIdAsync(model.Id);
+
+            // Update the cattery entity with the data from the view model
+            existingCattery.Name = model.Name;
+            existingCattery.City = model.City;
+            existingCattery.Address = model.Address;
+            existingCattery.EstablishmentDate = model.EstablishmentDate;
+
+            // Save changes to the database
+            await dbContext.SaveChangesAsync();
+        }
+
 
         public async Task<bool> ExistsByIdAsync(int catteryId)
         {

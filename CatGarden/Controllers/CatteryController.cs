@@ -138,6 +138,66 @@ namespace CatGarden.Web.Controllers
 
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            string userId = User.GetId()!;
+
+            var model = await catteryService.LoadEditCatteryAsync(id);
+
+            if (model == null)
+            {
+                TempData[ErrorMessage] = "Cattery with the selected id doesn't exist.";
+
+                return RedirectToAction("All", "Cattery");
+            }
+            var isOwnedByUser = await catteryService.IsCatteryOwnedByUserAsync(userId, id);
+            if (!isOwnedByUser)
+            {
+                TempData[ErrorMessage] = "Unauthorized to edit cattery!";
+                return BadRequest();
+            }
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(CatteryFormEditViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var existingCattery = await catteryService.GetByIdAsync(model.Id);
+
+            if (existingCattery == null)
+            {
+                TempData[ErrorMessage] = "Cattery with the selected id doesn't exist.";
+                return RedirectToAction("All", "Cattery");
+            }
+
+            string userId = User.GetId()!;
+
+            // Check if the user is authorized to edit the cattery
+            var isOwnedByUser = await catteryService.IsCatteryOwnedByUserAsync(userId, model.Id);
+            if (!isOwnedByUser)
+            {
+                TempData[ErrorMessage] = "Unauthorized to edit cattery!";
+                return BadRequest();
+            }
+
+            try
+            {
+                await catteryService.UpdateCatteryAsync(model);
+                TempData[SuccessMessage] = "Cattery updated successfully.";
+                return RedirectToAction("Details", "Cattery", new { id = model.Id });
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+        }
 
 
 

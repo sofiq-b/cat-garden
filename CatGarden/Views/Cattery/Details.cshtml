@@ -12,6 +12,7 @@
 @{
     ViewData["Title"] = "Cattery Details";
 }
+<partial name="DeleteConfirmation" />
 
 <style>
     .carousel-item img{
@@ -47,23 +48,30 @@
     </button>
 </div>
 
-
-
-<ul class="nav nav-tabs mt-3" id="myTab" role="tablist">
-    <li class="nav-item">
-        <a class="nav-link active" id="cats-tab" data-bs-toggle="tab" href="#cats" role="tab" aria-controls="cats" aria-selected="true">Cats</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" id="reviews-tab" data-bs-toggle="tab" href="#reviews" role="tab" aria-controls="reviews" aria-selected="false">Reviews</a>
-    </li>
+<div class="ulandbuttons" style="display: flex; justify-content: space-between;">
+    <ul class="nav nav-tabs mt-3" id="myTab" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="cats-tab" data-bs-toggle="tab" href="#cats" role="tab" aria-controls="cats" aria-selected="true">Cats</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="reviews-tab" data-bs-toggle="tab" href="#reviews" role="tab" aria-controls="reviews" aria-selected="false">Reviews</a>
+        </li>
+        @if (isCatteryOwner && catteryIsOwnedByUser)
+        {
+            <li class="nav-item">
+                <a class="nav-link" id="adoptionApplications-tab" data-bs-toggle="tab" href="#adoptionApplications" role="tab" aria-controls="adoptionApplications" aria-selected="false">Adoption Applications</a>
+            </li>
+        }
+    </ul>
     @if (isCatteryOwner && catteryIsOwnedByUser)
     {
-        <li class="nav-item">
-        <a class="nav-link" id="adoptionApplications-tab" data-bs-toggle="tab" href="#adoptionApplications" role="tab" aria-controls="adoptionApplications" aria-selected="false">Adoption Applications</a>
-        </li>
+        <div class="edbuttons" style="display: flex;">
+            <a asp-controller="Cattery" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning mb-2 w-100 p-3 fw-bold">Edit</a>
+            <button id="deleteButton" class="btn btn-danger mb-2 w-100 p-3 fw-bold" style="margin-left: 1em;" data-cattery-id="@Model.Id">Delete</button>
+        </div>
     }
-    
-</ul>
+</div>
+
 
 <!-- Tab Content -->
 <div class="tab-content" id="myTabContent">
@@ -168,5 +176,18 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-   
+    <script>
+        $(document).ready(function () {
+            $('#deleteButton').click(function () {
+                $('#deleteConfirmationModal').modal('show');
+            });
+
+            $('#deleteConfirmationModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var catId = $('#deleteButton').data('cattery-id');
+                var form = $('#deleteForm');
+                form.attr('action', '/Cattery/Delete/' + catteryId);
+            });
+        });
+    </script>
 }

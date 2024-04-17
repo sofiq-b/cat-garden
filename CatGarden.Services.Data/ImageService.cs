@@ -137,10 +137,18 @@ namespace CatGarden.Services.Data
         {
             try
             {
-                int catsIndex = fileUrl.IndexOf("/cats");
+                int index = 0;
+                if (fileUrl.Contains("catteries"))
+                {
+                    index = fileUrl.IndexOf("/catteries");
+                }
+                else
+                {
+                    index = fileUrl.IndexOf("/cats");
+                }
 
                 // Extract the portion of the URL starting from "/cats"
-                string relativeUrl = fileUrl.Substring(catsIndex);
+                string relativeUrl = fileUrl.Substring(index);
                 // Find the image by file name in the database
                 var image = await dbContext.Images.FirstOrDefaultAsync(i => i.URL == relativeUrl);
 
@@ -174,6 +182,28 @@ namespace CatGarden.Services.Data
 
             return images;
         }
+
+        public async Task<List<ImageModel>> GetCatteryImagesAsync(Cattery cattery)
+        {
+            var imagesData = await dbContext.Images.Where(i => i.CatteryId == cattery.Id).ToListAsync();
+
+            // Map the data to ImageModel objects
+            var images = new List<ImageModel>();
+            foreach (var imageData in imagesData)
+            {
+                var imageModel = new ImageModel
+                {
+                    Id = imageData.Id,
+                    Name = imageData.Name,
+                    URL = imageData.URL,
+                    IsCover = imageData.IsCover,
+                };
+                images.Add(imageModel);
+            }
+
+            return images;
+        }
+
 
     }
 
