@@ -374,8 +374,10 @@ namespace CatGarden.Services.Data
             dbContext.UsersFavCats.RemoveRange(favCats);
 
             var imagesToDelete = dbContext.Images.Where(image => image.CatId == catId);
-            //Remove images from db
             dbContext.RemoveRange(imagesToDelete);
+
+            var applicationsToDelete = dbContext.AdoptionApplications.Where(ap => ap.CatId == catId);
+            dbContext.RemoveRange(applicationsToDelete);
 
             // Remove the cat itself
             dbContext.Cats.Remove(cat);

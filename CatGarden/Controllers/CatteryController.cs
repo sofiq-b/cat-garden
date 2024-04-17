@@ -199,6 +199,29 @@ namespace CatGarden.Web.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Delete(int id)
+        {
+            // Check if the user is authorized to delete the cattery
+            var isOwnedByUser = await catteryService.IsCatteryOwnedByUserAsync(User.GetId()!,id);
+            if (!isOwnedByUser)
+            {
+                TempData[ErrorMessage] = "Unauthorized to delete cattery!";
+                return BadRequest();
+            }
+            try
+            {
+                var isDeleted = await catteryService.DeleteCatteryAsync(id);
+                TempData[SuccessMessage] = "Cattery was deleted successfully!";
+                return RedirectToAction("All", "Cattery");
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+        }
+
+
 
 
         private IActionResult HandleException(Exception ex)

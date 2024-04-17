@@ -14,7 +14,7 @@ namespace CatGarden.Services.Data.Interfaces
         Task<CatteryFormEditViewModel> LoadEditCatteryAsync(int catteryId);
         Task UpdateCatteryAsync(CatteryFormEditViewModel model);
 
-
+        Task<bool> DeleteCatteryAsync(int catteryId);
 
         Task<bool> ExistsByIdAsync(int catteryId);
         string GenerateCatteryDirectory(Cattery cattery);

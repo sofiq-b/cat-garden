@@ -244,15 +244,34 @@ namespace CatGarden.Services.Data
         {
             var existingCattery = await GetByIdAsync(model.Id);
 
-            // Update the cattery entity with the data from the view model
             existingCattery.Name = model.Name;
             existingCattery.City = model.City;
             existingCattery.Address = model.Address;
             existingCattery.EstablishmentDate = model.EstablishmentDate;
 
-            // Save changes to the database
             await dbContext.SaveChangesAsync();
         }
+
+        public async Task<bool> DeleteCatteryAsync(int catteryId)
+        {
+            Cattery cattery = await GetByIdAsync(catteryId);
+
+            var imagesToDelete = dbContext.Images.Where(image => image.CatteryId == catteryId);
+            dbContext.Images.RemoveRange(imagesToDelete);
+
+            var catsToDelete = dbContext.Cats.Where(cat => cat.CatteryId == catteryId);
+            dbContext.Cats.RemoveRange(catsToDelete);
+
+           
+            var reviewsToDelete = dbContext.Reviews.Where(review => review.CatteryId == catteryId);
+            dbContext.Reviews.RemoveRange(reviewsToDelete);
+
+            dbContext.Catteries.Remove(cattery);
+
+            await dbContext.SaveChangesAsync();
+            return true; 
+        }
+
 
 
         public async Task<bool> ExistsByIdAsync(int catteryId)

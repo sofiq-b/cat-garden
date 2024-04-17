@@ -184,7 +184,7 @@
 
             $('#deleteConfirmationModal').on('show.bs.modal', function (event) {
                 var button = $(event.relatedTarget);
-                var catId = $('#deleteButton').data('cattery-id');
+                var catteryId = $('#deleteButton').data('cattery-id');
                 var form = $('#deleteForm');
                 form.attr('action', '/Cattery/Delete/' + catteryId);
             });
