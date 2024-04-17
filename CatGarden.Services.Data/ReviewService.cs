@@ -79,6 +79,31 @@ namespace CatGarden.Services.Data
             await dbContext.SaveChangesAsync();
         }
 
+        public async Task<ReviewFormEditViewModel> GetReviewForDeleteAsync(int reviewId)
+        {
+            var review = await GetReviewByIdAsync(reviewId);
+
+            var viewModel = new ReviewFormEditViewModel
+            {
+                Id = review.Id,
+                Rating = review.Rating,
+                Comment = review.Comment,
+                CatteryId = review.CatteryId 
+            };
+
+            return viewModel;
+        }
+
+
+        public async Task<bool> DeleteReviewAsync(int reviewId)
+        {
+            var review = await GetReviewByIdAsync(reviewId);
+
+            dbContext.Remove(review);
+            await dbContext.SaveChangesAsync();
+
+            return true;
+        }
 
     }
 }

@@ -112,13 +112,13 @@ namespace CatGarden.Web.Controllers
             if (review == null)
             {
                 TempData[ErrorMessage] = "Review with the selected id doesn't exist.";
-                return RedirectToAction("All", "Review");
+                return RedirectToAction("All", "Cattery");
             }
 
             if (!await reviewService.CanUserEditReviewAsync(userId, review.Id))
             {
                 TempData[ErrorMessage] = "Unauthorized to edit review!";
-                return RedirectToAction("All", "Review");
+                return RedirectToAction("Details", "Cattery", new { id = review.CatteryId });
             }
 
             try
@@ -140,20 +140,22 @@ namespace CatGarden.Web.Controllers
             if (review == null)
             {
                 TempData[ErrorMessage] = "Review with the selected id doesn't exist.";
-                return RedirectToAction("All", "Review");
+                return RedirectToAction("All", "Cattery");
             }
 
             if (!await reviewService.CanUserEditReviewAsync(userId, review.Id))
             {
                 TempData[ErrorMessage] = "Unauthorized to edit review!";
-                return RedirectToAction("All", "Review");
+                return RedirectToAction("Details", "Cattery", new { id = review.CatteryId });
             }
 
             try
             {
                 await reviewService.UpdateReviewAsync(model);
                 TempData[SuccessMessage] = "Review updated successfully.";
-                return RedirectToAction("Details", "Cattery", new { id = model.CatteryId });
+                return RedirectToAction("Details", "Cattery", new { id = review.CatteryId });
+
+
             }
             catch (Exception ex)
             {
@@ -161,7 +163,61 @@ namespace CatGarden.Web.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id)
+        {
+            string userId = User.GetId()!;
+            var review = await reviewService.GetReviewByIdAsync(id);
 
+            if (review == null)
+            {
+                TempData[ErrorMessage] = "Review with the selected id doesn't exist."; 
+                return RedirectToAction("All", "Cattery");
+            }
+
+            if (!await reviewService.CanUserEditReviewAsync(userId, review.Id))
+            {
+                TempData[ErrorMessage] = "Unauthorized to delete review!";
+                return RedirectToAction("Details", "Cattery", new { id = review.CatteryId });
+            }
+
+            var model = await reviewService.GetReviewForDeleteAsync(review.Id);
+
+            return View(model);
+        }
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteConfirmed(ReviewFormEditViewModel model)
+        {
+            string userId = User.GetId()!;
+            var review = await reviewService.GetReviewByIdAsync(model.Id);
+            if (review == null)
+            {
+                TempData[ErrorMessage] = "Review with the selected id doesn't exist.";
+                return RedirectToAction("All", "Cattery");
+            }
+
+            if (!await reviewService.CanUserEditReviewAsync(userId, review.Id))
+            {
+                TempData[ErrorMessage] = "Unauthorized to delete review!";
+                return RedirectToAction("Details", "Cattery", new { id = review.CatteryId });
+            }
+
+            var isDeleted = await reviewService.DeleteReviewAsync(model.Id);
+
+            if (isDeleted)
+            {
+                TempData[SuccessMessage] = "Review was deleted successfully!";
+            }
+            else
+            {
+                TempData[ErrorMessage] = "Review not found or deletion failed!";
+            }
+
+            return RedirectToAction("Details", "Cattery", new { id = review.CatteryId });
+        }
 
 
 

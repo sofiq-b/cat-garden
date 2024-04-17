@@ -13,6 +13,8 @@ namespace CatGarden.Services.Data.Interfaces
         Task AddReviewAsync(ReviewFormViewModel reviewForm, string userId);
         Task<ReviewFormViewModel> LoadEditReviewAsync(int reviewId);
         Task UpdateReviewAsync(ReviewFormEditViewModel model);
+        Task<ReviewFormEditViewModel> GetReviewForDeleteAsync(int reviewId);
+        Task<bool> DeleteReviewAsync(int reviewId);
 
         Task<bool> CanUserEditReviewAsync(string userId, int reviewId);
         Task<Review> GetReviewByIdAsync(int id);
