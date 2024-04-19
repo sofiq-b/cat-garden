@@ -572,7 +572,7 @@ namespace CatGarden.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("CatGarden.Data.Models.ApplicationUser", "User")
-                        .WithMany()
+                        .WithMany("AdoptionApplications")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -647,7 +647,7 @@ namespace CatGarden.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("CatGarden.Data.Models.ApplicationUser", "User")
-                        .WithMany()
+                        .WithMany("Reviews")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -730,6 +730,10 @@ namespace CatGarden.Data.Migrations
             modelBuilder.Entity("CatGarden.Data.Models.ApplicationUser", b =>
                 {
                     b.Navigation("AdoptedCats");
+
+                    b.Navigation("AdoptionApplications");
+
+                    b.Navigation("Reviews");
                 });
 
             modelBuilder.Entity("CatGarden.Data.Models.Cat", b =>

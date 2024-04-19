@@ -51,9 +51,9 @@ namespace CatGarden.Web.Controllers
                 TempData["SuccessMessage"] = "Adoption application sent successfully!";
                 return RedirectToAction("MyApplications", "AdoptionApplication");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return HandleException(ex);
+                return GeneralError();
             }
         }
         [HttpGet]
@@ -70,11 +70,11 @@ namespace CatGarden.Web.Controllers
                 }
                 return View(applications);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return HandleException(ex);
+                return GeneralError();
             }
-           
+
         }
 
         public async Task<IActionResult> Delete(Guid id)
@@ -103,11 +103,11 @@ namespace CatGarden.Web.Controllers
 
                 return RedirectToAction("MyApplications", "AdoptionApplication");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return HandleException(ex);
+                return GeneralError();
             }
-            
+
         }
 
         [HttpPost]
@@ -133,9 +133,9 @@ namespace CatGarden.Web.Controllers
                 TempData[SuccessMessage] = "Adoption application accepted!";
                 return RedirectToAction("Details", "Cattery", new { id = cat.CatteryId });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return HandleException(ex);
+                return GeneralError();
             }
         }
 
@@ -162,28 +162,17 @@ namespace CatGarden.Web.Controllers
                 TempData[SuccessMessage] = "Adoption application rejected!";
                 return RedirectToAction("Details", "Cattery", new { id = cat.CatteryId });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return HandleException(ex);
+                return GeneralError();
             }
         }
-
-
-
-
-        private IActionResult HandleException(Exception ex)
+        private IActionResult GeneralError()
         {
-            if (ex is WebException we)
-            {
-                HttpStatusCode statusCode = ((HttpWebResponse)we.Response).StatusCode;
+            TempData[ErrorMessage] =
+                "Unexpected error occurred! Please try again later or contact administrator";
 
-                return RedirectToAction("HttpStatusCodeHandler", "Error", new { statusCode = (int)statusCode });
-            }
-            else
-            {
-                TempData[ErrorMessage] = "Unexpected error occurred! Please try again later or contact administrator";
-                return RedirectToAction("Index", "Home");
-            }
+            return RedirectToAction("Index", "Home");
         }
     }
 }

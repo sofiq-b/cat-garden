@@ -1,4 +1,5 @@
 ﻿using CatGarden.Data.Models;
+using CatGarden.Services.Data.Models.Cat;
 using CatGarden.ViewModels.Cat;
 using CatGarden.Web.ViewModels.Cat;
 using CatGarden.Web.ViewModels.Home;
@@ -31,5 +32,7 @@ namespace CatGarden.Services.Data.Interfaces
         Task<bool> IsFavoritedByUserWithIdAsync(int catId, string userId);
         Task<bool> IsAdoptedAsync(int catId);
         Task UpdateCatAsync(CatFormEditViewModel model);
+
+        Task<AllCatsFilteredAndPagedServiceModel> AllAsync(AllCatsQueryModel queryModel, string userId);
     }
 }

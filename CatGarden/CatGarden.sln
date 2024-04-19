@@ -19,9 +19,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CatGarden.Web.ViewModels", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{8652D668-3EEA-47C4-936B-13C23E39A8CD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CatGarden.Services.Data", "..\CatGarden.Services.Data\CatGarden.Services.Data.csproj", "{CB18A1C9-9163-4DBD-A62B-6278B80D412A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CatGarden.Services.Data", "..\CatGarden.Services.Data\CatGarden.Services.Data.csproj", "{CB18A1C9-9163-4DBD-A62B-6278B80D412A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CatGarden.Web.Infrastructure", "..\CatGarden.Web.Infrastructure\CatGarden.Web.Infrastructure.csproj", "{EA17A8F0-0D16-4A1F-B852-99528E1F5297}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CatGarden.Web.Infrastructure", "..\CatGarden.Web.Infrastructure\CatGarden.Web.Infrastructure.csproj", "{EA17A8F0-0D16-4A1F-B852-99528E1F5297}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CatGarden.Services.Data.Models", "..\CatGarden.Services.Data.Models\CatGarden.Services.Data.Models.csproj", "{0C4ECB04-5FF8-47D8-95CE-138C5179DC94}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,6 +59,10 @@ Global
 		{EA17A8F0-0D16-4A1F-B852-99528E1F5297}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EA17A8F0-0D16-4A1F-B852-99528E1F5297}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EA17A8F0-0D16-4A1F-B852-99528E1F5297}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C4ECB04-5FF8-47D8-95CE-138C5179DC94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C4ECB04-5FF8-47D8-95CE-138C5179DC94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C4ECB04-5FF8-47D8-95CE-138C5179DC94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C4ECB04-5FF8-47D8-95CE-138C5179DC94}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -68,6 +74,7 @@ Global
 		{31EDABC2-1B0A-45FF-9984-C0380E2BDB4A} = {9D2CB643-326A-46E9-9B00-EF57EAEA520C}
 		{CB18A1C9-9163-4DBD-A62B-6278B80D412A} = {8652D668-3EEA-47C4-936B-13C23E39A8CD}
 		{EA17A8F0-0D16-4A1F-B852-99528E1F5297} = {9D2CB643-326A-46E9-9B00-EF57EAEA520C}
+		{0C4ECB04-5FF8-47D8-95CE-138C5179DC94} = {8652D668-3EEA-47C4-936B-13C23E39A8CD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9B607497-0D6A-47CA-B539-15F4EDC6A659}

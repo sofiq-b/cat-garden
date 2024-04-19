@@ -8,5 +8,7 @@
 
         public const string CatAttributeRequired = "The cat's {0} is required.";
 
+        public const int DefaultPage = 1;
+        public const int EntitiesPerPage = 4;
     }
 }

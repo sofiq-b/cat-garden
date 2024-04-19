@@ -20,6 +20,6 @@ namespace CatGarden.Services.Data.Interfaces
         string GenerateCatteryDirectory(Cattery cattery);
         Task<Cattery> GetByIdAsync(int catteryId);
         Task<bool> IsCatteryOwnedByUserAsync(string userId, int catteryId);
-
+        Task<IEnumerable<string>> AllCatteryNamesAsync();
     }
 }

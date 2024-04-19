@@ -1,12 +1,15 @@
 ﻿using CatGarden.Data;
 using CatGarden.Data.Models;
 using CatGarden.Services.Data.Interfaces;
+using CatGarden.Services.Data.Models.Cat;
 using CatGarden.ViewModels.Cat;
 using CatGarden.Web.ViewModels.Cat;
+using CatGarden.Web.ViewModels.Cat.Enums;
 using CatGarden.Web.ViewModels.Home;
 using CatGarden.Web.ViewModels.ImageGallery;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using static CatGarden.Common.EntityValidationConstants;
 using static CatGarden.Common.Enums;
 using Cat = CatGarden.Data.Models.Cat;
 using Image = CatGarden.Data.Models.Image;
@@ -385,6 +388,98 @@ namespace CatGarden.Services.Data
             return await dbContext.UsersFavCats
             .AnyAsync(ufc => ufc.CatId == catId && ufc.UserId.ToString() == userId);
         }
-    
+
+        public async Task<AllCatsFilteredAndPagedServiceModel> AllAsync(AllCatsQueryModel queryModel, string userId)
+        {
+            IQueryable<Cat> catsQuery = this.dbContext.Cats
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(queryModel.Cattery))
+            {
+                catsQuery = catsQuery
+                    .Where(c => c.Cattery.Name == queryModel.Cattery);
+            }
+
+            if (!string.IsNullOrWhiteSpace(queryModel.SearchString))
+            {
+                string wildCard = $"%{queryModel.SearchString.ToLower()}%";
+                catsQuery = catsQuery
+                    .Where(c => EF.Functions.Like(c.Name, wildCard) ||
+                     EF.Functions.Like(c.Description, wildCard));
+            }
+
+            if (queryModel.Breed != null)
+            {
+                catsQuery = catsQuery.Where(c => c.Breed == queryModel.Breed);
+            }
+
+            if (queryModel.Gender != null)
+            {
+                catsQuery = catsQuery.Where(c => c.Gender == queryModel.Gender);
+            }
+
+            if (queryModel.Color != null)
+            {
+                catsQuery = catsQuery.Where(c => c.Color == queryModel.Color);
+            }
+
+            if (queryModel.CoatLength != null)
+            {
+                catsQuery = catsQuery.Where(c => c.CoatLength == queryModel.CoatLength);
+            }
+
+            if (queryModel.City != null)
+            {
+                catsQuery = catsQuery.Where(c => c.Cattery.City == queryModel.City);
+            }
+
+
+            catsQuery = queryModel.CatSorting switch
+            {
+                CatSorting.Newest => catsQuery
+                .OrderBy(c=>c.DateAdded),
+
+                CatSorting.Oldest => catsQuery
+                 .OrderByDescending(c => c.DateAdded),
+
+                CatSorting.AgeAscending => catsQuery
+                .OrderBy(c => c.Age),
+
+                CatSorting.AgeDescending => catsQuery
+                .OrderByDescending(c => c.Age),
+
+                CatSorting.LikesAscending => catsQuery
+                .OrderBy(c => c.LikesCount),
+
+                CatSorting.LikesDescending => catsQuery
+                .OrderByDescending(c => c.LikesCount),
+
+                CatSorting.IsAvailable => catsQuery
+                .OrderByDescending(c => c.AvailabilityStatus!= AvailabilityStatus.Adopted)
+            };
+            IEnumerable<CatDisplayViewModel> allCats = await catsQuery
+                .Skip((queryModel.CurrentPage - 1) * queryModel.CatsPerPage)
+                .Take(queryModel.CatsPerPage)
+                .Select(cat => new CatDisplayViewModel
+                {
+                    Id = cat.Id,
+                    Name = cat.Name,
+                    Breed = cat.Breed.ToString(),
+                    Gender = cat.Gender.ToString(),
+                    Age = cat.Age,
+                    IsFavorite = dbContext.UsersFavCats.Any(ufc => ufc.UserId.ToString() == userId && ufc.CatId == cat.Id),
+                    Location = cat.Cattery.City.ToString(),
+                    LikesCount = cat.LikesCount,
+                    CoverImageUrl = cat.Images.FirstOrDefault(i => i.IsCover) != null ? cat.Images.FirstOrDefault(i => i.IsCover)!.URL : "alternative_text_here"
+                })
+                .ToListAsync();
+            int totalCats = catsQuery.Count();
+
+            return new AllCatsFilteredAndPagedServiceModel()
+            {
+                TotalCatsCount = totalCats,
+                Cats = allCats
+            };
+        }
     }
 }

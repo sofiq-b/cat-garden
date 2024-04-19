@@ -295,5 +295,14 @@ namespace CatGarden.Services.Data
 
             return false; 
         }
+
+        public async Task<IEnumerable<string>> AllCatteryNamesAsync()
+        {
+            IEnumerable<string> allNames = await this.dbContext
+                .Catteries
+                .Select(c => c.Name)
+                .ToListAsync();
+            return allNames;
+        }
     }
 }

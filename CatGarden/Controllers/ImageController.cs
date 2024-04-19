@@ -3,6 +3,7 @@ using CatGarden.Web.Infrastructure.Extensions;
 using CatGarden.Web.ViewModels.Image;
 using CatGarden.Web.ViewModels.ImageGallery;
 using Microsoft.AspNetCore.Mvc;
+using static CatGarden.Common.NotificationMessagesConstants;
 
 namespace CatGarden.Web.Controllers
 {
@@ -45,9 +46,9 @@ namespace CatGarden.Web.Controllers
 
                 return Ok(tempFilePath);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return GeneralError();
             }
         }
 
@@ -139,6 +140,14 @@ namespace CatGarden.Web.Controllers
 
 
             return Json(fileInfoList);
+        }
+
+        private IActionResult GeneralError()
+        {
+            TempData[ErrorMessage] =
+                "Unexpected error occurred! Please try again later or contact administrator";
+
+            return RedirectToAction("Index", "Home");
         }
     }
 }

@@ -53,12 +53,10 @@ namespace CatGarden.Web.Controllers
 
                 return View(formModel);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return HandleException(ex);
+                return GeneralError();
             }
-
-
         }
 
         [HttpPost]
@@ -96,9 +94,9 @@ namespace CatGarden.Web.Controllers
 
                 return RedirectToAction("Details", "Cattery", new { id = catteryId });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return HandleException(ex);
+                return GeneralError();
             }
 
         }
@@ -122,9 +120,9 @@ namespace CatGarden.Web.Controllers
                     .GetDetailsByIdAsync(id);
                 return View(viewModel);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return HandleException(ex);
+                return GeneralError();
             }
 
         }
@@ -183,9 +181,9 @@ namespace CatGarden.Web.Controllers
                 TempData[SuccessMessage] = "Cattery updated successfully.";
                 return RedirectToAction("Details", "Cattery", new { id = model.Id });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return HandleException(ex);
+                return GeneralError();
             }
         }
 
@@ -204,29 +202,17 @@ namespace CatGarden.Web.Controllers
                 TempData[SuccessMessage] = "Cattery was deleted successfully!";
                 return RedirectToAction("All", "Cattery");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return HandleException(ex);
+                return GeneralError();
             }
         }
-
-
-
-
-        private IActionResult HandleException(Exception ex)
+        private IActionResult GeneralError()
         {
-            if (ex is WebException we)
-            {
-                HttpStatusCode statusCode = ((HttpWebResponse)we.Response).StatusCode;
+            TempData[ErrorMessage] =
+                "Unexpected error occurred! Please try again later or contact administrator";
 
-                return RedirectToAction("HttpStatusCodeHandler", "Error", new { statusCode = (int)statusCode });
-            }
-            else
-            {
-                TempData[ErrorMessage] = "Unexpected error occurred! Please try again later or contact administrator";
-                return RedirectToAction("Index", "Home");
-            }
+            return RedirectToAction("Index", "Home");
         }
-
     }
 }

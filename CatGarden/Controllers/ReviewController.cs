@@ -54,9 +54,9 @@ namespace CatGarden.Web.Controllers
 
                 return View(viewModel);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return HandleException(ex);
+                return GeneralError();
             }
 
         }
@@ -95,9 +95,9 @@ namespace CatGarden.Web.Controllers
                 TempData[SuccessMessage] = "Review added successfully!";
                 return RedirectToAction("Details", "Cattery", new { id = viewModel.CatteryId });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return HandleException(ex);
+                return GeneralError();
             }
 
         }
@@ -124,9 +124,9 @@ namespace CatGarden.Web.Controllers
                 var model = await reviewService.LoadEditReviewAsync(id);
                 return View(model);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return HandleException(ex);
+                return GeneralError();
             }
         }
 
@@ -155,9 +155,9 @@ namespace CatGarden.Web.Controllers
 
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return HandleException(ex);
+                return GeneralError();
             }
         }
 
@@ -214,21 +214,12 @@ namespace CatGarden.Web.Controllers
 
             return RedirectToAction("Details", "Cattery", new { id = review.CatteryId });
         }
-
-        private IActionResult HandleException(Exception ex)
+        private IActionResult GeneralError()
         {
-            if (ex is WebException we)
-            {
-                HttpStatusCode statusCode = ((HttpWebResponse)we.Response).StatusCode;
+            TempData[ErrorMessage] =
+                "Unexpected error occurred! Please try again later or contact administrator";
 
-                return RedirectToAction("HttpStatusCodeHandler", "Error", new { statusCode = (int)statusCode });
-            }
-            else
-            {
-                TempData[ErrorMessage] = "Unexpected error occurred! Please try again later or contact administrator";
-                return RedirectToAction("Index", "Home");
-            }
+            return RedirectToAction("Index", "Home");
         }
-
     }
 }

@@ -1,4 +1,5 @@
 ﻿using CatGarden.Services.Data.Interfaces;
+using CatGarden.Services.Data.Models.Cat;
 using CatGarden.ViewModels.Cat;
 using CatGarden.Web.Infrastructure.Extensions;
 using CatGarden.Web.ViewModels.Cat;
@@ -31,18 +32,21 @@ namespace CatGarden.Web.Controllers
         }
 
         [AllowAnonymous]
-        public async Task<IActionResult> All()
+        public async Task<IActionResult> All([FromQuery]AllCatsQueryModel queryModel)
         {
             string userId = User.GetId()!;
+            AllCatsFilteredAndPagedServiceModel serviceModel = await this.catService.AllAsync(queryModel, userId);
 
-            var allCats = await catService.GetAllCatsAsync(userId);
+            queryModel.Cats = serviceModel.Cats;
+            queryModel.TotalCats = serviceModel.TotalCatsCount;
+            queryModel.Catteries = await this.catteryService.AllCatteryNamesAsync();
 
-            if (!allCats.Any())
+            if (queryModel.TotalCats == 0)
             {
                 return View("NoCatsFound");
             }
 
-            return View(allCats);
+            return this.View(queryModel);
         }
 
 
@@ -77,11 +81,10 @@ namespace CatGarden.Web.Controllers
 
                 return View(formModel);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return HandleException(ex);
+                return GeneralError();
             }
-
         }
 
         [HttpPost]
@@ -110,13 +113,9 @@ namespace CatGarden.Web.Controllers
 
                 return RedirectToAction("Details", "Cat", new { id = catId });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                
-                TempData[ErrorMessage] = ex.ToString();
-               
-                formModel.Catteries = await catteryService.OwnedCatteriesAsync(User.GetId()!);
-                return View(formModel);
+                return GeneralError();
             }
         }
 
@@ -142,11 +141,10 @@ namespace CatGarden.Web.Controllers
                     .GetDetailsByIdAsync(id, User.GetId()!);
                 return View(viewModel);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return HandleException(ex);
+                return GeneralError();
             }
-
         }
 
         [HttpPost]
@@ -306,11 +304,10 @@ namespace CatGarden.Web.Controllers
                 TempData[SuccessMessage] = "Cat updated successfully.";
                 return RedirectToAction("Details", "Cat", new { id = model.Id });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return HandleException(ex);
+                return GeneralError();
             }
-
         }
 
 
@@ -337,21 +334,12 @@ namespace CatGarden.Web.Controllers
                 return RedirectToAction(nameof(All));
             }
         }
-
-        private IActionResult HandleException(Exception ex)
+        private IActionResult GeneralError()
         {
-            if (ex is WebException we)
-            {
-                HttpStatusCode statusCode = ((HttpWebResponse)we.Response).StatusCode;
+            TempData[ErrorMessage] =
+                "Unexpected error occurred! Please try again later or contact administrator";
 
-                return RedirectToAction("HttpStatusCodeHandler", "Error", new { statusCode = (int)statusCode });
-            }
-            else
-            {
-                TempData[ErrorMessage] = "Unexpected error occurred! Please try again later or contact administrator";
-                return RedirectToAction("Index", "Home");
-            }
+            return RedirectToAction("Index", "Home");
         }
-
     }
 }

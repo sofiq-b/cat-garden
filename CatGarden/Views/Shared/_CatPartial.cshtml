@@ -1,0 +1,160 @@
+﻿@model CatGarden.Web.ViewModels.Cat.CatDisplayViewModel
+@using CatGarden.Services.Data.Interfaces
+@using CatGarden.Web.Infrastructure.Extensions
+@using static CatGarden.Common.Enums
+@inject ICatteryOwnerService CatteryOwnerService
+@inject ICatService CatService
+@{
+    bool isCatteryOwner = await CatteryOwnerService.CatteryOwnerExistsByUserIdAsync(User.GetId()!);
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<partial name="DeleteConfirmation" />
+<script src="path/to/jquery.js"></script>
+<script src="path/to/bootstrap.js"></script>
+
+<style>
+    .heart-icon {
+        color: lightgreen;
+        font-size: 30px;
+    }
+
+    .heart-button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: rgba(0, 0, 0, 0.3);
+        border: none;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        color: lightgreen;
+    }
+
+    .likes-count {
+        display: none;
+        position: absolute;
+        top: calc(100% + 15px);
+        right: 1px;
+        transform: translateX(-50%);
+        background-color: rgba(0, 0, 0, 0.3);
+        color: #fff;
+        padding: 5px 10px;
+        border-radius: 5px;
+        z-index: 999;
+        width: 180px;
+    }
+
+    .heart-button-container:hover .likes-count {
+        display: block;
+    }
+
+    .heart-button-container {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 999;
+    }
+</style>
+
+<div class="card col-4" style="width: 20rem; position: relative; padding-top: 12px;">
+    <!-- Heart button -->
+    @if (!isCatteryOwner && (User.Identity?.IsAuthenticated ?? false))
+    {
+        <div class="heart-button-container">
+            @if (Model.IsFavorite)
+            {
+                <form method="post" class="favorite-form favorite position-absolute top-0 end-0 m-2" data-cat-name="@Model.Name">
+                    <input type="hidden" class="cat-id" value="@Model.Id" />
+                    <button type="submit" class="btn btn-warning heart-button">
+                        <i class="fas fa-heart heart-icon"></i>
+                    </button>
+                </form>
+            }
+            else
+            {
+                <form method="post" class="favorite-form position-absolute top-0 end-0 m-2" data-cat-name="@Model.Name">
+                    <input type="hidden" class="cat-id" value="@Model.Id" />
+                    <button type="submit" class="btn btn-warning heart-button">
+                        <i class="far fa-heart heart-icon"></i>
+                    </button>
+                </form>
+            }
+            <!-- Likes count -->
+            <span class="likes-count">@Model.Name has been favorited @Model.LikesCount times!</span>
+        </div>
+    }
+
+
+
+
+    <!-- Card content -->
+    <img src="@Model.CoverImageUrl" class="card-img-top" alt="Cat Image">
+    <div class="card-body">
+        <h5 class="card-title mt-1">@Model.Name</h5>
+        <h6 class="card-title mt-1">@EnumExtensions.GetDisplayName(Enum.Parse<Breed>(Model.Breed))</h6>
+        <p class="mb-0"><span class="fw-bold">Gender: </span>@Model.Gender</p>
+        <p class="mb-0"><span class="fw-bold">Age: </span>@Model.Age</p>
+        <p class="mb-0"><span class="fw-bold">City: </span>@Model.Location</p>
+    </div>
+
+    <!-- Details button -->
+    <a asp-controller="Cat" asp-action="Details" asp-route-id="@Model.Id" class="btn btn-success mb-2 w-100 p-3 fw-bold">Details</a>
+
+    <!-- Delete button -->
+    @if (isCatteryOwner && await CatService.IsCatPartOfOwnedCattery(Model.Id, User.GetId()!))
+    {
+        <button id="deleteButton-@Model.Id" class="btn btn-danger mb-2 w-100 p-3 fw-bold deleteButton" data-cat-id="@Model.Id">Delete</button>
+    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            $('.deleteButton').click(function () {
+                var catId = $(this).data('cat-id');
+                $('#deleteConfirmationModal').modal('show');
+
+                // Set the delete action URL with the catId
+                var deleteUrl = '@Url.Action("Delete", "Cat")' + '/' + catId;
+                $('#deleteForm').attr('action', deleteUrl);
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('.favorite-form').submit(function (event) {
+                event.preventDefault(); // Prevent the form from submitting normally
+
+                var form = $(this);
+                var catId = form.find('.cat-id').val();
+                var catName = form.data('cat-name');
+                var isFavorite = form.hasClass('favorite');
+                var actionUrl = isFavorite ? '@Url.Action("RemoveFavorite", "Cat")' : '@Url.Action("AddFavorite", "Cat")';
+
+                $.ajax({
+                    type: 'POST',
+                    url: actionUrl,
+                    data: { catId: catId },
+                    success: function (response) {
+                        // Toggle the 'favorite' class on the form to indicate whether the cat is now a favorite
+                        form.toggleClass('favorite');
+
+                        // Toggle the heart icon based on whether the cat is now a favorite
+                        var heartIcon = form.find('.heart-icon');
+                        heartIcon.toggleClass('far fa-heart fas fa-heart');
+
+                        // Update the likes count displayed next to the heart icon
+                        var likesCount = form.closest('.card').find('.likes-count');
+                        likesCount.text(catName + ' has been favorited ' + response.likesCount + ' times!');
+                    },
+                    error: function (xhr, status, error) {
+                        console.error(xhr.responseText);
+                        // Handle error appropriately
+                    }
+                });
+            });
+        });
+    </script>
+}

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<CatGarden.Web.ViewModels.Cat.CatDisplayViewModel>
+﻿@model CatGarden.Web.ViewModels.Cat.AllCatsQueryModel
 @using CatGarden.Services.Data.Interfaces
 @using CatGarden.Web.Infrastructure.Extensions
 @using static CatGarden.Common.Enums
@@ -8,57 +8,6 @@
     bool isCatteryOwner = await CatteryOwnerService.CatteryOwnerExistsByUserIdAsync(User.GetId()!);
 }
 
-
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
-<partial name="DeleteConfirmation" />
-<script src="path/to/jquery.js"></script>
-<script src="path/to/bootstrap.js"></script>
-
-<style>
-    .heart-icon {
-        color: lightgreen;
-        font-size: 30px;
-    }
-
-    .heart-button {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: rgba(0, 0, 0, 0.3);
-        border: none;
-        border-radius: 50%;
-        width: 60px;
-        height: 60px;
-        color: lightgreen;
-    }
-
-    .likes-count {
-        display: none;
-        position: absolute;
-        top: calc(100% + 15px);
-        right: 1px;
-        transform: translateX(-50%);
-        background-color: rgba(0, 0, 0, 0.3);
-        color: #fff;
-        padding: 5px 10px;
-        border-radius: 5px;
-        z-index: 999;
-        width: 180px;
-    }
-
-    .heart-button-container:hover .likes-count {
-        display: block;
-    }
-
-    .heart-button-container {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        z-index: 999;
-    }
-</style>
-
 @{
     ViewBag.Title = "All Cats";
 }
@@ -66,109 +15,166 @@
 <h2 class="text-center">@ViewBag.Title</h2>
 <hr />
 
-<div class="text-center row">
-    @foreach (var cat in Model)
-    {
-        <div class="card col-4" style="width: 20rem; position: relative; padding-top: 12px;">
-            <!-- Heart button -->
-            @if (!isCatteryOwner && (User.Identity?.IsAuthenticated ?? false))
-            {
-                <div class="heart-button-container">
-                    @if (cat.IsFavorite)
-                    {
-                        <form method="post" class="favorite-form favorite position-absolute top-0 end-0 m-2" data-cat-name="@cat.Name">
-                            <input type="hidden" class="cat-id" value="@cat.Id" />
-                            <button type="submit" class="btn btn-warning heart-button">
-                                <i class="fas fa-heart heart-icon"></i>
-                            </button>
-                        </form>
-                    }
-                    else
-                    {
-                        <form method="post" class="favorite-form position-absolute top-0 end-0 m-2" data-cat-name="@cat.Name">
-                            <input type="hidden" class="cat-id" value="@cat.Id" />
-                            <button type="submit" class="btn btn-warning heart-button">
-                                <i class="far fa-heart heart-icon"></i>
-                            </button>
-                        </form>
-                    }
-                    <!-- Likes count -->
-                    <span class="likes-count">@cat.Name has been favorited @cat.LikesCount times!</span>
-                </div>
-            }
+<form method="get">
+    <div class="row">
 
-            
-
-
-            <!-- Card content -->
-            <img src="@cat.CoverImageUrl" class="card-img-top" alt="Cat Image">
-            <div class="card-body">
-                <h5 class="card-title mt-1">@cat.Name</h5>
-                <h6 class="card-title mt-1">@EnumExtensions.GetDisplayName(Enum.Parse<Breed>(cat.Breed))</h6>
-                <p class="mb-0"><span class="fw-bold">Gender: </span>@cat.Gender</p>
-                <p class="mb-0"><span class="fw-bold">Age: </span>@cat.Age</p>
-                <p class="mb-0"><span class="fw-bold">City: </span>@cat.Location</p>
-            </div>
-
-            <!-- Details button -->
-            <a asp-controller="Cat" asp-action="Details" asp-route-id="@cat.Id" class="btn btn-success mb-2 w-100 p-3 fw-bold">Details</a>
-
-            <!-- Delete button -->
-            @if (isCatteryOwner && await CatService.IsCatPartOfOwnedCattery(cat.Id, User.GetId()!))
-            {
-                <button id="deleteButton-@cat.Id" class="btn btn-danger mb-2 w-100 p-3 fw-bold deleteButton" data-cat-id="@cat.Id">Delete</button>
-            }
+        <div class="form-group col-md-3">
+            <label asp-for="Breed"></label>
+            <select asp-for="Breed" class="form-control">
+                <option value="">All</option>
+                @foreach (Breed breed in Enum.GetValues(typeof(Breed)))
+                {
+                    <option value="@breed.ToString()">@EnumExtensions.GetDisplayName(breed)</option>
+                }
+            </select>
         </div>
+
+        <div class="form-group col-md-3">
+            <label asp-for="Gender"></label>
+            <select asp-for="Gender" class="form-control">
+                <option value="">All</option>
+                @foreach (var gender in Enum.GetValues(typeof(Gender)))
+                {
+                    <option value="@gender">@gender</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group col-md-3">
+            <label asp-for="Color"></label>
+            <select asp-for="Color" class="form-control">
+                <option value="">All</option>
+                @foreach (var color in Enum.GetValues(typeof(Color)))
+                {
+                    <option value="@color">@color</option>
+                }
+            </select>
+        </div>
+
+
+        <div class="form-group col-md-3">
+            <label asp-for="CoatLength"></label>
+            <select asp-for="CoatLength" class="form-control">
+                <option value="">All</option>
+                @foreach (var coatLength in Enum.GetValues(typeof(CoatLength)))
+                {
+                    <option value="@coatLength">@coatLength</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group col-md-3">
+            <label asp-for="City"></label>
+            <select asp-for="City" class="form-control">
+                <option value="">All</option>
+                @foreach (City city in Enum.GetValues(typeof(City)))
+                {
+                    <option value="@city.ToString()">@EnumExtensions.GetDisplayName(city)</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group col-md-3">
+            <label asp-for="CatSorting"></label>
+            <select asp-for="CatSorting" class="form-control">
+                <option value="Newest">Newest</option>
+                <option value="Oldest">Oldest</option>
+                <option value="AgeAscending">Age (Ascending)</option>
+                <option value="AgeDescending">Age (Descending)</option>
+                <option value="LikesAscending">Likes (Ascending)</option>
+                <option value="LikesDescending">Likes (Descending)</option>
+            </select>
+        </div>
+
+        <div class="form-group col-md-3">
+            <label asp-for="SearchString"></label>
+            <input asp-for="SearchString" class="form-control" placeholder="...">
+        </div>
+
+        <div class="form-group col-md-3">
+            <label asp-for="Cattery"></label>
+            <select asp-for="Cattery" class="form-control">
+                <option value="">All</option>
+                @foreach (var cattery in Model.Catteries)
+                {
+                    <option value="@cattery">@cattery</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group">
+
+            <label asp-for="CatsPerPage"></label>
+
+            <select asp-for="CatsPerPage" class="form-control">
+
+                <option value="4">4</option>
+
+                <option value="8">8</option>
+
+                <option value="12">12</option>
+
+            </select>
+
+        </div>
+
+        <div class="col-md-3">
+            <div class="form-group mt-4 p-2">
+                <input type="submit" value="Search" class="btn btn-primary" />
+            </div>
+        </div>
+    </div>
+</form>
+
+@{
+    int previousPage = Model.CurrentPage - 1;
+    if (previousPage < 1)
+    {
+        previousPage = 1;
+    }
+
+    int maxPage = (int)Math.Ceiling((double)Model.TotalCats /
+        Model.CatsPerPage);
+}
+
+<div class="row mb-5">
+    <div class="col-md-6 d-grid gap-2 d-md-flex justify-content-md-start">
+        <a class="btn btn-primary @(Model.CurrentPage == 1 ? "disabled" : string.Empty)"
+           asp-controller="Cat"
+           asp-action="All"
+           asp-route-currentPage="@previousPage"
+           asp-route-category="@Model.Cattery"
+           asp-route-searchTerm="@Model.SearchString"
+           asp-route-sorting="@((int)Model.CatSorting)"><<</a>
+    </div>
+
+    @{
+        bool shouldNextPageBeDisabled = Model.CurrentPage == maxPage ||
+        !Model.Cats.Any();
+    }
+
+    <div class="col-md-6 d-grid gap-2 d-md-flex justify-content-md-end">
+        <a class="btn btn-primary
+           @(shouldNextPageBeDisabled ? "disabled" : string.Empty)"
+           asp-controller="Cat"
+           asp-action="All"
+           asp-route-currentPage="@(Model.CurrentPage + 1)"
+           asp-route-category="@Model.Cattery"
+           asp-route-searchTerm="@Model.SearchString"
+           asp-route-sorting="@((int)Model.CatSorting)">>></a>
+    </div>
+</div>
+
+@if (!Model.Cats.Any())
+{
+    <h2 class="text-center">No cats found by the given criteria!</h2>
+}
+
+<div class="row">
+    @foreach (var cat in Model.Cats)
+    {
+        <partial name="_CatPartial" model="@cat" />
     }
 </div>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-    <script>
-        $(document).ready(function () {
-            $('.deleteButton').click(function () {
-                var catId = $(this).data('cat-id');
-                $('#deleteConfirmationModal').modal('show');
 
-                // Set the delete action URL with the catId
-                var deleteUrl = '@Url.Action("Delete", "Cat")' + '/' + catId;
-                $('#deleteForm').attr('action', deleteUrl);
-            });
-        });
-    </script>
-    <script>
-        $(document).ready(function () {
-            $('.favorite-form').submit(function (event) {
-                event.preventDefault(); // Prevent the form from submitting normally
-
-                var form = $(this);
-                var catId = form.find('.cat-id').val();
-                var catName = form.data('cat-name');
-                var isFavorite = form.hasClass('favorite');
-                var actionUrl = isFavorite ? '@Url.Action("RemoveFavorite", "Cat")' : '@Url.Action("AddFavorite", "Cat")';
-
-                $.ajax({
-                    type: 'POST',
-                    url: actionUrl,
-                    data: { catId: catId },
-                    success: function (response) {
-                        // Toggle the 'favorite' class on the form to indicate whether the cat is now a favorite
-                        form.toggleClass('favorite');
-
-                        // Toggle the heart icon based on whether the cat is now a favorite
-                        var heartIcon = form.find('.heart-icon');
-                        heartIcon.toggleClass('far fa-heart fas fa-heart');
-
-                        // Update the likes count displayed next to the heart icon
-                        var likesCount = form.closest('.card').find('.likes-count');
-                        likesCount.text(catName + ' has been favorited ' + response.likesCount + ' times!');
-                    },
-                    error: function (xhr, status, error) {
-                        console.error(xhr.responseText);
-                        // Handle error appropriately
-                    }
-                });
-            });
-        });
-    </script>
-}
