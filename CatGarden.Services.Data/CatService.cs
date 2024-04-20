@@ -437,10 +437,10 @@ namespace CatGarden.Services.Data
             catsQuery = queryModel.CatSorting switch
             {
                 CatSorting.Newest => catsQuery
-                .OrderBy(c=>c.DateAdded),
+                .OrderByDescending(c=>c.DateAdded),
 
                 CatSorting.Oldest => catsQuery
-                 .OrderByDescending(c => c.DateAdded),
+                 .OrderBy(c => c.DateAdded),
 
                 CatSorting.AgeAscending => catsQuery
                 .OrderBy(c => c.Age),

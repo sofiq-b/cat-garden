@@ -56,7 +56,7 @@
     <div style="max-width: 600px; width: 100%;">
         <h2 class="text-center">@ViewData["Title"]</h2>
 
-        <form id="catForm" asp-action="Add" method="post" enctype="multipart/form-data">
+        <form id="catForm" asp-area="" asp-controller="Cat" asp-action="Add" method="post" enctype="multipart/form-data">
             <div class="form-group">
                 <label asp-for="Name"></label>
                 <input asp-for="Name" class="form-control" />

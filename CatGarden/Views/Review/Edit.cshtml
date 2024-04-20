@@ -68,7 +68,7 @@
     /* Modified from: https://github.com/mukulkant/Star-rating-using-pure-css */
 </style>
 
-<form id="reviewForm" asp-action="Edit" method="post">
+<form id="reviewForm" asp-area="" asp-controller="Review" asp-action="Edit" method="post">
     <div class="form-group">
         <label asp-for="Rating"></label>
         <div class="rate">
