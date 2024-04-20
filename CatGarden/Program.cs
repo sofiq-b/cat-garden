@@ -34,9 +34,13 @@ builder.Services.AddApplicationServices(typeof(ICatService));
 
 builder.Services.AddRecaptchaService();
 
+builder.Services.AddMemoryCache();
+builder.Services.AddResponseCaching();
+
 builder.Services.ConfigureApplicationCookie(cfg =>
 {
     cfg.LoginPath = "/User/Login";
+    cfg.AccessDeniedPath = "/Home/Error/401";
 });
 
 builder.Services.AddControllersWithViews();
@@ -57,7 +61,7 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseExceptionHandler("/Home/Error/500");
-    app.UseStatusCodePagesWithRedirects("/Error?statusCode={0}");
+    app.UseStatusCodePagesWithRedirects("/Home/Error?statusCode={0}");
     app.UseHsts();
 }
 
@@ -65,6 +69,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseResponseCaching();
 
 app.UseAuthentication();
 app.UseAuthorization();

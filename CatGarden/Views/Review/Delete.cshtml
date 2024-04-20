@@ -17,7 +17,7 @@
                 <form asp-action="DeleteConfirmed" method="post">
                     <input type="hidden" asp-for="Id" />
                     <button type="submit" class="btn btn-danger">Confirm Delete</button>
-                    <a asp-controller="Cattery" asp-action="Details" asp-route-id="@Model.CatteryId" class="btn btn-secondary">Cancel</a>
+                    <a asp-area="" asp-controller="Cattery" asp-action="Details" asp-route-id="@Model.CatteryId" class="btn btn-secondary">Cancel</a>
                 </form>
 
             </div>

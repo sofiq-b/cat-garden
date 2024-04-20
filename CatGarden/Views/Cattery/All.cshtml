@@ -38,7 +38,7 @@
                 <h5 class="card-title mt-1">@cattery.Name</h5>
                 <p class="mb-0"><span class="fw-bold">City: </span>@EnumExtensions.GetDisplayName(Enum.Parse<City>(cattery.City))</p>
                 <p class="mb-0"><span class="fw-bold">Address: </span>@cattery.Address</p>
-                <p class="mb-0"><span class="fw-bold">Establishment Date: </span>@cattery.EstablishmentDate.ToShortDateString()</p>
+                <p class="mb-0"><span class="fw-bold">Establishment Date: </span>@cattery.EstablishmentDate.ToString("dd/MM/yyyy")</p>
             </div>
 
             <!-- Details button -->

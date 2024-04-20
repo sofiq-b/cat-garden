@@ -20,17 +20,7 @@ namespace CatGarden.Web.Controllers
         {
             IEnumerable<IndexViewModel> viewModel = await this.catService.LastThreeCatsAsync();
 
-            string userId = User.GetId()!;
-            bool isCatteryOwner = await catteryOwnerService.CatteryOwnerExistsByUserIdAsync(userId);
-
-            if (isCatteryOwner)
-            {
-                ViewData["IsCatteryOwner"] = true;
-            }
-            else
-            {
-                ViewData["IsCatteryOwner"] = false;
-            }
+            
             return View(viewModel);
         }
 

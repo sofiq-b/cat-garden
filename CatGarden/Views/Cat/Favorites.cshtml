@@ -54,7 +54,7 @@
 
 <h2 class="text-center">@ViewBag.Title</h2>
 <hr />
-<form method="post" asp-controller="Cat" asp-action="ClearFavorites">
+<form method="post" asp-area="" asp-controller="Cat" asp-action="ClearFavorites">
     <button type="submit" class="btn btn-danger" style="background-color:darkred">Clear Favorites</button>
 </form>
 <div class="text-center row">
@@ -96,7 +96,7 @@
             </div>
 
             <!-- Details button -->
-            <a asp-controller="Cat" asp-action="Details" asp-route-id="@cat.Id" class="btn btn-success mb-2 w-100 p-3 fw-bold">Details</a>
+            <a asp-area="" asp-controller="Cat" asp-action="Details" asp-route-id="@cat.Id" class="btn btn-success mb-2 w-100 p-3 fw-bold">Details</a>
         </div>
     }
 

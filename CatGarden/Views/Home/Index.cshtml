@@ -22,7 +22,7 @@
         <p class="lead">
             @if (User.Identity?.IsAuthenticated ?? false)
             {
-                <a asp-controller="Cat" asp-action="Add" class="btn btn-primary btn-lg"
+                <a asp-area="" asp-controller="Cat" asp-action="Add" class="btn btn-primary btn-lg"
                    role="button">Add Cat</a>
             }
         </p>
@@ -62,7 +62,3 @@
 </main>
 
 
-@section Scripts
-{
-    <script>statistics();</script>
-}

@@ -146,14 +146,14 @@
                         }
                         else
                         {
-                            <form asp-controller="AdoptionApplication" asp-action="SendApplication" asp-route-catId="@Model.Id">
+                            <form asp-area="" asp-controller="AdoptionApplication" asp-action="SendApplication" asp-route-catId="@Model.Id">
                                 <input type="submit" class="btn btn-success mb-2 w-100 p-3 fw-bold" value="Adopt" />
                             </form>
                         }
                     }
                     @if (isPartOfCattery || this.User.IsAdmin())
                     {
-                        <a asp-controller="Cat" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning mb-2 w-100 p-3 fw-bold">Edit</a>
+                        <a asp-area="" asp-controller="Cat" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning mb-2 w-100 p-3 fw-bold">Edit</a>
                         <button id="deleteButton" class="btn btn-danger mb-2 w-100 p-3 fw-bold" data-cat-id="@Model.Id">Delete</button>
                     }
                 }
@@ -196,8 +196,8 @@
                 </div>
                 <!-- Project info box -->
                 <div class="project-info-box">
-                    <p><b>Date Added:</b> @Model.DateAdded.ToString("dd-MM-yyyy")</p>
-                    <p><b>Cattery:</b> <a asp-controller="Cattery" asp-action="Details" asp-route-id="@Model.CatteryId" style="text-decoration: none; ">@Model.CatteryName</a></p>
+                    <p><b>Date Added:</b> @Model.DateAdded.ToString("dd/MM/yyyy")</p>
+                    <p><b>Cattery:</b> <a asp-area="" asp-controller="Cattery" asp-action="Details" asp-route-id="@Model.CatteryId" style="text-decoration: none; ">@Model.CatteryName</a></p>
 
 
                 </div><!-- / project-info-box -->

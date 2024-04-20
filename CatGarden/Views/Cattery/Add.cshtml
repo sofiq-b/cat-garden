@@ -229,7 +229,11 @@
                     }
                 });
             }
-
+            function convertDateFormat(dateString) {
+                var parts = dateString.split("/");
+                // Reformat the date as mm/dd/yyyy
+                return parts[1] + '/' + parts[0] + '/' + parts[2];
+            }
             // Form submission event
             $('#catteryForm').submit(function (event) {
                 // Check if no image is set as cover
@@ -239,6 +243,8 @@
                     // Show alert or error message
                     alert('Please set an image as cover before submitting the form.');
                 }
+                var establishmentDateValue = $('#establishmentDateInput').val();
+                $('#establishmentDateInput').val(convertDateFormat(establishmentDateValue));
             });
             $('#establishmentDateInput').datepicker({
                 format: 'dd/mm/yyyy',
