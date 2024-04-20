@@ -36,7 +36,7 @@ namespace CatGarden.Web.Controllers
                 FirstName = model.FirstName,
                 LastName = model.LastName,
             };
-            await this.userManager.SetUserNameAsync(user,model.Email);
+            await this.userManager.SetEmailAsync(user,model.Email);
 
             await this.userManager.SetUserNameAsync(user,model.Email);
 

@@ -1,10 +1,10 @@
 using CatGarden.Data;
 using CatGarden.Data.Models;
-using CatGarden.Services.Data;
 using CatGarden.Services.Data.Interfaces;
 using CatGarden.Web.Infrastructure.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using static CatGarden.Common.GeneralApplicationConstants;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +27,7 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
     options.Password.RequireNonAlphanumeric = builder.Configuration.GetValue<bool>("Identity:Password:RequireNonAlphanumeric");
     options.Password.RequiredLength = builder.Configuration.GetValue<int>("Identity:Password:RequiredLength");
 })
+    .AddRoles<IdentityRole<Guid>>()
     .AddEntityFrameworkStores<CatGardenDbContext>();
 
 builder.Services.AddApplicationServices(typeof(ICatService));
@@ -65,6 +66,8 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.SeedAdministrator(DevelopmentAdminEmail);
 
 app.UseSession();
 

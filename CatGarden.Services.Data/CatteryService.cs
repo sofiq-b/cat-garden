@@ -159,7 +159,7 @@ namespace CatGarden.Services.Data
                       .Select(app => new AdoptionApplicationOfUserViewModel   
                       {
                           Id = app.Id.ToString(),
-                          Username = app.User.UserName,
+                          Username = app.User.FirstName + " " + app.User.LastName,
                           CatName = cat.Name,
                           ApplicationDate = app.ApplicationDate,
                           ApplicationStatus = app.ApplicationStatus.ToString()
@@ -172,7 +172,7 @@ namespace CatGarden.Services.Data
             {
                 Id = review.Id,
                 UserId = review.User.Id.ToString(),
-                Username = review.User.UserName,
+                Username = review.User.FirstName + " " + review.User.LastName,
                 Rating = review.Rating,
                 Comment = review.Comment,
                 DatePosted = review.DatePosted
