@@ -59,7 +59,7 @@
 
 <div class="card col-4" style="width: 20rem; position: relative; padding-top: 12px;">
     <!-- Heart button -->
-    @if (!isCatteryOwner && (User.Identity?.IsAuthenticated ?? false))
+    @if ((!isCatteryOwner && (User.Identity?.IsAuthenticated ?? false)) || this.User.IsAdmin())
     {
         <div class="heart-button-container">
             @if (Model.IsFavorite)
@@ -102,7 +102,7 @@
     <a asp-controller="Cat" asp-action="Details" asp-route-id="@Model.Id" class="btn btn-success mb-2 w-100 p-3 fw-bold">Details</a>
 
     <!-- Delete button -->
-    @if (isCatteryOwner && await CatService.IsCatPartOfOwnedCattery(Model.Id, User.GetId()!))
+    @if (isCatteryOwner && await CatService.IsCatPartOfOwnedCattery(Model.Id, User.GetId()!) || this.User.IsAdmin())
     {
         <button id="deleteButton-@Model.Id" class="btn btn-danger mb-2 w-100 p-3 fw-bold deleteButton" data-cat-id="@Model.Id">Delete</button>
     }

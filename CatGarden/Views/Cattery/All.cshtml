@@ -47,7 +47,7 @@
                 bool catteryIsOwnedByUser = await CatteryService.IsCatteryOwnedByUserAsync(User.GetId()!, cattery.Id);
             }
             <!-- Delete button -->
-            @if ((User.Identity?.IsAuthenticated ?? false) && (catteryIsOwnedByUser))
+            @if (((User.Identity?.IsAuthenticated ?? false) && (catteryIsOwnedByUser)) || User.IsAdmin())
             {
                 <button id="deleteButton-@cattery.Id" class="btn btn-danger mb-2 w-100 p-3 fw-bold deleteButton" data-cattery-id="@cattery.Id">Delete</button>
             }

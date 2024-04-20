@@ -56,14 +56,14 @@
         <li class="nav-item">
             <a class="nav-link" id="reviews-tab" data-bs-toggle="tab" href="#reviews" role="tab" aria-controls="reviews" aria-selected="false">Reviews</a>
         </li>
-        @if (isCatteryOwner && catteryIsOwnedByUser)
+        @if ((isCatteryOwner && catteryIsOwnedByUser) || User.IsAdmin())
         {
             <li class="nav-item">
                 <a class="nav-link" id="adoptionApplications-tab" data-bs-toggle="tab" href="#adoptionApplications" role="tab" aria-controls="adoptionApplications" aria-selected="false">Adoption Applications</a>
             </li>
         }
     </ul>
-    @if (isCatteryOwner && catteryIsOwnedByUser)
+    @if ((isCatteryOwner && catteryIsOwnedByUser) || User.IsAdmin())
     {
         <div class="edbuttons" style="display: flex;">
             <a asp-controller="Cattery" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning mb-2 w-100 p-3 fw-bold">Edit</a>
@@ -94,7 +94,7 @@
                     <a asp-controller="Cat" asp-action="Details" asp-route-id="@cat.Id" class="btn btn-success mb-2 w-100 p-3 fw-bold">Details</a>
 
                     <!-- Delete button -->
-                    @if (isCatteryOwner && await CatService.IsCatPartOfOwnedCattery(cat.Id, User.GetId()!))
+                    @if ((isCatteryOwner && await CatService.IsCatPartOfOwnedCattery(cat.Id, User.GetId()!)) || User.IsAdmin())
                     {
                         <button id="deleteButton-@cat.Id" class="btn btn-danger mb-2 w-100 p-3 fw-bold deleteButton" data-cat-id="@cat.Id">Delete</button>
                     }
@@ -116,7 +116,7 @@
                             <small class="text-muted">Posted on @review.DatePosted.ToString("dd-MM-yyyy")</small>
                         </p>
                     </div>
-                    @if (User.GetId() == review.UserId)
+                    @if ((User.GetId() == review.UserId) || User.IsAdmin())
                     {
                         <div>
                             <a asp-controller="Review" asp-action="Edit" asp-route-id="@review.Id" class="btn btn-primary">Edit</a>
@@ -125,7 +125,7 @@
                     }
                 </div>
             }
-            @if (!isCatteryOwner && !catteryIsOwnedByUser)
+            @if ((!isCatteryOwner && !catteryIsOwnedByUser) || User.IsAdmin())
             {
                 <a asp-controller="Review" asp-action="Add" asp-route-id="@Model.Id" class="btn btn-primary">Add a Review</a>
             }
@@ -133,7 +133,7 @@
     </div>
     
     <!-- Adoption Applications Tab -->
-    @if (isCatteryOwner && catteryIsOwnedByUser)
+    @if ((isCatteryOwner && catteryIsOwnedByUser) || User.IsAdmin())
     {
         <div class="tab-pane fade" id="adoptionApplications" role="tabpanel" aria-labelledby="adoptionApplications-tab">
             <div class="mt-3">

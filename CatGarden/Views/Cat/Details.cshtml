@@ -136,7 +136,7 @@
             <div>
                 @if (this.User.Identity?.IsAuthenticated ?? false)
                 {
-                    @if (!isCatteryOwner)
+                    @if (!isCatteryOwner || this.User.IsAdmin())
                     {
                         @if (isAdopted)
                         {
@@ -151,13 +151,10 @@
                             </form>
                         }
                     }
-                    else
+                    @if (isPartOfCattery || this.User.IsAdmin())
                     {
-                        if (isPartOfCattery)
-                        {
-                            <a asp-controller="Cat" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning mb-2 w-100 p-3 fw-bold">Edit</a>
-                            <button id="deleteButton" class="btn btn-danger mb-2 w-100 p-3 fw-bold" data-cat-id="@Model.Id">Delete</button>
-                        }
+                        <a asp-controller="Cat" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning mb-2 w-100 p-3 fw-bold">Edit</a>
+                        <button id="deleteButton" class="btn btn-danger mb-2 w-100 p-3 fw-bold" data-cat-id="@Model.Id">Delete</button>
                     }
                 }
             </div>

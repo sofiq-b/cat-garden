@@ -40,7 +40,7 @@ namespace CatGarden.Web.Controllers
         {
             bool isCatteryOwner = await catteryOwnerService.CatteryOwnerExistsByUserIdAsync(User.GetId()!);
 
-            if (!isCatteryOwner)
+            if (!isCatteryOwner && !this.User.IsAdmin())
             {
                 TempData[ErrorMessage] = "You must become a cattery owner in order to add new catteries!";
 
@@ -69,7 +69,7 @@ namespace CatGarden.Web.Controllers
 
             bool isCatteryOwner = await catteryOwnerService.CatteryOwnerExistsByUserIdAsync(User.GetId()!);
 
-            if (!isCatteryOwner)
+            if (!isCatteryOwner && !this.User.IsAdmin())
             {
                 TempData[ErrorMessage] = "You must become a cattery owner in order to add new catteries!";
 
@@ -141,7 +141,7 @@ namespace CatGarden.Web.Controllers
                 return RedirectToAction("All", "Cattery");
             }
             var isOwnedByUser = await catteryService.IsCatteryOwnedByUserAsync(userId, id);
-            if (!isOwnedByUser)
+            if (!isOwnedByUser && !this.User.IsAdmin())
             {
                 TempData[ErrorMessage] = "Unauthorized to edit cattery!";
                 return BadRequest();
@@ -169,7 +169,7 @@ namespace CatGarden.Web.Controllers
             string userId = User.GetId()!;
 
             var isOwnedByUser = await catteryService.IsCatteryOwnedByUserAsync(userId, model.Id);
-            if (!isOwnedByUser)
+            if (!isOwnedByUser && !this.User.IsAdmin())
             {
                 TempData[ErrorMessage] = "Unauthorized to edit cattery!";
                 return BadRequest();
@@ -191,7 +191,7 @@ namespace CatGarden.Web.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var isOwnedByUser = await catteryService.IsCatteryOwnedByUserAsync(User.GetId()!,id);
-            if (!isOwnedByUser)
+            if (!isOwnedByUser && !this.User.IsAdmin())
             {
                 TempData[ErrorMessage] = "Unauthorized to delete cattery!";
                 return BadRequest();

@@ -57,7 +57,7 @@ namespace CatGarden.Web.Controllers
 
             bool isCatteryOwner =
                 await catteryOwnerService.CatteryOwnerExistsByUserIdAsync(User.GetId()!);
-            if (!isCatteryOwner)
+            if (!isCatteryOwner && !this.User.IsAdmin())
             {
                 TempData[ErrorMessage] = "You must become a cattery owner in order to add new cats!";
 
@@ -154,15 +154,15 @@ namespace CatGarden.Web.Controllers
             if (!catExists)
             {
                 TempData[ErrorMessage] = "Cat with the provided id does not exist!";
-                return NotFound();
+                return RedirectToAction("All", "Cat");
             }
 
             string userId = User.GetId()!;
 
-            if (await catteryOwnerService.CatteryOwnerExistsByUserIdAsync(userId))
+            if (await catteryOwnerService.CatteryOwnerExistsByUserIdAsync(userId) && !this.User.IsAdmin())
             {
                 TempData[ErrorMessage] = "Favorites tab is inaccessible to cattery owners.";
-                return Forbid();
+                return RedirectToAction("All", "Cat");
             }
 
             var isFavorite = await catService.IsFavoritedByUserWithIdAsync(catId, userId);
@@ -190,22 +190,22 @@ namespace CatGarden.Web.Controllers
             if (!catExists)
             {
                 TempData[ErrorMessage] = "Cat with the provided id does not exist!";
-                return NotFound();
+                return RedirectToAction("All", "Cat");
             }
 
             string userId = User.GetId()!;
 
-            if (await catteryOwnerService.CatteryOwnerExistsByUserIdAsync(userId))
+            if (await catteryOwnerService.CatteryOwnerExistsByUserIdAsync(userId) && !this.User.IsAdmin())
             {
                 TempData[ErrorMessage] = "Favorites tab is inaccessible to cattery owners.";
-                return BadRequest();
+                return RedirectToAction("All", "Cat");
             }
 
             var isFavorite = await catService.IsFavoritedByUserWithIdAsync(catId, userId);
             if (!isFavorite)
             {
                 TempData[ErrorMessage] = "Unauthorized to remove cat from favorites!";
-                return BadRequest();
+                return RedirectToAction("All", "Cat");
             }
 
             await catService.RemoveFavoriteAsync(catId, userId);
@@ -219,7 +219,7 @@ namespace CatGarden.Web.Controllers
         {
             string userId = User.GetId()!;
 
-            if (await catteryOwnerService.CatteryOwnerExistsByUserIdAsync(userId))
+            if (await catteryOwnerService.CatteryOwnerExistsByUserIdAsync(userId) && !this.User.IsAdmin())
             {
                 TempData[ErrorMessage] = "Favorites tab is inaccessible to cattery owners.";
 
@@ -235,7 +235,7 @@ namespace CatGarden.Web.Controllers
         {
             string userId = User.GetId()!;
 
-            if (await catteryOwnerService.CatteryOwnerExistsByUserIdAsync(userId))
+            if (await catteryOwnerService.CatteryOwnerExistsByUserIdAsync(userId) && !this.User.IsAdmin())
             {
                 TempData[ErrorMessage] = "Favorites tab is inaccessible to cattery owners.";
 
@@ -264,10 +264,10 @@ namespace CatGarden.Web.Controllers
                 return RedirectToAction("All", "Cat");
             }
             var isOwnedByUser = await catService.IsCatPartOfOwnedCattery(id, userId);
-            if (!isOwnedByUser)
+            if (!isOwnedByUser && !this.User.IsAdmin())
             {
                 TempData[ErrorMessage] = "Unauthorized to edit cat!";
-                return BadRequest();
+                return RedirectToAction("All", "Cat");
             }
 
             return View(model);
@@ -292,10 +292,10 @@ namespace CatGarden.Web.Controllers
             string userId = User.GetId()!;
 
             var isOwnedByUser = await catService.IsCatPartOfOwnedCattery(model.Id, userId);
-            if (!isOwnedByUser)
+            if (!isOwnedByUser && !this.User.IsAdmin())
             {
                 TempData[ErrorMessage] = "Unauthorized to edit cat!";
-                return BadRequest();
+                return RedirectToAction("All", "Cat");
             }
 
             try
@@ -316,22 +316,29 @@ namespace CatGarden.Web.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var isOwnedByUser = await catService.IsCatPartOfOwnedCattery(id, User.GetId()!);
-            if (!isOwnedByUser)
+            if (!isOwnedByUser && !this.User.IsAdmin())
             {
                 TempData[ErrorMessage] = "Unauthorized to delete cat!";
-                return BadRequest();
+                return RedirectToAction("All", "Cat");
             }
-            var isDeleted = await catService.DeleteCatAsync(id);
 
-            if (isDeleted)
+            try
             {
-                TempData[SuccessMessage] = "Cat was deleted successfully!";
-                return RedirectToAction(nameof(All));
+                var isDeleted = await catService.DeleteCatAsync(id);
+                if (isDeleted)
+                {
+                    TempData[SuccessMessage] = "Cat was deleted successfully!";
+                    return RedirectToAction("All", "Cat");
+                }
+                else
+                {
+                    TempData[ErrorMessage] = "Cat not found or deletion failed!";
+                    return RedirectToAction("All", "Cat");
+                }
             }
-            else
+            catch (Exception)
             {
-                TempData[ErrorMessage] = "Cat not found or deletion failed!";
-                return RedirectToAction(nameof(All));
+                return GeneralError();
             }
         }
         private IActionResult GeneralError()

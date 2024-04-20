@@ -37,7 +37,7 @@ namespace CatGarden.Web.Controllers
                     return RedirectToAction("All", "Cat");
                 }
                 var userIsCatteryOwner = await catteryOwnerService.CatteryOwnerExistsByUserIdAsync(userId);
-                if (userIsCatteryOwner)
+                if (userIsCatteryOwner && !this.User.IsAdmin())
                 {
                     TempData[ErrorMessage] = "User is cattery owner.";
                     return RedirectToAction("All", "Cattery");
@@ -122,7 +122,7 @@ namespace CatGarden.Web.Controllers
                 TempData[ErrorMessage] = "Adoption application not found.";
                 return RedirectToAction("All", "Catteries");
             }
-            if (!await catteryService.IsCatteryOwnedByUserAsync(userId, cat.CatteryId))
+            if (!await catteryService.IsCatteryOwnedByUserAsync(userId, cat.CatteryId) && !this.User.IsAdmin())
             {
                 TempData[ErrorMessage] = "Unauthorized to manage adopt applications!";
                 return RedirectToAction("All", "Catteries");
@@ -151,7 +151,7 @@ namespace CatGarden.Web.Controllers
                 TempData[ErrorMessage] = "Adoption application not found.";
                 return RedirectToAction("All", "Catteries");
             }
-            if (!await catteryService.IsCatteryOwnedByUserAsync(userId, cat.CatteryId))
+            if (!await catteryService.IsCatteryOwnedByUserAsync(userId, cat.CatteryId) && !this.User.IsAdmin())
             {
                 TempData[ErrorMessage] = "Unauthorized to manage adopt applications!";
                 return RedirectToAction("All", "Catteries");

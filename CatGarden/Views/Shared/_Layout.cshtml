@@ -45,7 +45,7 @@
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Cat" asp-action="Add">Add Cat</a>
                                 </li>
                             }
-                            else
+                            @if (!isCatteryOwner || User.IsAdmin())
                             {
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-area="" asp-controller="AdoptionApplication" asp-action="MyApplications">Adoption Applications</a>
