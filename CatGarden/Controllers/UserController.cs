@@ -1,5 +1,6 @@
 ﻿using CatGarden.Data.Models;
 using CatGarden.Web.ViewModels.User;
+using Griesoft.AspNetCore.ReCaptcha;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -25,6 +26,8 @@ namespace CatGarden.Web.Controllers
         }
 
         [HttpPost]
+        [ValidateRecaptcha(Action = nameof(Register),
+            ValidationFailedAction = ValidationFailedAction.ContinueRequest)]
         public async Task <IActionResult> Register(RegisterFormModel model)
         {
             if (!ModelState.IsValid)

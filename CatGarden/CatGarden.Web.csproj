@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="dropzone" Version="4.3.0" />
+    <PackageReference Include="Griesoft.AspNetCore.ReCaptcha" Version="2.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.25" />
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.29" />
