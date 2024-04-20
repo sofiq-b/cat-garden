@@ -95,7 +95,7 @@
 
             <div class="form-group">
                 <label asp-for="EstablishmentDate"></label>
-                <input id="establishmentDateInput" class="form-control" type="text" value="@Model.EstablishmentDate.ToString("dd/MM/yyyy")" />
+                <input asp-for="EstablishmentDate" class="form-control" id="establishmentDateInput" class="form-control" type="text" value="@Model.EstablishmentDate.ToString("dd/MM/yyyy")" />
                 <span asp-validation-for="EstablishmentDate" class="text-danger"></span>
             </div>
 
@@ -246,6 +246,9 @@
                 todayHighlight: true,
                 startDate: '01/01/0001', // Set the start date to January 1, 0001
                 endDate: new Date() // Restrict dates to today and before
+            });
+            $('#establishmentDateInput').change(function () {
+                $(this).attr('value', $('#establishmentDateInput').val());
             });
 
         });
