@@ -1,6 +1,7 @@
 ﻿using CatGarden.Data;
 using CatGarden.Data.Models;
 using CatGarden.Services.Data.Interfaces;
+using CatGarden.Web.ViewModels.User;
 using Microsoft.EntityFrameworkCore;
 
 namespace CatGarden.Services.Data
@@ -13,6 +14,36 @@ namespace CatGarden.Services.Data
         {
             this.dbContext = dbContext;
         }
+
+        public async Task<IEnumerable<UserViewModel>> AllAsync()
+        {
+            List<UserViewModel> allUsers = await this.dbContext
+                .Users
+                .Select(u => new UserViewModel()
+                {
+                    Id = u.Id.ToString(),
+                    Email = u.Email,
+                    FullName = u.FirstName + " " + u.LastName
+                })
+                .ToListAsync();
+            foreach (UserViewModel user in allUsers)
+            {
+                CatteryOwner? catteryOwner = this.dbContext
+                    .CatteryOwners
+                    .FirstOrDefault(a => a.UserId.ToString() == user.Id);
+                if (catteryOwner != null)
+                {
+                    user.PhoneNumber = catteryOwner.PhoneNumber;
+                }
+                else
+                {
+                    user.PhoneNumber = string.Empty;
+                }
+            }
+
+            return allUsers;
+        }
+
         public async Task<string> GetFullNameByEmailAsync(string email)
         {
             ApplicationUser? user = await this.dbContext

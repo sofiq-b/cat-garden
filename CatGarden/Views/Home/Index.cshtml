@@ -43,7 +43,7 @@
                         <img class="d-block mx-auto" style="max-height: 400px; max-width: 100%; object-fit: contain;" src="@cat.CoverImageUrl" alt="@cat.Name">
                         <div class="carousel-caption d-none d-md-block">
                             <h5>
-                                <a class="btn btn-primary" asp-controller="Cat" asp-action="Details" asp-route-id="@cat.Id"> @cat.Name</a>
+                                <a class="btn btn-primary" asp-area="" asp-controller="Cat" asp-action="Details" asp-route-id="@cat.Id"> @cat.Name</a>
                             </h5>
                         </div>
                     </div>

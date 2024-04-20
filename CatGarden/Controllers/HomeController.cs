@@ -1,5 +1,5 @@
 ﻿using CatGarden.Services.Data.Interfaces;
-using CatGarden.Web.Infrastructure.Extensions;
+using static CatGarden.Common.GeneralApplicationConstants;
 using CatGarden.Web.ViewModels.Home;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,6 +18,11 @@ namespace CatGarden.Web.Controllers
 
         public async Task<IActionResult> Index()
         {
+            if (this.User.IsInRole(AdminRoleName))
+            {
+                return this.RedirectToAction("Index", "Home", new { Area = AdminAreaName });
+            }
+
             IEnumerable<IndexViewModel> viewModel = await this.catService.LastThreeCatsAsync();
 
             

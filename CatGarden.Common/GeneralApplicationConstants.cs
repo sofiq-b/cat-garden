@@ -13,5 +13,9 @@
 
         public const string AdminRoleName = "Administrator";
         public const string DevelopmentAdminEmail = "admin@catgarden.bg";
+        public const string AdminAreaName = "Admin";
+
+        public const string UsersCacheKey = "UsersCache";
+        public const int UsersCacheDurationMinutes = 5;
     }
 }

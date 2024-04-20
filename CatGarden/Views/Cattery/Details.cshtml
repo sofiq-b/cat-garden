@@ -66,7 +66,7 @@
     @if ((isCatteryOwner && catteryIsOwnedByUser) || User.IsAdmin())
     {
         <div class="edbuttons" style="display: flex;">
-            <a asp-controller="Cattery" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning mb-2 w-100 p-3 fw-bold">Edit</a>
+            <a asp-area="" asp-controller="Cattery" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning mb-2 w-100 p-3 fw-bold">Edit</a>
             <button id="deleteButton" class="btn btn-danger mb-2 w-100 p-3 fw-bold" style="margin-left: 1em;" data-cattery-id="@Model.Id">Delete</button>
         </div>
     }
@@ -91,7 +91,7 @@
                     </div>
 
                     <!-- Details button -->
-                    <a asp-controller="Cat" asp-action="Details" asp-route-id="@cat.Id" class="btn btn-success mb-2 w-100 p-3 fw-bold">Details</a>
+                    <a asp-area="" asp-controller="Cat" asp-action="Details" asp-route-id="@cat.Id" class="btn btn-success mb-2 w-100 p-3 fw-bold">Details</a>
 
                     <!-- Delete button -->
                     @if ((isCatteryOwner && await CatService.IsCatPartOfOwnedCattery(cat.Id, User.GetId()!)) || User.IsAdmin())
@@ -119,15 +119,15 @@
                     @if ((User.GetId() == review.UserId) || User.IsAdmin())
                     {
                         <div>
-                            <a asp-controller="Review" asp-action="Edit" asp-route-id="@review.Id" class="btn btn-primary">Edit</a>
-                            <a asp-controller="Review" asp-action="Delete" asp-route-id="@review.Id" class="btn btn-danger">Delete</a>
+                            <a asp-area="" asp-controller="Review" asp-action="Edit" asp-route-id="@review.Id" class="btn btn-primary">Edit</a>
+                            <a asp-area="" asp-controller="Review" asp-action="Delete" asp-route-id="@review.Id" class="btn btn-danger">Delete</a>
                         </div>
                     }
                 </div>
             }
             @if ((!isCatteryOwner && !catteryIsOwnedByUser) || User.IsAdmin())
             {
-                <a asp-controller="Review" asp-action="Add" asp-route-id="@Model.Id" class="btn btn-primary">Add a Review</a>
+                <a asp-area="" asp-controller="Review" asp-action="Add" asp-route-id="@Model.Id" class="btn btn-primary">Add a Review</a>
             }
         </div>
     </div>
@@ -151,11 +151,11 @@
                                         <p class="card-text">Application Date: @application.ApplicationDate.ToShortDateString()</p>
                                         <p class="card-text">Status: @application.ApplicationStatus</p>
                                         <div>
-                                            <form asp-controller="AdoptionApplication" asp-action="Accept" asp-route-id="@application.Id" method="post">
+                                            <form asp-area="" asp-controller="AdoptionApplication" asp-action="Accept" asp-route-id="@application.Id" method="post">
                                                 <button type="submit" class="btn btn-success btn-sm float-right">Accept</button>
                                             </form>
 
-                                            <form asp-controller="AdoptionApplication" asp-action="Reject" asp-route-id="@application.Id" method="post">
+                                            <form asp-area="" asp-controller="AdoptionApplication" asp-action="Reject" asp-route-id="@application.Id" method="post">
                                                 <button type="submit" class="btn btn-danger btn-sm float-right">Reject</button>
                                             </form>
                                         </div>

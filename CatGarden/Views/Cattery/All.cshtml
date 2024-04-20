@@ -42,7 +42,7 @@
             </div>
 
             <!-- Details button -->
-            <a asp-controller="Cattery" asp-action="Details" asp-route-id="@cattery.Id" class="btn btn-success mb-2 w-100 p-3 fw-bold">Details</a>
+            <a asp-area="" asp-controller="Cattery" asp-action="Details" asp-route-id="@cattery.Id" class="btn btn-success mb-2 w-100 p-3 fw-bold">Details</a>
             @{
                 bool catteryIsOwnedByUser = await CatteryService.IsCatteryOwnedByUserAsync(User.GetId()!, cattery.Id);
             }

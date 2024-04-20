@@ -34,7 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Areas\Identity\Pages\Account\" />
+    <Folder Include="Areas\Admin\Models\" />
     <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
