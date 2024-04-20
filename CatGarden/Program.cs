@@ -29,7 +29,12 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 })
     .AddEntityFrameworkStores<CatGardenDbContext>();
 
-builder.Services.AddApplicationServices(typeof(ICatService)); 
+builder.Services.AddApplicationServices(typeof(ICatService));
+
+builder.Services.ConfigureApplicationCookie(cfg =>
+{
+    cfg.LoginPath = "/User/Login";
+});
 
 builder.Services.AddControllersWithViews();
 
